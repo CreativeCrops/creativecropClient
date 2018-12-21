@@ -1,0 +1,49 @@
+lyte-nav:not([lt-prop-alignment="vertical"]){
+	.lyteNavHorizontal();
+	padding: @padding;
+	border-radius: @borderRadius;
+}
+
+lyte-nav:not([lt-prop-alignment="vertical"]) lyte-nav-item {
+	.lyteNavHorizontalItem();
+	margin-right:@marginRight;
+	transition: @transition;
+}
+
+lyte-nav:not([lt-prop-alignment="vertical"]) lyte-nav-item:hover{
+	.lyteNavHorizontalItemHover();
+	transform: @transform;	
+}
+
+lyte-nav:not([lt-prop-alignment="vertical"]) .lyteNavActive{
+	.lyteNavActiveItemHorizontal();
+	border-radius: @borderRadius;
+}
+
+lyte-nav[lt-prop-alignment="vertical"] lyte-nav-item{
+	.lyteNavVerticalItem();
+	text-align: @textAlign;
+}
+
+lyte-nav[lt-prop-alignment="vertical"]{
+	.lyteNavVertical();
+	border-radius: @borderRadius;
+	padding: @padding;
+}
+
+lyte-nav[lt-prop-alignment="vertical"] lyte-nav-item{
+	.lyteNavVerticalItem();
+	margin: @margin;
+	transition: @transition;
+}
+
+lyte-nav[lt-prop-alignment="vertical"] lyte-nav-item:hover{
+	.lyteNavVerticalItemHover();
+	border-radius: @borderRadius;
+	transform: @transform;	
+}
+
+lyte-nav[lt-prop-alignment="vertical"] .lyteNavActive{
+	.lyteNavActiveItemVertical();
+	border-radius: @borderRadius;
+}

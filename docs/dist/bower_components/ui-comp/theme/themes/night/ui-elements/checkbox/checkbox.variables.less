@@ -1,0 +1,117 @@
+
+
+
+
+/* Common for all checkboxes */
+.lyteCheckBoxDisabled(){
+	@opacity: 0.5;
+}
+
+
+
+
+/* Primary Checkbox */
+
+.lytePrimaryCheckBox(){
+	@background: url(images/lyte_ui_sprite.svg) no-repeat scroll;
+	@margin: -0.125rem 0.3125rem 0 0;
+	@width: 14px;
+	@height: 14px;
+	@backgroundPosition-normal: -59px -1px;
+	@backgroundPosition-checked: -93px -1px !important;
+}
+
+
+
+
+/* Default Checkbox */
+
+.lyteDefaultCheckBox(){
+	@width: 14px;
+	@height: 14px;
+	@margin: -0.125rem 0.3125rem 0 0;
+	@background: url(images/lyte_ui_sprite.svg) no-repeat scroll;
+	@backgroundPosition-normal: -76px -1px;
+	@backgroundPosition-checked: -93px -1px !important;	
+}
+
+
+
+
+/* Check switch */
+
+.lyteCheckBoxSwitch(){
+	@verticalAlign: top;
+	@width: 2.1875rem;
+	@height: 1.25rem;
+	@borderRadius: 1.25rem;
+	@background: @lightGrey;	
+}
+
+
+
+
+/* switch button */
+
+.lyteCheckBoxSwitchButton(){
+	@width: 1rem;
+	@height: 1rem;
+	@background: @white;
+	@borderRadius: 1.25rem;
+	@left: 0.125rem;
+	@top: 0.125rem;
+	@transition: left 200ms ease;
+}
+
+
+
+
+/* switch button position after checked */
+
+.lyteCheckBoxSwitchChecked(){
+	@left: calc(1.1875rem - 0.125rem);
+}
+
+
+
+
+/* Slider button */
+
+.lyteCheckBoxSliderButton(){
+	@width: 1.40rem;
+	@height: 1.40rem;
+	@zIndex: 1;
+	@opacity: 1;
+	@backgroundColor: @white;
+	@boxShadow: none;
+	@borderRadius: 50%;
+	@left: 0px;
+	@transition: left 200ms ease;
+
+}
+
+
+
+
+/* Slider */
+
+.lyteCheckBoxSliderBar(){
+	@zIndex: 0;
+	@width: 3.5rem;
+	@height: 0.20rem;
+	@top: 0.60rem;
+	@left: 0px;
+	@backgroundColor: #908f8f;	
+}
+
+
+
+
+/* Slider button checked */
+
+.lyteCheckBoxSliderChecked(){
+	@left: 2.25rem;
+	@backgroundColor: #0095ff;	
+	@boxShadow: 0px 0px 1rem 0.4rem rgba(255, 255, 255, 0.5);
+}
+

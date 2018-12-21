@@ -1,0 +1,5218 @@
+/* UI Components' variables are prefixed with lyte except for global variables
+
+Eg: lyteDropdownPadding
+
+*/
+/* Import global variables */
+/* Default theme imported */
+/* COLORS */
+/* DARK COLORS FOR TEXTS */
+/* BASIC COLORS FOR COMPONENTS */
+/* FONT SIZES */
+/* COMPONENT SPECIFIC */
+/* Loading theme in configuration */
+/* global theme */
+/* Themes of components */
+/* COLORS */
+/* DARK COLORS FOR TEXTS */
+/* BASIC COLORS FOR COMPONENTS */
+/* FONT SIZES */
+/* COMPONENT SPECIFIC */
+/* Loading custom themes */
+body {
+  margin: 0px;
+  padding: 0px;
+}
+/* import theme overrides */
+body {
+  background: #1f1f1f;
+  font-weight: 700;
+  color: #fff;
+}
+a {
+  cursor: pointer;
+  font-weight: 400;
+  color: #888;
+}
+a:active {
+  color: #fff;
+}
+h1 {
+  font-size: 3rem;
+}
+h2 {
+  font-size: 2.5rem;
+}
+h3 {
+  font-size: 2rem;
+}
+h4 {
+  font-size: 1.5rem;
+}
+h5 {
+  font-size: 1rem;
+}
+/* import custom css */
+/* Import Component Variables */
+/* Default theme imported */
+/* LYTE-ACCORDION-HEADER */
+/* LYTE-ACCORDION-BODY */
+/* LYTE-ICON arrow */
+/* LYTE-ICON plus */
+/* Loading theme in configuration */
+/* LYTE-ACCORDION-HEADER */
+/* LYTE-ACCORDION-BODY */
+/* LYTE-ICON arrow */
+/* LYTE-ICON plus */
+/* Loading final tweaks to your variables */
+/* Make changes to override predefined styles */
+/* LYTE-ACCORDION TAG STYLES */
+lyte-accordion {
+  display: block;
+}
+/* LYTE-ACCORDION-HEADER TAG STYLES */
+lyte-accordion-header {
+  display: block;
+  padding: 1rem;
+  cursor: pointer;
+  background-color: transparent;
+  box-sizing: content-box;
+  color: #fff;
+  height: 2rem;
+}
+/* LYTE-ACCORDION-BODY TAG STYLES */
+lyte-accordion-body {
+  display: block;
+  padding: 1rem;
+  margin: 0px;
+  box-sizing: content-box;
+  overflow: hidden;
+  height: auto;
+  transition: height ease-out, padding-top ease-out, padding-bottom ease-out;
+}
+/* LYTE-ACCORDION-ITEM STYLES */
+lyte-accordion-item {
+  display: block;
+}
+/* LYTE-ICON arrow Styles */
+lyte-icon.lyteAccordionArrow {
+  background: url(images/lyte_ui_sprite.svg) no-repeat -45px -3px;
+  width: 11px;
+  height: 6px;
+  display: inline-block;
+  float: right;
+  margin: 0px 0px 0.3125rem 0px;
+  transition: 0.3s all ease;
+}
+.lyteAccordionActive lyte-icon.lyteAccordionArrow {
+  transform: rotate(180deg);
+}
+/* LYTE-PLUS arrow Styles */
+lyte-icon.lyteAccordionPlus {
+  background: url(images/lyte_ui_sprite.svg) no-repeat -30px -1px;
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  float: right;
+  margin: 0px 0px 0.3125rem 0px;
+}
+.lyteAccordionActive lyte-icon.lyteAccordionPlus {
+  background-position: -30px -165px;
+  height: 3px;
+  margin: 0px 0px 0.3125rem 0px;
+}
+/* import theme overrides - styles */
+lyte-accordion-header {
+  border: solid 0.125rem #fff;
+  border-radius: 0.25rem;
+}
+.lyteAccordionActive lyte-icon.arrow-down {
+  transform: rotate(180deg);
+}
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/accordion.less file
+ */
+/* Default theme imported */
+/* Alert Wrapper */
+/* CLOSE ICON */
+/* LYTE ALERT SHOW */
+/* ALERT POPUP CONTAINER */
+/* HEADER */
+/* CONTENT */
+/* FOOTER */
+/* PRIMARY MESSAGE */
+/* STATUS ICON */
+/* SUCCESS ICON */
+/* ERROR ICON */
+/* WARNING ICON */
+/* INFO ICON */
+/* CONFIRM ICON */
+/* FREEZE LAYER */
+/* WHITE FREEZE */
+/* BLACK FREEZE */
+/* ALL BUTTONS */
+/* Loading theme in configuration */
+/* Loading final tweaks to your variables */
+/* Make changes to override predefined styles */
+lyte-alert {
+  display: none;
+}
+/* Alert Wrapper */
+.alertWrapper {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10001;
+}
+/* CLOSE ICON */
+.alertPopup .lyte-svg {
+  background-image: url(../images/lyte_ui_sprite.svg);
+}
+.alertClose {
+  background-position: -14px -1px;
+  width: 12px;
+  height: 11px;
+  opacity: 0.5;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 30px;
+}
+.alertClose:hover {
+  opacity: 1;
+}
+/* LYTE ALERT SHOW */
+lyte-alert.show {
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+/* ALERT POPUP CONTAINER */
+.alertPopup {
+  background-color: #fff;
+  border: 1px solid #f7f7f7;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.4);
+  position: absolute;
+  z-index: 10001;
+  top: -100%;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  opacity: 1;
+  min-width: 500px;
+  max-width: 900px;
+  transition-property: top;
+  transition-timing-function: ease;
+  transition-duration: 0.8s;
+}
+lyte-alert.show .alertPopup {
+  opacity: 1;
+}
+/* HEADER */
+.alertHeader {
+  padding: 15px 30px;
+}
+.alertHeader {
+  background-color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+}
+/* CONTENT */
+.alertContent {
+  padding: 15px 30px;
+}
+.alertContentMiddle {
+  display: table-cell;
+  vertical-align: middle;
+}
+/* FOOTER */
+.alertFooter {
+  padding: 15px 30px;
+  text-align: right;
+}
+/* PRIMARY MESSAGE */
+.alertPrimaryMsg {
+  margin-bottom: 5px;
+  display: block;
+  font-weight: bold;
+}
+/* Secondary Message */
+.alertSecondaryMsg,
+.dBlock {
+  display: block;
+}
+/* STATUS ICON */
+.statusIcon {
+  background-image: url(../images/lyte_ui_sprite.svg);
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  margin-right: 15px;
+  display: inline-block;
+}
+/* SUCCESS ICON */
+.successAlertIcon {
+  background-position: -1px -18px;
+}
+/* ERROR ICON */
+.errorAlertIcon {
+  background-position: -34px -19px;
+}
+/* WARNING ICON */
+.warningAlertIcon {
+  background-position: -100px -19px;
+}
+/* INFO ICON */
+.infoAlertIcon {
+  background-position: -66px -19px;
+}
+/* CONFIRM ICON */
+.confirmAlertIcon {
+  background-position: -133px -23px;
+}
+/* ALERT FREEZE LAYER */
+.alertFreezeLayer {
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  height: auto;
+}
+/* WHITE FREEZE LAYER */
+.whiteFreeze {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+/* BLACK FREEZE LAYER */
+.blackFreeze {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+/* ALIGNMENT */
+.alertFooter.left {
+  text-align: left;
+}
+.alertFooter.center {
+  text-align: center;
+}
+.alertFooter.right {
+  text-align: right;
+}
+/* ALERT FOOTER BUTTONS */
+.alertFooter lyte-button {
+  margin-left: 7px;
+}
+.alertFooter lyte-button:first-child {
+  margin-left: 0px;
+}
+.clearFloat {
+  clear: both;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/alert.less file
+ */
+/* Default theme imported */
+/* STYLES COMMON TO ALL BUTTONS */
+/* DISABLED BUTTON */
+/* DEFAULT BUTTON */
+/* PRIMARY BUTTON */
+/* SECONDARY BUTTON */
+/* SUCCESS BUTTON */
+/* FAILURE BUTTON */
+/* BUTTON SIZES */
+/* Loading theme in configuration */
+/* STYLES COMMON TO ALL BUTTONS */
+/* DISABLED BUTTON */
+/* DEFAULT BUTTON */
+/* PRIMARY BUTTON */
+/* SUCCESS BUTTON */
+/* FAILURE BUTTON */
+/* Loading final tweaks to your variables */
+/* Make changes to override predefined styles */
+/* BUTTON STYLES */
+lyte-button {
+  display: inline-block;
+}
+lyte-button button {
+  display: inline-block;
+  border-radius: 0.25rem;
+  font-size: 0.909rem;
+  padding: 0.5rem 1rem;
+  box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  -webkit-font-smoothing: auto;
+  font-family: "ProximaNovaRegular", arial, sans-serif;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+lyte-button button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+/* DEFAULT BUTTON */
+lyte-button .lyteDefaultBtn {
+  background-color: transparent;
+  color: #fff;
+  border: solid 0.125rem #fff;
+}
+lyte-button .lyteDefaultBtn:hover {
+  border: solid 0.125rem #fff;
+  border-bottom: solid 0.125rem #fff;
+}
+/* PRIMARY BUTTON */
+lyte-button .lytePrimaryBtn {
+  background-color: #42a2eb;
+  color: #fff;
+  border: solid 0.125rem #42a2eb;
+}
+.lytePrimaryBtn:hover {
+  border: 0.125rem solid #42a2eb;
+  background-color: #42a2eb;
+  border-bottom: solid 0.125rem #42a2eb;
+}
+/* SECONDARY BUTTON */
+lyte-button .lyteSecondary {
+  background-color: #fd6611;
+  color: #fff;
+  border: solid 1px #fd6611;
+}
+lyte-button .lyteSecondary:hover {
+  background-color: #fe975d;
+  color: #fff;
+  border: solid 1px #fe975d;
+}
+/* SUCCESS BUTTON */
+lyte-button .lyteSuccess:not(.lyteDefaultBtn) {
+  border: 0.125rem solid #00E676;
+  background-color: #00E676;
+  color: #fff;
+}
+.lyteSuccess.lyteDefaultBtn {
+  color: #00E676;
+  border-color: #00E676;
+}
+.lyteSuccess:hover {
+  border: 0.125rem solid #00E676;
+  background-color: #00E676;
+  color: #fff;
+  border-bottom: solid 0.125rem #00E676;
+}
+.lyteSuccess.lyteDefaultBtn:hover {
+  background-color: #00E676 !important;
+  color: #fff !important;
+  border-bottom: solid 0.125rem #00E676;
+}
+/* FAILURE BUTTON */
+lyte-button .lyteFailure:not(.lyteDefaultBtn) {
+  border: 0.125rem solid #D50000;
+  background-color: #D50000;
+  color: #fff;
+}
+.lyteFailure.lyteDefaultBtn {
+  color: #f10202;
+  border-color: #D50000;
+}
+.lyteFailure:hover {
+  border: 0.125rem solid #f35652;
+  background-color: #f35652;
+  border-bottom: solid 0.125rem #B11814;
+}
+.lyteFailure.lyteDefaultBtn:hover {
+  border: 0.125rem solid #D50000 !important;
+  background-color: #D50000 !important;
+  color: #fff;
+  border-bottom: solid 0.125rem #B11814 !important;
+}
+/* BUTTON SIZES */
+.lyteLg {
+  padding: 0.625rem 1rem;
+  font-size: 1.125rem;
+  line-height: 1.3333333;
+}
+.lyteSm {
+  padding: 0.3125rem 0.625rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.lyteExsm {
+  padding: 0.0625rem 0.3125rem;
+  font-size: 0.685rem;
+  line-height: 1.5;
+}
+/* import theme overrides - styles */
+button.lyteDefaultBtn:active {
+  background: #fff;
+  color: #000;
+}
+button.lytePrimaryBtn:active {
+  background: #188be2;
+  border-color: #188be2;
+}
+lyte-button button {
+  font-weight: 700;
+}
+button.lyteSuccess:not(.lyteDefaultBtn):active {
+  background: #00b35c;
+  border-color: #00b35c;
+}
+button.lyteFailure:not(.lyteDefaultBtn):active {
+  background: #a20000;
+  border-color: #a20000;
+}
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/button.less file
+ */
+/* Default theme imported */
+/* Horizontal Nav */
+/* Horizontal Nav - lyte-nav-item */
+/* Active item */
+/* Vertical Nav */
+/* Vertical Nav - Scrollable div */
+/* Vertical Nav -  lyte-nav-item */
+/* arrow styles */
+/* Down Arrow */
+/* Up Arrow */
+/* Loading theme in configuration */
+/* Horizontal Nav */
+/* Horizontal Nav - lyte-nav-item */
+/* Active item */
+/* Vertical Nav */
+/* Vertical Nav - Scrollable div */
+/* Vertical Nav -  lyte-nav-item */
+/* arrow styles */
+/* Down Arrow */
+/* Up Arrow */
+/* Loading final tweaks to your variables */
+/* Make changes to override predefined styles */
+/* Horizontal Nav */
+lyte-nav:not([lt-prop-alignment="vertical"]) {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  background-color: #4e4646;
+  line-height: 2.429rem !important;
+}
+/* Horizontal Nav item */
+lyte-nav:not([lt-prop-alignment="vertical"]) lyte-nav-item {
+  display: inline-block;
+  padding: 0.375rem 0.75rem 0.4375rem;
+  font-size: 1rem;
+  font-family: "ProximaNovaLtSemibold", Arial, sans-serif;
+  color: #eee;
+  cursor: pointer;
+}
+/* Active Element */
+lyte-nav[lt-prop-alignment="vertical"] .lyteNavActive {
+  background-color: #231e1e;
+  color: #fff;
+}
+lyte-nav:not([lt-prop-alignment="vertical"]) .lyteNavActive {
+  background-color: #231e1e;
+  color: #fff;
+}
+/* Vertical Nav */
+lyte-nav[lt-prop-alignment="vertical"] {
+  display: block;
+  list-style-type: none;
+  background-color: #4e4646;
+  width: auto;
+  height: 12.5rem;
+  overflow: hidden;
+}
+/* Vertical Nav - Scrollable Nav Div */
+lyte-nav[lt-prop-alignment="vertical"] .lyteNavDiv {
+  height: calc(100% - 2.5rem);
+  position: relative;
+}
+/* vertical nav item */
+lyte-nav[lt-prop-alignment="vertical"] lyte-nav-item {
+  padding: 0.75rem 0.1rem;
+  width: 100%;
+  display: list-item;
+  box-sizing: content-box;
+  font-family: "ProximaNovaLtSemibold", Arial, sans-serif;
+  color: #eee;
+  cursor: pointer;
+}
+/* Nav Arrow */
+lyte-arrow {
+  width: 100%;
+  height: 1.25rem;
+  display: inline-block;
+  text-align: center;
+}
+/* Down Arrow */
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 0.3125rem solid transparent;
+  border-right: 0.3125rem solid transparent;
+  border-top: 0.3125rem solid #eee;
+  position: relative;
+  top: 0.625rem;
+  left: -0.1875rem;
+}
+/* Up Arrow */
+.arrow-up {
+  width: 0;
+  height: 0;
+  position: relative;
+  top: -0.625rem;
+  left: -0.1875rem;
+  border-left: 0.3125rem solid transparent;
+  border-right: 0.3125rem solid transparent;
+  border-bottom: 0.3125rem solid #eee;
+}
+/* import theme overrides - styles */
+lyte-nav:not([lt-prop-alignment="vertical"]) {
+  padding: 0.5rem 0.5rem 0.5rem 2rem;
+  border-radius: 2rem;
+}
+lyte-nav:not([lt-prop-alignment="vertical"]) lyte-nav-item {
+  margin-right: 0.3rem;
+  transition: all 0.2s ease-in-out;
+}
+lyte-nav:not([lt-prop-alignment="vertical"]) lyte-nav-item:hover {
+  transform: scale(1.15);
+}
+lyte-nav:not([lt-prop-alignment="vertical"]) .lyteNavActive {
+  border-radius: 0.25rem;
+}
+lyte-nav[lt-prop-alignment="vertical"] lyte-nav-item {
+  text-align: center;
+}
+lyte-nav[lt-prop-alignment="vertical"] {
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+}
+lyte-nav[lt-prop-alignment="vertical"] lyte-nav-item {
+  margin: 0.3rem 0rem;
+  transition: all 0.2s ease-in-out;
+}
+lyte-nav[lt-prop-alignment="vertical"] lyte-nav-item:hover {
+  border-radius: 0.25rem;
+  transform: scale(1.3);
+}
+lyte-nav[lt-prop-alignment="vertical"] .lyteNavActive {
+  border-radius: 0.25rem;
+}
+/* import custom css */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/nav.less file
+ */
+/* Default theme imported */
+/* Common for all checkboxes */
+/* Primary Checkbox */
+/* Default Checkbox */
+/* Check switch */
+/* switch button */
+/* switch button position after checked */
+/* Slider */
+/* Slider button */
+/* Slider */
+/* Slider button checked */
+/* Loading theme in configuration */
+/* Common for all checkboxes */
+/* Primary Checkbox */
+/* Default Checkbox */
+/* Check switch */
+/* switch button */
+/* switch button position after checked */
+/* Slider button */
+/* Slider */
+/* Slider button checked */
+/* Loading final tweaks to your variables */
+/* Basic styles common for all checkboxes */
+.lyteCheckbox input {
+  position: absolute;
+  visibility: hidden;
+  z-index: -1;
+}
+.lyteHide {
+  display: none;
+}
+lyte-checkbox[lt-prop-disabled="true"] {
+  opacity: 0.5;
+}
+/* Primary and Default Checkboxes */
+.lyteCheckBoxPrimary:before {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  margin: -0.125rem 0.3125rem 0 0;
+  vertical-align: middle;
+  background: url(images/lyte_ui_sprite.svg) no-repeat scroll;
+  cursor: pointer;
+  content: "";
+}
+.lyteCheckBoxPrimary:before {
+  background-position: -59px -1px;
+}
+.lyteCheckbox input:checked + .lyteCheckBoxPrimary:before {
+  background-position: -93px -1px !important;
+}
+.lyteCheckBoxDefault:before {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  margin: -0.125rem 0.3125rem 0 0;
+  vertical-align: middle;
+  background: url(images/lyte_ui_sprite.svg) no-repeat scroll;
+  cursor: pointer;
+  content: "";
+}
+.lyteCheckBoxDefault:before {
+  background-position: -76px -1px;
+}
+.lyteCheckbox input:checked + .lyteCheckBoxDefault:before {
+  background-position: -93px -1px !important;
+}
+/* Switch Checkboxes */
+.lyteCheckSwitch {
+  cursor: pointer;
+  vertical-align: top;
+  width: 2.1875rem;
+  height: 1.25rem;
+  display: inline-block;
+  border-radius: 1.25rem;
+  position: relative;
+  background: #ddd;
+}
+.lyteCheckSwitch .on-btn {
+  width: 1rem;
+  height: 1rem;
+  background: #fff;
+  display: inline-block;
+  border-radius: 1.25rem;
+  position: absolute;
+  left: 0.125rem;
+  top: 0.125rem;
+  -webkit-transition: left 200ms ease;
+  -moz-transition: left 200ms ease;
+  -o-transition: left 200ms ease;
+  transition: left 200ms ease;
+}
+input[type="checkbox"].on-off-sw:checked + .lyteCheckSwitch .on-btn {
+  left: calc(1.1875rem - 0.125rem);
+}
+input[type="checkbox"].on-off-sw:checked + .lyteCheckSwitch {
+  background-color: #72c98a;
+}
+/* Sliders */
+.lyteCheckSlider {
+  position: relative;
+  display: inline-block;
+  height: 1.4rem;
+}
+.lyteCheckSliderText {
+  padding: 0 0 0 4.25rem;
+  vertical-align: middle;
+}
+.lyteCheckSliderLabel {
+  box-sizing: content-box;
+  cursor: pointer;
+  position: relative;
+}
+.lyteCheckSlider:before {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: inline-block;
+  z-index: 1;
+  opacity: 1;
+  position: absolute;
+  background-color: #fff;
+  box-shadow: none;
+  border-radius: 50%;
+  content: '';
+  left: 0px;
+  -webkit-transition: left 200ms ease;
+  -moz-transition: left 200ms ease;
+  -o-transition: left 200ms ease;
+  transition: left 200ms ease;
+}
+.lyteCheckSlider:after {
+  cursor: pointer;
+  position: absolute;
+  z-index: 0;
+  width: 3.5rem;
+  height: 0.2rem;
+  top: 0.6rem;
+  left: 0px;
+  display: inline-block;
+  content: '';
+  background-color: #908f8f;
+}
+input[type="checkbox"]:checked + .lyteCheckSlider:before {
+  left: 2.25rem;
+}
+input[type="checkbox"]:checked + .lyteCheckSlider:after {
+  background-color: #0095ff;
+}
+/* import theme overrides - styles */
+input[type="checkbox"]:checked + .lyteCheckSlider:before {
+  box-shadow: 0px 0px 1rem 0.4rem rgba(255, 255, 255, 0.5);
+}
+/* import custom css */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/checkbox.less file
+ */
+/* Default theme imported */
+/* Calendar Container */
+/* Calendar Navigation Panel */
+/* Button opacities */
+/* calendar header */
+/* dates container - where the dates and days are present */
+/* Individual Cell */
+/* More Day styles */
+/* Disabled dates */
+/* Calendar Selected */
+/* Calendar Date Hover */
+/* Today Style */
+/* Loading theme in configuration */
+/* Calendar Container */
+/* Calendar Navigation Panel */
+/* Button opacities */
+/* calendar header */
+/* dates container - where the dates and days are present */
+/* Individual Cell */
+/* More Day styles */
+/* Disabled dates */
+/* Calendar Selected */
+/* Calendar Date Hover */
+/* Loading final tweaks to your variables */
+/* Make changes to override predefined styles */
+/* Calendar Container */
+.lyteCalendarPopup {
+  background: #000;
+  z-index: 100;
+  padding: 1rem 1.25rem 1.25rem;
+  border: none !important;
+  box-shadow: 0 0.0625rem 1rem rgba(255, 255, 255, 0.5);
+  -webkit-box-shadow: 0 0.0625rem 1rem rgba(255, 255, 255, 0.5);
+  font-family: ProximaNovaRegular, arial, sans-serif;
+  font-size: 0.685rem;
+  display: inline-block;
+}
+/* Navigation Panel */
+.lyteCalendarNavigator {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+/* Common for all navigation buttons */
+.lyteCalNav {
+  width: 20px;
+  height: 15px;
+  display: inline-block;
+  cursor: pointer;
+}
+/* Left month button */
+.lyteCaldLft {
+  right: 10px;
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -273px -1px;
+  opacity: 1;
+}
+/* Right month button */
+.lyteCaldRgt {
+  left: 10px;
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -298px -1px;
+  opacity: 1;
+}
+/* Left year button */
+.lyteCalyearNavLft {
+  right: 15px;
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -244px -1px;
+  opacity: 1;
+}
+/* Right year button */
+.lyteCalyearNavRgt {
+  left: 15px;
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -322px -1px;
+  opacity: 1;
+}
+.lyteCalyearNavLft:hover,
+.lyteCalyearNavRgt:hover,
+.lyteCaldRgt:hover,
+.lyteCaldLft:hover {
+  opacity: 1;
+}
+/* Calendar Header */
+.lyteCalsCalMon {
+  cursor: default;
+  width: 9rem;
+  display: inline-block;
+  color: #fff;
+  font-size: 0.8125rem;
+  vertical-align: middle;
+}
+/* Table Layout using divs */
+.lyteCalTableRow {
+  display: table-row;
+}
+.lyteCalTableRowHeader {
+  display: table-row;
+}
+/* Date container - all days and dates */
+.lyteCalTableContainerHeader {
+  color: #555;
+  border-spacing: 0.75rem;
+  width: 100%;
+  display: table;
+}
+.lyteCalTableContainer {
+  color: #fff;
+  border-spacing: 0.75rem;
+  width: 100%;
+  display: table;
+}
+/* Individual cell */
+.lyteCalTableCellHeader {
+  font-size: 0.75rem;
+  cursor: default;
+  border-radius: 0.1875rem;
+  text-align: center;
+  padding: 0.1875rem 0.3125rem;
+  font-family: ProximaNovaLight, arial, sans-serif !important;
+  display: table-cell;
+}
+.lyteCalTableCell {
+  font-size: 0.75rem;
+  cursor: default;
+  border-radius: 50%;
+  text-align: center;
+  padding: 0.5rem 0.1875rem;
+  font-family: ProximaNovaLight, arial, sans-serif !important;
+  display: table-cell;
+}
+/* More Day Styles */
+.lyteCalTableCellHeader {
+  color: #fff;
+  padding: 0;
+  width: 2rem;
+}
+.lyteCalGray {
+  color: #8c8989;
+}
+/* calendar selected */
+.lyteCalSel {
+  box-shadow: 0 0 0 1px #cbcbcb;
+}
+.lyteCalToday {
+  color: #fff;
+  background: #b3b3b3;
+  border-radius: 3px;
+}
+.lyteCalSel:hover {
+  color: #fff;
+  background: #b3b3b3;
+  border-radius: 0.1875rem;
+}
+/* Calendar Hover */
+.lyteCalTableCell:hover:not(.lyteCalSel) {
+  background: #b3b3b3;
+}
+.lyteCalTableCell {
+  cursor: pointer;
+}
+/* Today Style */
+.lyteCalBtns .lyteCalCurrentDate {
+  float: left;
+}
+.lyteCalBtns .lyteCalCurrentDate a {
+  cursor: pointer;
+}
+/* import theme overrides - styles */
+table.lyteCalDay td {
+  border: solid 0.0625rem #fff;
+}
+td.lyteCalGray {
+  border: none !important;
+}
+.lyteCalendarPopup {
+  border-radius: 1rem;
+}
+.lyteCaldLft {
+  margin: 1px;
+  right: 0px;
+  border: solid #fff;
+  width: 5px;
+  height: 5px;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 1px;
+  background: none;
+  opacity: 1;
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+}
+/* Right month button */
+.lyteCaldRgt {
+  margin: 1px;
+  left: 0px;
+  border: solid #fff;
+  width: 5px;
+  height: 5px;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 1px;
+  background: none;
+  opacity: 1;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+/* Left year button */
+.lyteCalyearNavLft {
+  margin: 1px 5px;
+  right: 0px;
+  border: solid #fff;
+  width: 5px;
+  height: 5px;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 1px;
+  background: none;
+  opacity: 1;
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+}
+/* Right year button */
+.lyteCalyearNavRgt {
+  margin: 1px 5px;
+  left: 0px;
+  border: solid #fff;
+  width: 5px;
+  height: 5px;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 1px;
+  background: none;
+  opacity: 1;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+/* import custom css */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/calendar.less file
+ */
+/* Default theme imported */
+/* Disabled radiobuttons */
+/* Basic radiobuttons */
+/* radio check for all basic types */
+/* Background color for default */
+/* Background color for primary */
+/* Background color for black */
+/* After radiobutton is checked */
+/* Label styles for basic radiobutton */
+/* Switch radiobuttons */
+/* switch */
+/* switch button */
+/* radio button gets checked so set left of the button */
+/* Sliders */
+/* Slider button CSS */
+/* Slider */
+/* slider checked */
+/* Loading theme in configuration */
+/* Disabled radiobuttons */
+/* Basic radiobuttons */
+/* radio check for all basic types */
+/* Background color for default */
+/* Background color for primary */
+/* Background color for black */
+/* After radiobutton is checked */
+/* Label styles for basic radiobutton */
+/* Switch radiobuttons */
+/* switch */
+/* switch button */
+/* radio button gets checked so set left of the button */
+/* Sliders */
+/* Slider button CSS */
+/* Slider */
+/* slider checked */
+/* Loading custom themes */
+/* Make changes to override predefined styles */
+/* CSS Common for all radiobuttons */
+lyte-radiobutton {
+  display: inline-block;
+}
+lyte-radiobutton label {
+  cursor: pointer;
+}
+.lyteHide {
+  display: none;
+}
+/* disabled radiobutton */
+lyte-radiobutton[lt-prop-disabled="true"] {
+  opacity: 0.5;
+}
+/* Basic Radiobuttons */
+/* For all basic types */
+.lyteDefault .lyteRadioLayer {
+  background: #000;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  width: 0.8125rem;
+  height: 0.8125rem;
+  border: 1px solid #fff;
+  box-sizing: border-box;
+  border-radius: 50%;
+}
+.lytePrimary .lyteRadioLayer {
+  background: #000;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  width: 0.8125rem;
+  height: 0.8125rem;
+  border: 1px solid #42a2eb;
+  box-sizing: border-box;
+  border-radius: 50%;
+}
+.lyteBlack .lyteRadioLayer {
+  background: #000;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  width: 0.8125rem;
+  height: 0.8125rem;
+  border: 1px solid #04d8c2;
+  box-sizing: border-box;
+  border-radius: 50%;
+}
+/* radio check for all basic types */
+.lyteRadioBtn .lyteRadioLayer .lyteRadioCheck,
+.lyteRadioBtn .lyteRadioLayer:after {
+  content: '';
+  transition: 0.15s all ease-In-Out;
+  -webkit-transition: 0.15s all ease-In-Out;
+  border-radius: 50%;
+  width: 0.4325rem;
+  height: 0.4325rem;
+  border: 0;
+  transform: scale(0);
+  -webkit-transform: scale(0);
+  -moz-transform: scale(0);
+  -ms-transform: scale(0);
+  top: 2px;
+  left: 2px;
+  transform-origin: center;
+  -webkit-transform-origin: center;
+  -moz-transform-origin: center;
+  -ms-transform-origin: center;
+  position: absolute;
+}
+/* Background color for default */
+.lyteDefault.lyteRadioBtn .lyteRadioLayer .lyteRadioCheck {
+  background: #fff;
+}
+/* Background color for primary */
+.lytePrimary.lyteRadioBtn .lyteRadioLayer .lyteRadioCheck {
+  background: #42a2eb;
+}
+/* Background color for black */
+.lyteBlack.lyteRadioBtn .lyteRadioLayer .lyteRadioCheck {
+  background: #04d8c2;
+}
+/* After radiobutton is checked */
+.lyteRadioBtn input[type="radio"]:checked + .lyteRadioLayer .lyteRadioCheck {
+  transform: scale(1);
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -ms-transform: scale(1);
+}
+/* Label Styles of basic radiobutton */
+.lyteRadioBtn .lyteRadioLabel {
+  font-size: 1rem !important;
+  margin: 0 0.3125rem 0 0;
+  vertical-align: top;
+  display: inline-block;
+}
+/* Switches */
+/* radio switch */
+.lyteRadioSwitch {
+  vertical-align: top;
+  width: 2.1875rem;
+  height: 1.25rem;
+  display: inline-block;
+  border-radius: 1.25rem;
+  position: relative;
+  background: #ddd;
+}
+/* radio switch button */
+.lyteRadioSwitch .on-btn {
+  width: 1rem;
+  height: 1rem;
+  background: #fff;
+  display: inline-block;
+  border-radius: 1.25rem;
+  position: absolute;
+  left: 0.125rem;
+  top: 0.125rem;
+  -webkit-transition: left 200ms ease;
+  -moz-transition: left 200ms ease;
+  -o-transition: left 200ms ease;
+  transition: left 200ms ease;
+}
+/* radio button is checked so set left */
+input[type="radio"].on-off-sw:checked + .lyteRadioSwitch .on-btn {
+  left: calc(1.1875rem - 0.125rem);
+}
+/* Sliders */
+.lyteRadioSlider {
+  position: relative;
+  display: inline-block;
+  height: 1.4rem;
+}
+.lyteRadioSliderText {
+  padding: 0 0 0 4.25rem;
+  vertical-align: middle;
+}
+.lyteRadioSliderLabel {
+  box-sizing: border-box;
+  cursor: pointer;
+  position: relative;
+}
+.lyteRadioSlider:before {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: inline-block;
+  z-index: 1;
+  opacity: 1;
+  position: absolute;
+  background-color: #fff;
+  box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15), 0 0 0 1px rgba(34, 36, 38, 0.15) inset;
+  border-radius: 50%;
+  content: '';
+  left: 0px;
+  -webkit-transition: left 200ms ease;
+  -moz-transition: left 200ms ease;
+  -o-transition: left 200ms ease;
+  transition: left 200ms ease;
+}
+.lyteRadioSlider:after {
+  cursor: pointer;
+  position: absolute;
+  z-index: 0;
+  width: 3.5rem;
+  height: 0.2rem;
+  top: 0.6rem;
+  left: 0px;
+  display: inline-block;
+  content: '';
+  background-color: #BDBDBD;
+}
+input[type="radio"]:checked + .lyteRadioSlider:before {
+  left: 2.25rem;
+}
+input[type="radio"]:checked + .lyteRadioSlider:after {
+  background-color: #000;
+}
+/* import theme overrides - styles s*/
+/* import custom css */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/radiobutton.less file
+ */
+/* Default theme imported */
+/* DROP LABEL STYLES */
+/* MULTISELECT WIDTH */
+/* DROP BODY */
+/* DROP BOX STYLES */
+/* lyte dropdown down icon */
+/* DROP ICON */
+/* LYTE DROP ITEM */
+/* DROP ITEM HOVER */
+/* DROP BUTTON NORMAL */
+/* DROP BUTTON FOCUS */
+/* MULTI SELECT DROP BUTTON */
+/* INDIVIDUAL ITEMS OF MULTISELECT */
+/* MULTI SELECT INPUT */
+/* TEXT LABEL */
+/* DISABLED DROPDOWN OPACITY */
+/* DROPDOWN ITEM SELECTED */
+/* LYTE ARROW ICON */
+/* TOP ARROW */
+/* BOTTOM ARROW */
+/* RIGHT ARROW */
+/* LEFT ARROW */
+/* Z INDEX */
+/* Loading theme in configuration */
+/* DROP LABEL STYLES */
+/* MULTISELECT WIDTH */
+/* DROP BODY */
+/* DROP BOX STYLES */
+/* DROP ICON */
+/* LYTE DROP ITEM */
+/* DROP ITEM HOVER */
+/* DROP BUTTON NORMAL */
+/* DROP BUTTON FOCUS */
+/* MULTI SELECT DROP BUTTON */
+/* INDIVIDUAL ITEMS OF MULTISELECT */
+/* MULTI SELECT INPUT */
+/* TEXT LABEL */
+/* DISABLED DROPDOWN OPACITY */
+/* DROPDOWN ITEM SELECTED */
+/* LYTE ARROW ICON */
+/* TOP ARROW */
+/* BOTTOM ARROW */
+/* RIGHT ARROW */
+/* LEFT ARROW */
+/* Loading final tweaks to your variables */
+/* Common for all dropdowns */
+lyte-dropdown {
+  display: inline-block;
+  width: auto;
+}
+lyte-drop-button {
+  display: inline-block;
+}
+lyte-drop-footer {
+  display: block;
+}
+lyte-drop-header {
+  display: block;
+}
+.lyteDummyEventContainer {
+  outline: none;
+}
+.lyteDropdownActive {
+  display: none!important;
+}
+.lyteDropdownFiltered {
+  display: none!important;
+}
+.lyteDropdownHidden {
+  display: none!important;
+}
+.lyte-dropdown-filtered {
+  display: none!important;
+}
+/* DROP LABEL STYLES */
+lyte-drop-label {
+  display: block;
+  height: auto;
+  padding: 0.45rem 1.1rem;
+  font-weight: 700;
+  font-size: 0.855rem;
+  text-align: center;
+}
+/* MULTISELECT DROPDOWN */
+lyte-dropdown[lt-prop-type="multiple"]:not([lt-prop-yield="true"]) {
+  width: 100%;
+}
+/* DROP BODY STYLES */
+lyte-drop-body {
+  display: block;
+  max-height: 12.5rem;
+  overflow-y: auto;
+  position: relative;
+}
+/* LYTE DROP BOX STYLES */
+lyte-drop-box {
+  background-color: #000;
+  box-sizing: content-box;
+  margin: 0;
+  vertical-align: middle;
+  border: 0.125rem solid #fff !important;
+  box-shadow: 0rem 0.125rem 0.3125rem rgba(0, 0, 0, 0.2);
+  width: auto;
+  min-width: 300px;
+  top: 1.6875rem;
+  left: 0;
+  z-index: 10002;
+  position: absolute;
+}
+/* LYTE DROPDOWN DOWN ARROW */
+.lyteMarginRight {
+  margin-right: 1.25rem;
+}
+/* LYTE DROP ITEM */
+lyte-drop-item {
+  position: relative;
+  cursor: pointer;
+  display: block;
+  border: none;
+  height: auto;
+  text-align: auto;
+  border-top: none;
+  line-height: 0.9rem;
+  color: #fff;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.855rem;
+  text-transform: none;
+  font-weight: 700;
+  box-shadow: none;
+  -webkit-touch-callout: none;
+}
+lyte-drop-item:hover {
+  background-color: none;
+}
+/* drop button for normal dropdowns */
+lyte-dropdown:not([lt-prop-type="multiple"]):not([lt-prop-type="multisearch"]) lyte-drop-button {
+  position: relative;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  padding: 0.3125rem 0.625rem;
+  border: 0.125rem solid #ddd;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.855rem;
+  box-sizing: content-box;
+}
+/* DROP BUTTON FOCUS */
+lyte-dropdown:not([lt-prop-type="multiple"]) lyte-drop-button::focus {
+  border-color: #2185d0;
+  outline: none;
+}
+/* DROP BUTTON FOR MULTI SELECT */
+lyte-dropdown[lt-prop-type="multiple"] lyte-drop-button {
+  border: 1px solid #ddd;
+  min-width: 100%;
+  padding: 0.4375rem 0.625rem 0.4375rem 0.3125rem;
+  box-sizing: content-box;
+  min-height: 2.5rem;
+}
+lyte-drop-button input {
+  border: none;
+  background-color: transparent;
+  font-size: 0.855rem;
+  color: #333;
+  padding: 0.5rem 0.625rem;
+  box-sizing: content-box;
+}
+lyte-drop-button input:focus {
+  outline: none;
+}
+/* MUTLI SELECT DROPBUTTON SELECTED VALUES */
+.lyteMultiselect {
+  border-bottom: 1px solid #ddd;
+  display: inline-block;
+}
+.lyteMultipleSelect {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: inline-block;
+}
+.lyteMultipleSelect li {
+  display: inline-block;
+  padding: 0.125rem 1.125rem 0.125rem 0.4375rem !important;
+  background-color: #dedede;
+  color: #333;
+  font-size: 0.855rem;
+  position: relative;
+  border-radius: 3px;
+  margin: 0.125rem 0.625rem 0.125rem 0;
+}
+/* DROPDOWN DOWN ARROW ICON */
+lyte-icon.dropdown {
+  background: none;
+  width: 5px;
+  height: 5px;
+  display: inline-block;
+  opacity: 1;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: rotate(45deg) translateY(-50%) translateX(-50%);
+}
+/* BODY WRAPPER TO PREVENT SCROLL */
+.bodyWrapper {
+  overflow: hidden;
+  position: absolute;
+  z-index: 9999;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+/* DROPDOW TEXT LABEL */
+.lyteDropdownText {
+  margin: 0 1.25rem 0 0;
+  display: inline-block;
+}
+/* DISABLED DROPDOWN */
+.lyteDropdown-disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.5;
+}
+/* DROPDOWN ITEM SELECTED AND NAVIGATED */
+.lyteDropdownSelection {
+  background-color: none;
+  position: relative;
+}
+/* DROPDOWN ARROW */
+.lyteArrowIcon {
+  width: 0;
+  height: 0;
+  border-bottom: 0.5rem solid #fff;
+  position: absolute;
+}
+/*Arrow Top*/
+.lyteArrowTop {
+  top: 0px;
+}
+.lyteArrowTop:after,
+.lyteArrowTop:before {
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteArrowTop:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-bottom-color: #fff;
+  border-width: 0.5rem;
+  margin-left: -0.5rem;
+}
+.lyteArrowTop:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-bottom-color: #ddd;
+  border-width: 0.5625rem;
+  margin-left: -0.5625rem;
+}
+/*Arrow bottom*/
+.lyteArrowBottom {
+  bottom: -0.5rem;
+}
+.lyteArrowBottom:after,
+.lyteArrowBottom:before {
+  top: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteArrowBottom:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-top-color: #fff;
+  border-width: 0.5rem;
+  margin-left: -0.5rem;
+}
+.lyteArrowBottom:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-top-color: #ddd;
+  border-width: 0.5625rem;
+  margin-left: -0.5625rem;
+}
+/*Arrow Right*/
+.lyteArrowRight {
+  right: 0px;
+}
+.lyteArrowRight:after,
+.lyteArrowRight:before {
+  left: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteArrowRight:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-left-color: #fff;
+  border-width: 0.5rem;
+  margin-top: -0.5rem;
+}
+.lyteArrowRight:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-left-color: #ddd;
+  border-width: 0.5625rem;
+  margin-top: -0.5625rem;
+}
+/*Arrow Left*/
+.lyteArrowLeft:not(.lyteScaleOption) {
+  left: 0px;
+}
+.lyteArrowLeft:not(.lyteScaleOption):after,
+.lyteArrowLeft:not(.lyteScaleOption):before {
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteArrowLeft:not(.lyteScaleOption):after {
+  border-color: rgba(255, 255, 255, 0);
+  border-right-color: #fff;
+  border-width: 0.5rem;
+  margin-top: -0.5rem;
+}
+.lyteArrowLeft:not(.lyteScaleOption):before {
+  border-color: rgba(221, 221, 221, 0);
+  border-right-color: #ddd;
+  border-width: 0.5625rem;
+  margin-top: -0.5625rem;
+}
+/* CLOSE BUTTON */
+.lyteCloseIcon {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -125px -4px;
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  position: absolute;
+  right: 4px;
+  top: 6px;
+  opacity: 0.8;
+  cursor: pointer;
+}
+/* Z INDEX */
+.lyteDropdownZIndex {
+  z-index: 10000;
+}
+/* import theme overrides - styles */
+lyte-drop-box {
+  border-radius: 0.25rem;
+  min-width: 300px;
+}
+lyte-dropdown:not([lt-prop-type="multiple"]):not([lt-prop-type="multisearch"]) lyte-drop-button {
+  border-radius: 0.25rem;
+}
+lyte-drop-item {
+  transition: padding-left 0.3s ease;
+}
+lyte-drop-item:hover {
+  padding-left: 60px;
+}
+.lyteDropdownSelection {
+  padding-left: 60px;
+}
+lyte-icon.dropdown {
+  margin: 1px;
+  border: solid #fff;
+  width: 5px;
+  height: 5px;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 1px;
+  background: none;
+  opacity: 1;
+  transform: rotate(45deg) translateY(-50%) translateX(-50%);
+  -webkit-transform: rotate(45deg) translateY(-50%) translateX(-50%);
+}
+/* import custom css */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/dropdown.less file
+ */
+/* Default theme imported */
+/* autocomplete style */
+/* lyte-autocomplete-description */
+/* .lyteautocompleteHighlight */
+/* div.lyteautocompleteError */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* Autocomplete styles */
+lyte-autocomplete-description {
+  opacity: 0.4;
+}
+.lyteautocompleteHighlight {
+  background: yellow;
+}
+lyte-autocomplete div.lyteDummyEventContainer {
+  outline: none;
+  width: 100%;
+  display: block !important;
+}
+lyte-autocomplete lyte-drop-button {
+  border: 0px !important;
+  padding: 0px !important;
+}
+lyte-autocomplete lyte-dropdown {
+  width: 100%;
+}
+div.lyteautocompleteError {
+  display: none;
+  padding: 10px 20px;
+}
+lyte-autocomplete {
+  display: inline-block;
+}
+.lyteSearchHidden {
+  display: none !important;
+}
+lyte-drop-item div.lyteAutoComplete {
+  display: inline-block !important;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/autocomplete.less file
+ */
+/* Default theme imported */
+/* Breadcrumb styles */
+/* lyte-breadcrumb-structure */
+/* lyte-breadcrumb-item */
+/* 
+.lyteBreadcrumbSlash lyte-breadcrumb-item:not(:last-of-type), .lyteBreadcrumbArrow lyte-breadcrumb-item:not(:last-of-type) */
+/* lyte-breadcrumb-item.lyteActive */
+/* .lyteBreadcrumbSlash lyte-breadcrumb-item:not(:last-of-type):after */
+/* .lyteBreadcrumbArrow lyte-breadcrumb-item:not(:last-of-type):after */
+/* .lyteBreadcrumbBullet:before */
+/* .lyteBreadcrumbBullet .lyteCompleted lyte-breadcrumb-head*/
+/* .lyteBreadcrumbBullet .lyteCompleted:not(:first-child):before  */
+/* .lyteBreadcrumbBullet lyte-breadcrumb-head */
+/* .lyteBreadcrumbBullet lyte-breadcrumb-item */
+/* .lyteBreadcrumbBullet lyte-breadcrumb-body */
+/* .lyteBreadcrumbBullet lyte-breadcrumb-item:not(:first-child) */
+/* .lyteBreadcrumbPlain lyte-breadcrumb-item, .lyteBreadcrumbFlat lyte-breadcrumb-item  */
+/* .lyteBreadcrumbPlain lyte-breadcrumb-body, .lyteBreadcrumbFlat lyte-breadcrumb-body */
+/* .lyteBreadcrumbPlain lyte-breadcrumb-body:after,.lyteBreadcrumbFlat lyte-breadcrumb-body:after */
+/* .lyteBreadcrumbPlain lyte-breadcrumb-body:before, .lyteBreadcrumbFlat lyte-breadcrumb-body:before  */
+/* .lyteBreadcrumbFlat .lyteActive lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteActive lyte-breadcrumb-body */
+/* .lyteBreadcrumbFlat .lyteActive lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteActive lyte-breadcrumb-body:after */
+/* .lyteBreadcrumbFlat .lyteWarning lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteWarning lyte-breadcrumb-body */
+/* .lyteBreadcrumbFlat .lyteWarning lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteWarning lyte-breadcrumb-body:after */
+/* .lyteBreadcrumbFlat .lyteCompleted lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteCompleted lyte-breadcrumb-body*/
+/* .lyteBreadcrumbFlat .lyteCompleted lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteCompleted lyte-breadcrumb-body:after */
+/* .lyteBreadcrumbPlain lyte-breadcrumb-item:first-child lyte-breadcrumb-body:before */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* Breadcrumb styles */
+lyte-breadcrumb-structure {
+  line-height: 1;
+  margin: 0 0;
+  vertical-align: middle;
+  display: inline-block;
+}
+lyte-breadcrumb-item {
+  float: left;
+  margin-right: 10px;
+  padding: 0;
+  font-size: 0.875em;
+  position: relative;
+}
+.lyteBreadcrumbSlash lyte-breadcrumb-item:not(:last-of-type),
+.lyteBreadcrumbArrow lyte-breadcrumb-item:not(:last-of-type) {
+  margin-right: 20px;
+}
+lyte-breadcrumb-item.lyteActive {
+  color: #2C7BD0;
+}
+.lyteBreadcrumbSlash lyte-breadcrumb-item:not(:last-of-type):after {
+  content: '/';
+  position: absolute;
+  right: -12px;
+  top: 0;
+  color: #666;
+  opacity: 0.5;
+}
+.lyteBreadcrumbArrow lyte-breadcrumb-item:not(:last-of-type):after {
+  content: '';
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -191px -29px;
+  position: absolute;
+  right: -12px;
+  top: 3px;
+  color: #666;
+  width: 4px;
+  height: 7px;
+  opacity: 0.5;
+}
+/*Stage css*/
+.lyteBreadcrumbBullet,
+.lyteBreadcrumbPlain,
+.lyteBreadcrumbFlat {
+  position: relative;
+  white-space: nowrap;
+}
+.lyteBreadcrumbBullet:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 48%;
+  bottom: 38px;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  height: 1px;
+  background: #e3e3e3;
+}
+.lyteBreadcrumbBullet .lyteCompleted lyte-breadcrumb-head {
+  background: #2d7bd0 !important;
+  color: #fff;
+}
+.lyteBreadcrumbBullet .lyteCompleted:not(:first-child):before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 48%;
+  bottom: 38px;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  height: 1px;
+  background: #2d7bd0;
+}
+.lyteBreadcrumbBullet lyte-breadcrumb-head {
+  border: 1px solid #2d7bd0;
+  border-radius: 50%;
+  display: inline-block;
+  background: #fff;
+  position: relative;
+  text-align: center;
+  font-size: 0.7em;
+  box-sizing: border-box;
+  padding: 2px 5px;
+}
+.lyteBreadcrumbBullet lyte-breadcrumb-item {
+  margin-right: 0;
+}
+.lyteBreadcrumbBullet lyte-breadcrumb-body {
+  position: absolute;
+  top: -15px;
+  right: 0;
+  font-size: 0.75em;
+  color: #666;
+}
+.lyteBreadcrumbBullet lyte-breadcrumb-item:not(:first-child) {
+  padding-left: 60px;
+}
+.lyteBreadcrumbPlain lyte-breadcrumb-item,
+.lyteBreadcrumbFlat lyte-breadcrumb-item {
+  margin-right: 0px;
+}
+.lyteBreadcrumbPlain lyte-breadcrumb-body,
+.lyteBreadcrumbFlat lyte-breadcrumb-body {
+  display: block;
+  float: left;
+  background: #eaeaea;
+  text-align: center;
+  padding: 10px 20px 10px 30px;
+  position: relative;
+  margin: 0 2px 0 0;
+  font-size: 0.875em;
+  text-decoration: none;
+  color: #333;
+}
+.lyteBreadcrumbPlain lyte-breadcrumb-body:after,
+.lyteBreadcrumbFlat lyte-breadcrumb-body:after {
+  content: "";
+  border-top: 15px solid transparent;
+  border-bottom: 17px solid transparent;
+  border-left: 17px solid #eaeaea;
+  position: absolute;
+  right: -17px;
+  top: 0;
+  z-index: 1;
+}
+.lyteBreadcrumbPlain lyte-breadcrumb-body:before,
+.lyteBreadcrumbFlat lyte-breadcrumb-body:before {
+  content: "";
+  border-top: 15px solid transparent;
+  border-bottom: 17px solid transparent;
+  border-left: 17px solid #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+/*On progress css*/
+.lyteBreadcrumbFlat .lyteActive lyte-breadcrumb-body,
+.lyteBreadcrumbPlain .lyteActive lyte-breadcrumb-body {
+  background: #2d7bd0 !important;
+  color: #fff !important;
+}
+.lyteBreadcrumbFlat .lyteActive lyte-breadcrumb-body:after,
+.lyteBreadcrumbPlain .lyteActive lyte-breadcrumb-body:after {
+  border-left-color: #2d7bd0 !important;
+}
+/*Warning css*/
+.lyteBreadcrumbFlat .lyteWarning lyte-breadcrumb-body,
+.lyteBreadcrumbPlain .lyteWarning lyte-breadcrumb-body {
+  background: #ffb130 !important;
+  color: #fff !important;
+}
+.lyteBreadcrumbFlat .lyteWarning lyte-breadcrumb-body:after,
+.lyteBreadcrumbPlain .lyteWarning lyte-breadcrumb-body:after {
+  border-left-color: #ffb130 !important;
+}
+/*Completed css*/
+.lyteBreadcrumbFlat .lyteCompleted lyte-breadcrumb-body,
+.lyteBreadcrumbPlain .lyteCompleted lyte-breadcrumb-body {
+  background: #72c880 !important;
+  color: #fff !important;
+}
+.lyteBreadcrumbFlat .lyteCompleted lyte-breadcrumb-body:after,
+.lyteBreadcrumbPlain .lyteCompleted lyte-breadcrumb-body:after {
+  border-left-color: #72c880 !important;
+}
+.lyteBreadcrumbPlain lyte-breadcrumb-item:first-child lyte-breadcrumb-body:before {
+  border-left-color: transparent;
+}
+lyte-breadcrumb {
+  display: inline-block;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/breadcrumb.less file
+ */
+/* Default theme imported */
+/* lyte modal styles */
+/* .bodyWrapper */
+/* .modalWrapper */
+/* lyteModal */
+/* lyte-modal-header */
+/* lyte-modal-content */
+/* lyte-modal-footer */
+/* lyte-modal-freeze */
+/* lyteModalClose */
+/* .lyteModalClose:hover */
+/* lyte-modal-header.draggable */
+/* lyte-modal-footer.left */
+/* lyte-modal-footer.center */
+/* lyte-modal-footer.right */
+/* lyte-modal-footer lyte-button */
+/* lyte-modal-footer lyte-button:first-child */
+/* .lyteModalFromTop */
+/* .lyteModalFromBottom */
+/* .lyteModalFromLeft  */
+/* .lyteModalFromRight  */
+/* .lyteModalFadeIn */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* modal Styles */
+.bodyWrapper {
+  overflow: hidden;
+  position: absolute;
+  z-index: 9999;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.modalWrapper {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10001;
+}
+.lyteModal {
+  background-color: #fff;
+  border: 1px solid #f7f7f7;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.4);
+  position: absolute;
+  z-index: 10001;
+  opacity: 1;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+lyte-modal-header {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 10px 30px;
+  border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+}
+lyte-modal-content {
+  display: block;
+  padding: 20px 30px;
+  box-sizing: border-box;
+}
+lyte-modal-footer {
+  display: block;
+  padding: 10px 30px;
+  border-top: 1px solid rgba(34, 36, 38, 0.15);
+}
+.modalWrapper.scrollable {
+  overflow: hidden;
+}
+.modalWrapper.scrollable lyte-modal-content {
+  overflow: auto;
+}
+lyte-modal-freeze {
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  height: auto;
+  background: #000;
+  display: block;
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: ease;
+  transition-duration: 1s;
+}
+.lyteModalClose {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -14px -1px;
+  width: 12px;
+  height: 11px;
+  opacity: 0.5;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  z-index: 10001;
+}
+.lyteModalClose:hover {
+  opacity: 1;
+}
+lyte-modal-header.draggable {
+  cursor: move;
+}
+lyte-modal-footer.left {
+  text-align: left;
+}
+lyte-modal-footer.center {
+  text-align: center;
+}
+lyte-modal-footer.right {
+  text-align: right;
+}
+lyte-modal-footer lyte-button {
+  margin-left: 7px;
+}
+lyte-modal-footer lyte-button:first-child {
+  margin-left: 0px;
+}
+/*------- transition styles starts ------*/
+.lyteModalFromTop {
+  transition-property: top;
+  transition-timing-function: ease;
+}
+.lyteModalFromBottom {
+  transition-property: top;
+  transition-timing-function: ease;
+}
+.lyteModalFromLeft {
+  transition-property: left;
+  transition-timing-function: ease;
+}
+.lyteModalFromRight {
+  transition-property: left;
+  transition-timing-function: ease;
+}
+.lyteModalFadeIn {
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+/*------- transition styles starts ------*/
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/modal.less file
+ */
+/* Default theme imported */
+/* lyte gridstack */
+/* .lyteGridStackLeft */
+/* .lyteGridStackRight */
+/*.lyteGridStackBottom */
+/* .lyteGridStackBottomLeft */
+/* .lyteGridStackBottomRight */
+/*  div.lyteBestFit */
+/* .lyteGridstackHandler.selected.lyteSizeChange */
+/* .lyteGridstackHandler.items:not(.selected) */
+/* .lyteGridstackHandler.selected */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* Gridstack styles */
+.lyteGridStackLeft {
+  height: 100%;
+  width: 15px;
+  position: absolute !important;
+  left: 0px;
+  top: 0px;
+  bottom: 15px;
+  cursor: w-resize;
+  z-index: 20;
+}
+.lyteGridStackRight {
+  height: 100%;
+  width: 15px;
+  position: absolute !important;
+  right: 0px;
+  top: 0px;
+  bottom: 15px;
+  cursor: e-resize;
+  z-index: 20;
+}
+.lyteGridStackBottom {
+  height: 15px;
+  width: 100%;
+  position: absolute !important;
+  left: 0px;
+  bottom: 0px;
+  cursor: s-resize;
+  z-index: 18;
+}
+.lyteGridStackBottomLeft {
+  height: 15px;
+  width: 15px;
+  bottom: 0px;
+  left: 0px;
+  cursor: sw-resize;
+  position: absolute !important;
+  z-index: 20;
+}
+.lyteGridStackBottomRight {
+  height: 15px;
+  width: 15px;
+  bottom: 0px;
+  right: 0px;
+  cursor: se-resize;
+  position: absolute !important;
+  z-index: 20;
+}
+div.lyteBestFit {
+  border: black dotted;
+  z-index: 0;
+  position: absolute !important;
+  opacity: 0.4;
+}
+.lyteGridStackContent {
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  position: absolute !important;
+}
+lyte-gridstack {
+  display: block;
+  position: relative;
+}
+.lyteGridstackHandler.selected.lyteSizeChange {
+  transition: width 0s, height 0s;
+}
+.lyteGridstackScope {
+  overflow-anchor: none;
+  overflow: hidden !important;
+  outline: none;
+}
+.lyteGridstackHandler.items:not(.selected) {
+  position: absolute;
+  transition-duration: 0.4s;
+  overflow: auto;
+  -ms-overflow-style: none;
+  cursor: move;
+}
+.lyteGridstackHandler.selected {
+  opacity: 0.4;
+  z-index: 90;
+  position: absolute;
+  cursor: move;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/gridstack.less file
+ */
+/* Default theme imported */
+/* lyte input */
+/* lyte-input, .lyteInputBox, .lyteInputSearch */
+/* lyte-input */
+/* lyte-input.vertical */
+/* lyte-input.vertical > div  */
+/* lyte-input.vertical, .lyteInputBox.vertical */
+/* lyte-input.vertical > label , lyte-input.vertical > div,  .lyteInputBox.vertical > label, .lyteInputBox.vertical > div */
+/* .lyteInputBox > div:after, lyte-input > div:after */
+/* lyte-input > label, .lyteInputBox > label */
+/* lyte-input > div, .lyteInputBox > div */
+/* lyte-input > div.joinInput input */
+/* lyte-input > div */
+/* .lyteInputBox > div */
+/* .lyteInputBox > div.lyteInputBoxSearch */
+/* lyte-input > div input, .lyteInputBox > div input, lyte-input > div textarea, .lyteInputBox > div textarea */
+/* .lyteInputSearch, .lyteInputBoxSearch  */
+/* .lyteInputSearch */
+/* .lyteInputBoxSearch */
+/* lyte-input[lt-prop-type="search"] span.searchIcon */
+/* lyte-input[lt-prop-type="search"]:not(.lyteInputBox) input */
+/* .lyteInputSearch input, .lyteInputBoxSearch input */
+/* .lyteInput:hover > div, .lyteInputBox:hover > div, .lyteInputSearch:hover */
+/* lyte-input.lyteInputFocus */
+/* .lyteInputBox.lyteInputFocus */
+/* .lytePreviewImage */
+/* .lyteFileUploadContainer .lyteFileList ul */
+/*   .lyteTextareaResize */
+/* Loading theme in configuration */
+/* Loading custom themes */
+lyte-input,
+.lyteInputBox,
+.lyteInputSearch {
+  position: relative;
+  width: 100%;
+  padding: 0;
+  cursor: text;
+}
+lyte-input:not(.lyteInputBox) {
+  border-bottom: 1px solid #f0f0f0;
+}
+lyte-input.vertical {
+  border-bottom: none;
+}
+lyte-input.vertical > div {
+  border-bottom: 1px solid #f0f0f0;
+}
+lyte-input.horizontal > label,
+lyte-input.horizontal > div,
+.lyteInputBox.horizontal > label,
+.lyteInputBox.horizontal > div {
+  display: inline-block;
+}
+lyte-input.vertical > label,
+lyte-input.vertical > div,
+.lyteInputBox.vertical > label,
+.lyteInputBox.vertical > div {
+  display: block;
+}
+lyte-input.vertical,
+.lyteInputBox.vertical {
+  white-space: normal !important;
+}
+lyte-input.vertical > label,
+lyte-input.vertical > div,
+.lyteInputBox.vertical > label,
+.lyteInputBox.vertical > div {
+  width: 100%;
+}
+.lyteInputBox > div:after,
+lyte-input > div:after {
+  content: "";
+  clear: both;
+  display: block;
+}
+lyte-input > label,
+.lyteInputBox > label {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  padding: 19px 6px 6px 0;
+  color: #666;
+  display: inline-block;
+  width: 38%;
+  padding-right: 15px;
+  font-family: ProximaNovaRegular, arial, sans-serif !important;
+  font-size: 1rem;
+  word-wrap: break-word;
+}
+lyte-input > div,
+.lyteInputBox > div {
+  color: #222;
+  width: 60%;
+  vertical-align: bottom;
+  display: inline-block;
+  position: relative;
+  top: 1px;
+  transition: 0.3s all ease;
+  font-size: 1rem;
+  word-wrap: break-word;
+  font-family: ProximaNovaRegular, arial, sans-serif !important;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+}
+lyte-input > div.joinInput {
+  width: 100%;
+}
+lyte-input > div.joinInput input {
+  width: 25%;
+  box-sizing: border-box;
+  padding: 0px 10px;
+}
+lyte-input > div {
+  border-bottom: 1px solid transparent;
+  padding: 19px 0 5px 0;
+}
+.lyteInputBox > div {
+  border: 1px solid #e4e4e4;
+  border-top: 1px solid #f6f6f6;
+  padding: 8px 10px 8px 10px;
+  border-radius: 3px;
+}
+.lyteInputBox > div.lyteInputBoxSearch {
+  padding: 8px 10px 8px 30px;
+}
+lyte-input > div input,
+.lyteInputBox > div input,
+lyte-input > div textarea,
+.lyteInputBox > div textarea {
+  width: 100%;
+  color: #222;
+  font-size: 1rem !important;
+  font-family: ProximaNovaRegular, arial, sans-serif;
+  background-color: transparent;
+  padding: 0;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 0 !important;
+  max-width: 100%;
+  height: 1.286rem;
+  outline: medium none;
+}
+/*Input search */
+.lyteInputSearch,
+.lyteInputBoxSearch {
+  color: #222;
+  width: 100%;
+  vertical-align: bottom;
+  transition: 0.3s all ease;
+  font-size: 1rem;
+  word-wrap: break-word;
+  font-family: ProximaNovaRegular, arial, sans-serif !important;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  position: relative;
+}
+.lyteInputSearch {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 10px 0 5px 30px;
+}
+.lyteInputBoxSearch {
+  color: #222;
+  width: 100%;
+  vertical-align: bottom;
+  transition: 0.3s all ease;
+  font-size: 1rem;
+  word-wrap: break-word;
+  font-family: ProximaNovaRegular, arial, sans-serif !important;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  position: relative;
+  border: 1px solid #f0f0f0;
+  border-top: 1px solid #f6f6f6;
+  padding: 8px 10px 8px 30px;
+  border-radius: 3px;
+}
+lyte-input[lt-prop-type="search"] span.searchIcon {
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -362px -2px;
+  width: 16px;
+  height: 16px;
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 11px;
+  opacity: 0.6;
+}
+lyte-input[lt-prop-type="search"]:not(.lyteInputBox) input {
+  padding-left: 26px;
+}
+.lyteInputSearch input,
+.lyteInputBoxSearch input {
+  width: 100%;
+  color: #222;
+  font-size: 1rem !important;
+  font-family: ProximaNovaRegular, arial, sans-serif;
+  background-color: transparent;
+  padding: 0;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 0 !important;
+  max-width: 100%;
+  height: 1.286rem;
+  outline: medium none;
+}
+/*Hover css */
+.lyteInput:hover > div,
+.lyteInputBox:hover > div,
+.lyteInputSearch:hover {
+  border-bottom: 1px solid #a5a5a5;
+}
+lyte-input.lyteInputFocus {
+  border-bottom: 1px solid #69cff3 !important;
+}
+.lyteInputBox.lyteInputFocus {
+  border: 1px solid #69cff3 !important;
+}
+.lytePreviewImage {
+  height: 64px;
+}
+.lyteFileUploadContainer .lyteFileList ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.lyteTextareaResize {
+  position: absolute;
+  right: 0;
+  bottom: 9px;
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -386px -5px;
+  width: 9px;
+  height: 9px;
+  opacity: 0.6;
+  cursor: nwse-resize;
+}
+lyte-input {
+  display: inline-block;
+  width: inherit;
+}
+#lyteCalendar.lyteCalendarHidden {
+  display: none !important;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/input .less file
+ */
+/* Default theme imported */
+/* lyte menu styles */
+/* lyte-menu-body */
+/* lyte-menu-header */
+/* lyte-menu-item */
+/* lyte-menu-item:hover */
+/* lyte-menu-item ~ lyte-menu-group */
+/* lyte-menu-description */
+/* lyte-menu-body lyte-arrow  */
+/* lyte-arrow.menuArrow-down  */
+/* lyte-arrow.menuArrow-down i */
+/* lyte-menu-box lyte-arrow.menuArrow-up  */
+/* lyte-menu-box lyte-arrow.menuArrow-up i  */
+/* lyte-menu-group */
+/* lyte-menu-group:first-of-type */
+/* lyte-menu-group:last-of-type */
+/* lyte-menu-group:last-of-type ~ lyte-menu-item */
+/* .lyteArrowIcon */
+/* .lyteArrowTop:after */
+/* .lyteArrowTop:before */
+/* .lyteArrowBottom:after */
+/* .lyteArrowBottom:before */
+/* .lyteArrowRight:after */
+/* .lyteArrowRight:before */
+/* .lyteArrowLeft:not(.lyteScaleOption):after */
+/* .lyteArrowLeft:not(.lyteScaleOption):before */
+/* div.lytemenufreezelayer */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* Menu styles */
+lyte-menu-box {
+  top: 27px;
+  margin: 0;
+  z-index: 1002 !important;
+  vertical-align: middle;
+  width: auto;
+  position: absolute;
+  outline: none;
+}
+lyte-menu-body {
+  overflow: auto;
+  display: block;
+  outline: none;
+  background-color: #fff;
+  box-sizing: border-box;
+  border: 1px solid #d6d6d6 !important;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+lyte-menu-header {
+  display: block;
+  height: auto;
+  padding: 0.45rem 1.1rem;
+  font-weight: 400;
+  font-size: 0.855rem;
+  text-align: center;
+}
+lyte-menu-header div {
+  display: inline-block;
+}
+lyte-menu-item {
+  position: relative;
+  cursor: pointer;
+  display: block;
+  border: none;
+  height: auto;
+  text-align: left;
+  line-height: 0.9rem;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 0.45rem 1.1rem;
+  font-size: 0.855rem;
+  text-transform: none;
+  font-weight: 400;
+  box-shadow: none;
+  outline: none;
+  -webkit-touch-callout: none;
+}
+lyte-menu-item:hover {
+  background-color: #f7f7f7;
+}
+lyte-menu-item ~ lyte-menu-group {
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+}
+lyte-menu-description {
+  opacity: 0.4;
+}
+lyte-menu-box lyte-arrow {
+  width: 100% !important;
+  height: 20px !important;
+  display: inline-block;
+  text-align: center;
+  position: absolute;
+  background: inherit;
+}
+lyte-arrow.menuArrow-down {
+  bottom: 0px;
+}
+lyte-arrow.menuArrow-down i {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #151313;
+  position: relative;
+  top: 10px;
+  left: -3px;
+}
+lyte-menu-box lyte-arrow.menuArrow-up {
+  top: 0px;
+}
+lyte-menu-box lyte-arrow.menuArrow-up i {
+  width: 0;
+  height: 0;
+  position: relative;
+  top: -10px;
+  left: -3px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #151313;
+}
+lyte-menu-group {
+  border-bottom: 1px solid #e5e5e5;
+  display: inherit;
+}
+lyte-menu-group:first-of-type {
+  border-top: none;
+}
+lyte-menu-group:last-of-type {
+  border-bottom: none;
+}
+lyte-menu-group:last-of-type ~ lyte-menu-item {
+  border-top: 1px solid #e5e5e5;
+}
+lyte-menu {
+  display: inline-block;
+  width: auto;
+}
+.lyteArrowIcon {
+  border-bottom: 0.5rem solid #fff;
+  width: 0;
+  height: 0;
+  border-bottom: 8px solid #fff;
+  position: absolute;
+}
+.lyteArrowTop {
+  top: 1px;
+}
+.lyteArrowTop:after,
+.lyteArrowTop:before {
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteArrowTop:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-bottom-color: #ffffff;
+  border-width: 8px;
+  margin-left: -8px;
+}
+.lyteArrowTop:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-bottom-color: #ddd;
+  border-width: 9px;
+  margin-left: -9px;
+}
+/*Arrow bottom*/
+.lyteArrowBottom {
+  bottom: -7px;
+}
+.lyteArrowBottom:after,
+.lyteArrowBottom:before {
+  top: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteArrowBottom:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-top-color: #ffffff;
+  border-width: 8px;
+  margin-left: -8px;
+}
+.lyteArrowBottom:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-top-color: #ddd;
+  border-width: 9px;
+  margin-left: -9px;
+}
+/*Arrow Right*/
+.lyteArrowRight {
+  right: 1px;
+}
+.lyteArrowRight:after,
+.lyteArrowRight:before {
+  left: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteArrowRight:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-left-color: #ffffff;
+  border-width: 8px;
+  margin-top: -8px;
+}
+.lyteArrowRight:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-left-color: #ddd;
+  border-width: 9px;
+  margin-top: -9px;
+}
+/*Arrow Left*/
+.lyteArrowLeft:not(.lyteScaleOption) {
+  left: 1px;
+}
+.lyteArrowLeft:not(.lyteScaleOption):after,
+.lyteArrowLeft:not(.lyteScaleOption):before {
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteArrowLeft:not(.lyteScaleOption):after {
+  border-color: rgba(255, 255, 255, 0);
+  border-right-color: #ffffff;
+  border-width: 8px;
+  margin-top: -8px;
+}
+.lyteArrowLeft:not(.lyteScaleOption):before {
+  border-color: rgba(221, 221, 221, 0);
+  border-right-color: #ddd;
+  border-width: 9px;
+  margin-top: -9px;
+}
+div.lytemenufreezelayer {
+  opacity: 0.01;
+  background: #fff;
+  position: fixed;
+  z-index: 1000;
+}
+div.lytemenufreezelayer.top {
+  top: 0px;
+  width: 100%;
+}
+div.lytemenufreezelayer.bottom {
+  bottom: 0px;
+  width: 100%;
+}
+div.lytemenufreezelayer.left {
+  left: 0px;
+}
+div.lytemenufreezelayer.right {
+  right: 0px;
+  width: 100%;
+}
+div.lytemenufreezelayer.nogroup {
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: fixed;
+}
+.lyteMenuHidden {
+  display: none !important;
+}
+.lyteMenuWrapperDiv {
+  overflow: auto;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/menu.less file
+ */
+/* Default theme imported */
+/* navigator styles */
+/* .lyteNavigator */
+/* .lyteDoubleBack, .lyteSingleBack, .lyteNavigatorMidPoint, .lyteDoubleFront, .lyteSingleFront */
+/* .lyteNavigatorMidPoint */
+/* .lyteIconDoubleBack, .lyteIconSingleBack, .lyteIconSingleFront, .lyteIconDoubleFront */
+/* .lyteIconDoubleBack */
+/* .lyteIconSingleBack */
+/* .lyteIconSingleFront */
+/* .lyteIconDoubleFront */
+/* div.lyteDisabled */
+/* span.lyteNavigatorText */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* Navigator Styles */
+lyte-navigator {
+  display: inline-block;
+}
+.lyteNavigator {
+  width: 100%;
+  white-space: nowrap;
+  display: inline-block;
+}
+.lyteDoubleBack,
+.lyteSingleBack,
+.lyteNavigatorMidPoint,
+.lyteDoubleFront,
+.lyteSingleFront {
+  display: inline-block;
+  margin-right: 10px;
+}
+.lyteNavigatorMidPoint {
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: top;
+}
+.lyteIconDoubleBack,
+.lyteIconSingleBack,
+.lyteIconSingleFront,
+.lyteIconDoubleFront {
+  cursor: pointer;
+  opacity: 0.7;
+}
+.lyteIconDoubleBack {
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -244px -1px;
+  width: 29px;
+  height: 20px;
+  display: inline-block;
+}
+.lyteIconSingleBack {
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -273px -1px;
+  width: 25px;
+  height: 20px;
+  display: inline-block;
+}
+.lyteIconSingleFront {
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -298px -1px;
+  width: 25px;
+  height: 20px;
+  display: inline-block;
+}
+.lyteIconDoubleFront {
+  background: url('../images/lyte_ui_sprite.svg') no-repeat -322px -1px;
+  width: 29px;
+  height: 20px;
+  display: inline-block;
+}
+div.lyteDisabled {
+  pointer-events: none;
+  opacity: 0.2;
+}
+span.lyteNavigatorText {
+  display: inline-block;
+  color: #bbb;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/navigator.less file
+ */
+/* Default theme imported */
+/* lyte scrollbar */
+/* .lyteScrollContainer */
+/* .lyteScrollContainer.verticalScroll */
+/* .lyteScrollContainer.horizontalScroll */
+/* .lyteScrollContainer div */
+/* .lyteScrollContainer div:hover */
+/* .lyteScrollContainer.horizontalScroll.top */
+/* .lyteScrollContainer.verticalScroll.left */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* Make changes to override predefined styles */
+/* CSS Common for all scrollbars */
+.lyteScrollBar {
+  overflow: hidden !important;
+  position: relative !important;
+}
+.lyteScrollContainer {
+  position: absolute;
+  border-radius: 2px;
+  z-index: 15;
+}
+.lyteScrollContainer.verticalScroll {
+  width: 10px;
+  top: 0px;
+  left: auto ;
+  right: 0px;
+  bottom: 0px;
+  height: auto !important;
+}
+.lyteScrollContainer.horizontalScroll {
+  height: 10px;
+  top: auto;
+  left: 0px ;
+  right: 0px;
+  bottom: 0px;
+  width: auto !important;
+}
+.lyteScrollContainer div {
+  background: #888;
+  position: relative;
+  border-radius: 5px;
+}
+.lyteScrollContainer.verticalScroll div {
+  width: auto !important;
+}
+.lyteScrollContainer.horizontalScroll div {
+  height: auto !important;
+}
+.lyteScrollContainer div:hover {
+  background: #555;
+}
+.lyteScrollContainer.horizontalScroll.top {
+  top: 0px;
+  bottom: auto !important;
+}
+.lyteScrollContainer.verticalScroll.left {
+  left: 0px;
+  right: auto !important;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/scrollbar.less file
+ */
+/* Default theme imported */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* search Styles */
+lyte-search {
+  display: inline-block;
+}
+.lyteSearchHidden {
+  display: none !important;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/search.less file
+ */
+/* Default theme imported */
+/* lyte slider */
+/* .lyteHorizontal .lyteArrow.lyteSliderHandler:after,.lyteHorizontal .lyteArrow.lyteSliderHandler:before */
+/* .lyteHorizontal .lyteArrow.lyteSliderHandler:after */
+/* .lyteHorizontal .lyteArrow.lyteSliderHandler:before */
+/* .lyteVertical .lyteArrow.lyteSliderHandler:after,.lyteVertical .lyteArrow.lyteSliderHandler:before */
+/* .lyteVertical .lyteArrow.lyteSliderHandler:after */
+/* .lyteVertical .lyteArrow.lyteSliderHandler:before  */
+/* .lyteVertical .lyteArrowLeft.lyteSliderHandler:after,.lyteVertical .lyteArrowLeft.lyteSliderHandler:before */
+/* .lyteVertical .lyteArrowLeft.lyteSliderHandler:after */
+/* .lyteVertical .lyteArrowLeft.lyteSliderHandler:before  */
+/* .lyteScaleLine span:not(.lyteScalLable) */
+/* .lyteHorizontal .lyteArrow.lyteSliderHandler */
+/*  .lyteVertical.lyteRangeSlider  */
+/* .lyteVertical.lyteRangeSlider .lyteArrowLeft.lyteScaleOption */
+/* .lyteVertical.lyteRangeSlider .lyteArrowLeft.lyteScaleOption .lyteScaleLine span.lyteScalLable */
+/* .lyteVertical.lyteRangeSlider .lyteScaleLine span.lyteScalLable */
+/* .lyteVertical.lyteRangeSlider .lyteScaleOption */
+/* .lyteVertical.lyteRangeSlider .lyteScaleOption.lyteArrow .lyteScaleLine  */
+/* .lyteVertical.lyteRangeSlider .lyteScaleOption.lyteArrow .lyteScaleLine span.lyteScalLable */
+/* .lyteVertical.lyteRangeSlider .lyteScaleOption .lyteScaleLine */
+/* .lyteVertical .lyteScaleLine span:not(.lyteScalLable) */
+/* .lyteVertical .lyteArrowLeft.lyteSliderHandler */
+/* .lyteVertical .lyteArrow.lyteSliderHandler */
+/* .lyteVertical .lyteSquare.lyteSliderHandler */
+/* .lyteVertical .lyteCircle.lyteSliderHandler */
+/* .lyteVertical .lyteSliderFill */
+/* .lyteSquare.lyteSliderHandler */
+/* .lyteCircle.lyteSliderHandler */
+/* .lyteSliderFill */
+/* .lyteRangeSlider */
+/* .lyteRangeSlider .lyteScaleLine span.lyteScalLable */
+/* .lyteRangeSlider .lyteScaleOption */
+/* .lyteRangeSlider .lyteScaleOption .lyteScaleLine */
+/*  .lyteSliderHandler */
+/* .lyteSliderDisabled */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* slider Styles */
+.lyteHorizontal .lyteArrow.lyteSliderHandler:after,
+.lyteHorizontal .lyteArrow.lyteSliderHandler:before {
+  top: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteHorizontal .lyteArrow.lyteSliderHandler:after {
+  border-color: rgba(136, 183, 213, 0);
+  border-top-color: #fff;
+  border-width: 6px;
+  margin-left: -6px;
+}
+.lyteHorizontal .lyteArrow.lyteSliderHandler:before {
+  border-color: rgba(194, 225, 245, 0);
+  border-top-color: #ddd;
+  border-width: 7px;
+  margin-left: -7px;
+}
+.lyteVertical .lyteArrow.lyteSliderHandler:after,
+.lyteVertical .lyteArrow.lyteSliderHandler:before {
+  left: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteVertical .lyteArrow.lyteSliderHandler:after {
+  border-color: rgba(136, 183, 213, 0);
+  border-left-color: #fff;
+  border-width: 6px;
+  margin-top: -6px;
+}
+.lyteVertical .lyteArrow.lyteSliderHandler:before {
+  border-color: rgba(194, 225, 245, 0);
+  border-left-color: #ddd;
+  border-width: 7px;
+  margin-top: -7px;
+}
+/*Left side arrow*/
+.lyteVertical .lyteArrowLeft.lyteSliderHandler:after,
+.lyteVertical .lyteArrowLeft.lyteSliderHandler:before {
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteVertical .lyteArrowLeft.lyteSliderHandler:after {
+  border-color: rgba(136, 183, 213, 0);
+  border-right-color: #fff;
+  border-width: 6px;
+  margin-top: -6px;
+}
+.lyteVertical .lyteArrowLeft.lyteSliderHandler:before {
+  border-color: rgba(194, 225, 245, 0);
+  border-right-color: #ddd;
+  border-width: 7px;
+  margin-top: -7px;
+}
+lyte-slider {
+  display: inline-block;
+}
+lyte-slider .lyteSlide {
+  height: 100%;
+  width: 100%;
+}
+.lyteScaleLine span:not(.lyteScalLable) {
+  height: 100%;
+  width: 1px;
+  background-color: #ddd;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+.lyteHorizontal .lyteArrow.lyteSliderHandler {
+  width: 12px;
+  height: 12px;
+  top: -5px;
+  left: 13px;
+  position: absolute;
+  background-color: #fff;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+.lyteHorizontal .lyteSliderFill {
+  top: 0;
+  height: 100%;
+}
+.lyteVertical.lyteRangeSlider {
+  width: 8px;
+  height: 100%;
+}
+.lyteVertical.lyteRangeSlider .lyteArrowLeft.lyteScaleOption {
+  left: -15px;
+}
+.lyteVertical.lyteRangeSlider .lyteArrowLeft.lyteScaleOption .lyteScaleLine span.lyteScalLable {
+  position: absolute;
+  top: -5px;
+  left: -26px;
+  font-size: 0.75em;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleLine span.lyteScalLable {
+  position: absolute;
+  top: -5px;
+  left: 10px;
+  font-size: 0.75em;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleOption {
+  position: absolute;
+  top: 0;
+  left: 15px;
+  width: 10px;
+  height: 100%;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleOption.lyteArrow .lyteScaleLine {
+  left: 6px;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleOption.lyteArrow .lyteScaleLine span.lyteScalLable {
+  position: absolute;
+  top: -5px;
+  left: 8px;
+  font-size: 0.75em;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleOption .lyteScaleLine {
+  width: 6px;
+  height: 18px;
+  position: absolute;
+  margin-top: 0;
+  margin-left: -6px;
+  top: 20px;
+  left: 6px;
+}
+.lyteVertical .lyteScaleLine span:not(.lyteScalLable) {
+  height: 1px;
+  width: 100%;
+  left: 0;
+}
+.lyteVertical .lyteArrowLeft.lyteSliderHandler {
+  left: -3px !important;
+  width: 12px;
+  height: 12px;
+  top: -5px;
+  position: absolute;
+  background-color: #fff;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+.lyteVertical .lyteArrow.lyteSliderHandler {
+  left: -3px !important;
+  width: 12px;
+  height: 12px;
+  top: -5px;
+  left: -3px;
+  position: absolute;
+  background-color: #fff;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+.lyteVertical .lyteSquare.lyteSliderHandler {
+  width: 16px;
+  height: 10px;
+  top: 10px;
+  left: -5px;
+}
+.lyteVertical .lyteCircle.lyteSliderHandler {
+  top: 10px;
+  left: -3px;
+}
+.lyteVertical .lyteSliderFill {
+  height: 15px;
+  min-width: 8px;
+  width: 8px;
+  top: 0;
+}
+.lyteSquare.lyteSliderHandler {
+  width: 10px;
+  height: 16px;
+  top: -5px;
+  left: 10px;
+  position: absolute;
+  background-color: #fff;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+.lyteCircle.lyteSliderHandler {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  top: -3px;
+  left: 10px;
+  position: absolute;
+  background-color: #fff;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+.lyteSliderFill {
+  background-color: #61A6E8;
+  position: absolute;
+  width: 15px;
+  display: block;
+  -moz-box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.3);
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+.lyteRangeSlider {
+  display: block;
+  -moz-box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.3);
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  width: 100%;
+  height: 8px;
+  background-color: #fff;
+  position: relative;
+  outline: none;
+}
+.lyteRangeSlider .lyteScaleLine span.lyteScalLable {
+  position: absolute;
+  top: 10px;
+  left: 6px;
+  font-size: 0.75em;
+}
+.lyteRangeSlider .lyteScaleOption {
+  position: absolute;
+  top: 15px;
+  left: 0px;
+  width: 100%;
+  height: 10px;
+}
+.lyteRangeSlider .lyteScaleOption .lyteScaleLine {
+  width: 18px;
+  height: 6px;
+  text-align: center;
+  display: inline-block;
+  position: absolute;
+  margin-left: -9px;
+  left: 20px;
+}
+.lyteSliderHandler {
+  outline: none;
+}
+.lyteSliderDisabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/slider.less file
+ */
+/* Default theme imported */
+/* lyte step styles */
+/* lyte-step-structure */
+/* .lyteStepSlash lyte-step-item, .lyteStepArrow lyte-step-item */
+/*  lyte-step-item */
+/* lyte-step-item.lyteActive */
+/* .lyteStepSlash lyte-step-item:not(:last-of-type):after */
+/* .lyteStepSlash .lyteWarning */
+/*.lyteStepSlash .lyteCompleted */
+/* .lyteStepArrow lyte-step-item:not(:last-of-type):after */
+/* .lyteStepBullet, .lyteStepFlat */
+/* .lyteStepBullet:before */
+/* .lyteStepBullet .lyteCompleted lyte-step-head */
+/* .lyteStepBullet lyte-step-item.lyteCompleted:not(:first-of-type):before */
+/* .lyteStepBullet lyte-step-head */
+/* .lyteStepBullet lyte-step-item */
+/* .lyteStepBullet lyte-step-body */
+/* .lyteStepBullet lyte-step-item:not(:first-of-type) */
+/* .lyteStepBullet .lyteWarning lyte-step-head  */
+/* .lyteStepBullet lyte-step-item.lyteWarning:not(:first-of-type):before */
+/* .lyteStepFlat lyte-step-item, .lyteStepPlain lyte-step-item */
+/* .lyteStepFlat lyte-step-body, .lyteStepPlain lyte-step-body */
+/* .lyteStepFlat lyte-step-body:after, .lyteStepPlain lyte-step-body:after */
+/* .lyteStepFlat lyte-step-body:before, .lyteStepPlain lyte-step-body:before */
+/* .lyteStepFlat .lyteActive lyte-step-body, .lyteStepPlain .lyteActive lyte-step-body */
+/* .lyteStepFlat .lyteActive lyte-step-body:after, .lyteStepPlain .lyteActive lyte-step-body:after */
+/* .lyteStepFlat .lyteWarning lyte-step-body, .lyteStepPlain .lyteWarning lyte-step-body */
+/* .lyteStepFlat .lyteWarning lyte-step-body:after, .lyteStepPlain .lyteWarning lyte-step-body:after */
+/* .lyteStepFlat .lyteCompleted lyte-step-body,  .lyteStepPlain .lyteCompleted lyte-step-body */
+/* .lyteStepFlat .lyteCompleted lyte-step-body:after, .lyteStepPlain .lyteCompleted lyte-step-body:after */
+/* .lyteStepPlain lyte-step-item:first-child lyte-step-body:before */
+/* .lyteStepBox */
+/* .lyteStepBox lyte-step-item */
+/* .lyteStepBox lyte-step-item:last-of-type */
+/* .lyteStepBox lyte-step-item.lyteCompleted:before */
+/* .lyteStepBox lyte-step-item:not(.lyteCompleted):before */
+/* .lyteStepBox lyte-step-item.lyteActive */
+/* .lyteStepBox lyte-step-item.lyteActive:before */
+/* .lyteStepBox lyte-step-item:not(:last-of-type):after */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* step Styles */
+lyte-step-structure {
+  line-height: 1;
+  display: inline-block;
+  margin: 0 0;
+  vertical-align: middle;
+}
+.lyteStepSlash lyte-step-item:not(last-of-type),
+.lyteStepArrow lyte-step-item:not(last-of-type) {
+  margin-right: 20px;
+}
+lyte-step-item {
+  float: left;
+  margin-right: 10px;
+  padding: 0;
+  font-size: 0.875em;
+  position: relative;
+}
+lyte-step-item.lyteActive {
+  color: #2C7BD0;
+}
+.lyteStepSlash lyte-step-item:not(:last-of-type):after {
+  content: '/';
+  position: absolute;
+  right: -12px;
+  top: 0;
+  color: #666;
+  opacity: 0.5;
+}
+.lyteStepSlash .lyteWarning {
+  color: #ffb130;
+}
+.lyteStepSlash .lyteCompleted {
+  color: #72c880;
+}
+.lyteStepArrow lyte-step-item:not(:last-of-type):after {
+  content: '';
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -191px -29px;
+  position: absolute;
+  right: -12px;
+  top: 3px;
+  color: #666;
+  width: 4px;
+  height: 7px;
+  opacity: 0.5;
+}
+/*Stage css*/
+.lyteStepBullet,
+.lyteStepFlat {
+  position: relative;
+  white-space: nowrap;
+}
+.lyteStepBullet:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 48%;
+  bottom: 38px;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  height: 1px;
+  background: #e3e3e3;
+}
+.lyteStepBullet .lyteCompleted lyte-step-head {
+  background: #72c880 !important;
+  color: #fff;
+  border: 1px solid #72c880 !important;
+}
+.lyteStepBullet lyte-step-item.lyteCompleted:not(:first-of-type):before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 48%;
+  bottom: 38px;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  height: 1px;
+  background: #72c880;
+}
+.lyteStepBullet lyte-step-head {
+  border: 1px solid #2d7bd0;
+  border-radius: 50%;
+  display: inline-block;
+  background: #fff;
+  position: relative;
+  text-align: center;
+  font-size: 0.7em;
+  box-sizing: border-box;
+  padding: 2px 5px;
+}
+.lyteStepBullet lyte-step-item {
+  margin-right: 0;
+}
+.lyteStepBullet lyte-step-body {
+  position: absolute;
+  top: -15px;
+  right: 0;
+  font-size: 0.75em;
+  color: #666;
+}
+.lyteStepBullet lyte-step-item:not(:first-of-type) {
+  padding-left: 60px;
+}
+.lyteStepBullet .lyteWarning lyte-step-head {
+  border: 1px solid #ffb130;
+  background: #ffb130 !important;
+  color: #fff;
+}
+.lyteStepBullet lyte-step-item.lyteWarning:not(:first-of-type):before {
+  background: #ffb130;
+  content: "";
+  display: block;
+  position: absolute;
+  top: 48%;
+  bottom: 38px;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  height: 1px;
+}
+.lyteStepFlat lyte-step-item,
+.lyteStepPlain lyte-step-item {
+  margin-right: 0px;
+}
+.lyteStepFlat lyte-step-body,
+.lyteStepPlain lyte-step-body {
+  display: block;
+  float: left;
+  background: #eaeaea;
+  text-align: center;
+  padding: 10px 20px 10px 30px;
+  position: relative;
+  margin: 0 2px 0 0;
+  font-size: 0.875em;
+  text-decoration: none;
+  color: #333;
+}
+.lyteStepFlat lyte-step-body:after,
+.lyteStepPlain lyte-step-body:after {
+  content: "";
+  border-top: 15px solid transparent;
+  border-bottom: 17px solid transparent;
+  border-left: 17px solid #eaeaea;
+  position: absolute;
+  right: -17px;
+  top: 0;
+  z-index: 1;
+}
+.lyteStepFlat lyte-step-body:before,
+.lyteStepPlain lyte-step-body:before {
+  content: "";
+  border-top: 15px solid transparent;
+  border-bottom: 17px solid transparent;
+  border-left: 17px solid #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+/*On progress css*/
+.lyteStepFlat .lyteActive lyte-step-body,
+.lyteStepPlain .lyteActive lyte-step-body {
+  background: #2d7bd0 !important;
+  color: #fff !important;
+}
+.lyteStepFlat .lyteActive lyte-step-body:after,
+.lyteStepPlain .lyteActive lyte-step-body:after {
+  border-left-color: #2d7bd0 !important;
+}
+/*Warning css*/
+.lyteStepFlat .lyteWarning lyte-step-body,
+.lyteStepPlain .lyteWarning lyte-step-body {
+  background: #ffb130 !important;
+  color: #fff !important;
+}
+.lyteStepFlat .lyteWarning lyte-step-body:after,
+.lyteStepPlain .lyteWarning lyte-step-body:after {
+  border-left-color: #ffb130 !important;
+}
+/*Completed css*/
+.lyteStepFlat .lyteCompleted lyte-step-body,
+.lyteStepPlain .lyteCompleted lyte-step-body {
+  background: #72c880 !important;
+  color: #fff !important;
+}
+.lyteStepFlat .lyteCompleted lyte-step-body:after,
+.lyteStepPlain .lyteCompleted lyte-step-body:after {
+  border-left-color: #72c880 !important;
+}
+.lyteStepPlain lyte-step-item:first-child lyte-step-body:before {
+  border-left-color: transparent;
+}
+.lyteStepBox {
+  display: -webkit-inline-box;
+  margin: 1em;
+  line-height: 1.14285714em;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  counter-reset: ordered;
+}
+.lyteStepBox lyte-step-item {
+  align-items: center;
+  margin: 0 0;
+  padding: 1.14285714em 2em;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  border: none;
+  border-right: 1px solid rgba(34, 36, 38, 0.15);
+}
+.lyteStepBox lyte-step-item:last-of-type {
+  border-right: none;
+}
+.lyteStepBox lyte-step-item.lyteCompleted:before {
+  content: '';
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -1px -18px;
+  color: #21ba45;
+  height: 30px;
+  width: 30px;
+  margin-right: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+  counter-increment: ordered;
+}
+.lyteStepBox lyte-step-item:not(.lyteCompleted):before {
+  content: counters(ordered, ".");
+  margin-right: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+  height: 30px;
+  width: 30px;
+  font-size: 2em;
+  counter-increment: ordered;
+  position: relative;
+  top: 5px;
+}
+.lyteStepBox lyte-step-item.lyteActive {
+  background: #f3f4f5;
+}
+.lyteStepBox lyte-step-item.lyteActive:before {
+  content: counters(ordered, ".");
+  color: #21ba45;
+  margin-right: 1rem;
+  font-size: 2em;
+  counter-increment: ordered;
+  font-weight: 700;
+  position: relative;
+  top: 5px;
+}
+.lyteStepBox lyte-step-item:not(:last-of-type):after {
+  border-style: solid;
+  border-color: rgba(34, 36, 38, 0.15);
+  border-width: 0 1px 1px 0;
+  -webkit-transform: translateY(-50%) translateX(50%) rotate(-45deg);
+  transform: translateY(-50%) translateX(50%) rotate(-45deg);
+  z-index: 2;
+  content: '';
+  background: inherit;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  color: #666;
+  width: 1.14285714em;
+  height: 1.14285714em;
+  opacity: 1;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/step.less file
+ */
+/* Default theme imported */
+/* navigator styles */
+/* lyte-tr */
+/* lyte-td, lyte-th */
+/* lyte-table-structure */
+/* lyte-table.border lyte-th, lyte-table.border lyte-td */
+/* lyte-table.border lyte-td  */
+/* lyte-table.border lyte-th:last-of-type, lyte-table.border lyte-td:last-of-type */
+/* lyte-table.border lyte-tbody lyte-tr:last-of-type lyte-td */
+/* lyte-th */
+/* lyte -td */
+/*  lyte-tbody lyte-tr:hover */
+/* lyte-tablehead-resize */
+/* lyte-table-resize */
+/* lyte-table-horizontal-resize */
+/* lyte-table-vertical-resize */
+/* lyteTableFixed*/
+/* lyte-th.lyteFixedColumn:not(.lytePreventIcon):after */
+/* lyte-th.tableRowFixed */
+/* lyte-th.tableRowFixed.lyteTableFixed */
+/* div.lyteTableDummy */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* table Styles */
+lyte-table-structure {
+  display: table;
+  position: relative;
+}
+lyte-tr {
+  display: table-row;
+  background-color: white;
+}
+lyte-td,
+lyte-th {
+  display: table-cell;
+  vertical-align: inherit;
+  background-color: inherit;
+  min-width: 50px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+lyte-thead {
+  display: table-header-group;
+}
+lyte-tbody {
+  display: table-row-group;
+}
+lyte-tfoot {
+  display: table-footer-group;
+}
+lyte-table-structure {
+  background: #fff;
+  border-radius: 3px;
+  text-align: left;
+  color: rgba(0, 0, 0, 0.87);
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+}
+lyte-table.border lyte-th,
+lyte-table.border lyte-td {
+  border: 1px solid;
+  border-right: none;
+  border-color: #e5e5e5;
+}
+lyte-table.border lyte-td {
+  border-top: none;
+  border-color: #e5e5e5;
+}
+lyte-table.border lyte-th:last-of-type,
+lyte-table.border lyte-td:last-of-type {
+  border-right: 1px solid;
+  border-color: #e5e5e5;
+}
+lyte-table.border lyte-tbody lyte-tr:last-of-type lyte-td {
+  border-bottom: 1px solid;
+  border-color: #e5e5e5;
+}
+lyte-th {
+  cursor: auto;
+  background: #fff;
+  text-align: inherit;
+  color: #000;
+  font-size: 0.929rem;
+  outline: none;
+  padding: 8px 10px 8px 10px;
+  vertical-align: middle;
+  border-bottom: 3px double;
+  border-color: #e5e5e5;
+}
+lyte-td {
+  padding: 8px 10px 8px 10px;
+  font-size: 1rem;
+  overflow: hidden;
+  empty-cells: show;
+  border-bottom: 1px solid;
+  white-space: normal;
+  text-overflow: initial;
+  vertical-align: top;
+  word-wrap: break-word;
+  color: #666;
+  border-color: #e5e5e5;
+}
+/*Table hover class*/
+lyte-tbody lyte-tr:hover {
+  background-color: #f7f7f7;
+  cursor: pointer;
+}
+lyte-th,
+lyte-td {
+  position: relative;
+}
+lyte-tablehead-resize {
+  cursor: ew-resize;
+  position: absolute;
+  right: 0px;
+  height: 100%;
+  width: 15px;
+  top: 0px;
+  z-index: 9;
+}
+lyte-table-resize {
+  width: 15px;
+  height: 15px;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+  cursor: se-resize;
+  z-index: 10;
+}
+lyte-table-horizontal-resize {
+  width: 15px;
+  height: 100%;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+  cursor: col-resize;
+  z-index: 9;
+}
+lyte-table-vertical-resize {
+  width: 100%;
+  height: 15px;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+  cursor: row-resize;
+  z-index: 9;
+}
+.lyteTableFixed {
+  z-index: 7;
+}
+lyte-th.lyteFixedColumn:not(.lytePreventIcon):after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #e5e5e5;
+  z-index: 7;
+}
+lyte-th:last-of-type lyte-tablehead-resize {
+  cursor: default;
+  position: absolute;
+  right: 0px;
+  height: 0px;
+  width: 0px;
+  top: 0px;
+  z-index: 0;
+  pointer-events: none;
+}
+lyte-table {
+  display: block;
+  height: inherit;
+}
+lyte-table > div {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+lyte-th.tableRowFixed {
+  position: relative !important;
+  z-index: 6;
+}
+lyte-th.tableRowFixed.lyteTableFixed {
+  z-index: 8 !important;
+}
+lyte-col {
+  display: table-column;
+}
+lyte-colgroup {
+  display: table-column-group;
+}
+div.lyteTableDummy {
+  background: #e5cce6;
+  position: absolute;
+  opacity: 0.4;
+  z-index: 10;
+}
+lyte-tr.lyteTableDummyRow {
+  position: relative;
+}
+lyte-table > div > lyte-yield {
+  display: block;
+  width: 100%;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/table.less file
+ */
+/* Default theme imported */
+/* lyte tooltip */
+/* span.lyteTooltip */
+/* span.lyteTooltip.lyteLeft::before */
+/*& .lyteRight::after */
+/* span.lyteTooltip.lyteBottom::after */
+/* span.lyteTooltip.lyteTop::after */
+/* span.lyteTooltip.lyteBottomright::after */
+/* span.lyteTooltip.lyteTopright::after */
+/* span.lyteTooltip.lyteBottomleft::after */
+/* span.lyteTooltip.lyteTopleft::after */
+/* Loading theme in configuration */
+/* Loading custom themes */
+span.lyteTooltip {
+  position: absolute !important;
+  background-color: #222;
+  border-color: #222;
+  color: #fff;
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 2px;
+  font-size: 1em;
+  z-index: 99999;
+  pointer-events: none;
+}
+span.lyteTooltip.lyteLeft::before {
+  content: "";
+  position: absolute;
+  bottom: 25%;
+  right: -10px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent #222;
+  border-left-color: inherit !important;
+}
+.lyteRight::after {
+  content: "";
+  position: absolute;
+  bottom: 25%;
+  left: -5px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #222 transparent transparent;
+  border-right-color: inherit !important;
+}
+span.lyteTooltip.lyteBottom::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #222 transparent;
+  border-bottom-color: inherit !important;
+}
+span.lyteTooltip.lyteTop::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #222 transparent transparent transparent;
+  border-top-color: inherit !important;
+}
+span.lyteTooltip.lyteBottomright::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 20%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #222 transparent;
+  border-bottom-color: inherit !important;
+}
+span.lyteTooltip.lyteTopright::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 20%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #222 transparent transparent transparent;
+  border-top-color: inherit !important;
+}
+span.lyteTooltip.lyteBottomleft::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 80%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #222 transparent;
+  border-bottom-color: inherit !important;
+}
+span.lyteTooltip.lyteTopleft::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 80%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #222 transparent transparent transparent;
+  border-top-color: inherit !important;
+}
+span.lyteTooltip.lyteTooltipHidden {
+  display: none !important;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Make preferred css changes over here.
+ * This will be added to the end of the styles/tooltip.less file
+ */
+/* Default theme imported */
+/* LYTE-POPOVER - BODY WRAPPER */
+/* LYTE-POPOVER - WRAPPER */
+/* LYTE-POPOVER */
+/* LYTE-POPOVER - HEADER */
+/* LYTE-POPOVER - CONTENT */
+/* LYTE-POPOVER - FOOTER */
+/* LYTE-POPOVER - FREEZE */
+/* LYTE-POPOVER - FREEZE */
+/* LYTE-POPOVER - BUTTON */
+/* LYTE-POPOVER - ARROW */
+/* LYTE-POPOVER - ARROW - TOP */
+/* LYTE-POPOVER - ARROW - BOTTOM */
+/* LYTE-POPOVER - ARROW - RIGHT */
+/* LYTE-POPOVER - ARROW - LEFT */
+/* Loading theme in configuration */
+/* Loading custom themes */
+/* Popover Styles */
+.bodyWrapper {
+  overflow: hidden;
+  position: absolute;
+  z-index: 9999;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.popoverWrapper {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10001;
+}
+.lytePopover {
+  background-color: #fff;
+  border: 1px solid #f7f7f7;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.4);
+  position: absolute;
+  z-index: 10001;
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: ease;
+  box-sizing: border-box;
+}
+.popoverWrapper.scrollable {
+  overflow: hidden;
+}
+.popoverWrapper.scrollable .lytePopoverContent {
+  overflow: auto;
+}
+.popoverWrapper.scrollable .lytePopover {
+  max-height: 100%;
+}
+lyte-popover-header {
+  display: block;
+  padding: 15px 30px;
+  font-size: 20px;
+}
+lyte-popover-content {
+  display: block;
+  box-sizing: border-box;
+  padding: 15px 30px;
+}
+lyte-popover-footer {
+  display: block;
+  padding: 15px 30px;
+}
+lyte-popover-freeze {
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  height: auto;
+  background: #000;
+  display: block;
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+.lytePopoverClose {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -14px -1px;
+  width: 12px;
+  height: 11px;
+  opacity: 0.5;
+  cursor: pointer;
+  position: absolute;
+  top: 14px !important;
+  right: 15px;
+  z-index: 10001;
+}
+.lytePopoverClose:hover {
+  opacity: 1;
+}
+lyte-popover-header.draggable {
+  cursor: move;
+}
+lyte-popover-footer.left {
+  text-align: left;
+}
+lyte-popover-footer.center {
+  text-align: center;
+}
+lyte-popover-footer.right {
+  text-align: right;
+}
+lyte-popover-footer lyte-button {
+  margin-left: 7px;
+}
+lyte-popover-footer lyte-button:first-child {
+  margin-left: 0px;
+}
+/* Positioning CSS Ends*/
+/*Dropdown with arrow */
+.lytePopoverArrowIcon {
+  width: 0;
+  height: 0;
+  border-bottom: 8px solid #fff;
+  position: absolute;
+}
+/*Arrow Top*/
+.lytePopoverArrowTop {
+  top: 0px;
+}
+.lytePopoverArrowTop:after,
+.lytePopoverArrowTop:before {
+  top: 0px;
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lytePopoverArrowTop:after {
+  border-color: borderColor;
+  border-bottom-color: #ffffff;
+  border-width: 8px;
+  margin-left: -8px;
+}
+.lytePopoverArrowTop:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-bottom-color: #ddd;
+  border-width: 9px;
+  margin-left: -9px;
+}
+/*Arrow bottom*/
+.lytePopoverArrowBottom {
+  bottom: -8px;
+}
+.lytePopoverArrowBottom:after,
+.lytePopoverArrowBottom:before {
+  bottom: -8px;
+  top: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lytePopoverArrowBottom:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-top-color: #ffffff;
+  border-width: 8px;
+  margin-left: -8px;
+}
+.lytePopoverArrowBottom:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-top-color: #ddd;
+  border-width: 9px;
+  margin-left: -9px;
+}
+/*Arrow Right*/
+.lytePopoverArrowRight {
+  right: 0;
+}
+.lytePopoverArrowRight:after,
+.lytePopoverArrowRight:before {
+  right: 0;
+  left: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lytePopoverArrowRight:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-left-color: #ffffff;
+  border-width: 8px;
+  margin-top: -8px;
+}
+.lytePopoverArrowRight:before {
+  right: 0;
+  border-color: rgba(221, 221, 221, 0);
+  border-left-color: #ddd;
+  border-width: 9px;
+  margin-top: -9px;
+}
+/*Arrow Left*/
+.lytePopoverArrowLeft {
+  left: 0;
+}
+.lytePopoverArrowLeft:after,
+.lytePopoverArrowLeft:before {
+  left: 0;
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lytePopoverArrowLeft:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-right-color: #ffffff;
+  border-width: 8px;
+  margin-top: -8px;
+}
+.lytePopoverArrowLeft:before {
+  border-color: rgba(221, 221, 221, 0);
+  border-right-color: #ddd;
+  border-width: 9px;
+  margin-top: -9px;
+}
+.stop-scrolling {
+  height: 100%;
+  overflow: hidden;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Default theme imported */
+/* lyte messagebox styles */
+/* LYTE-MESSAGEBOX - DEFAULT VARIABLES*/
+/* LYTE-MESSAGEBOX - SYMBOL VARIABLES*/
+/* LYTE-MESSAGEBOX - CONTENT VARIABLES */
+/* LYTE-MESSAGEBOX - CLOSE VARIABLES */
+/* LYTE-MESSAGEBOX - SUCCESS VARIABLES */
+/* LYTE-MESSAGEBOX - ERROR VARIABLES */
+/* LYTE-MESSAGEBOX - WARNING VARIABLES */
+/* LYTE-MESSAGEBOX - INFO VARIABLES */
+/* Loading theme in configuration */
+/* Loading final tweaks to your variables */
+/* LYTE-MESSAGEBOX */
+.lyteMessageBox {
+  box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.2);
+  padding: 0 50px 0 0;
+  z-index: 9999;
+  background: #fff;
+  border-radius: 2px;
+  color: #333;
+  font-size: 15px;
+  transition: 0.3s all ease;
+  display: block;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  animation-duration: 0.5s;
+  -webkit-animation-duration: 0.5s;
+  animation-fill-mode: both;
+  -webkit-animation-fill-mode: both;
+  border: 1px solid;
+  position: absolute;
+  top: 20px;
+  min-width: 200px;
+}
+.llyteMessageBoxFadeIn {
+  animation-name: fadeIn;
+  -webkit-animation-name: fadeIn;
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.lyteMessageBoxFadeOut {
+  animation-name: fadeOut;
+  -webkit-animation-name: fadeOut;
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* LYTE-MESSAGEBOX - SYMBOL */
+.lyteMessageBox .lyteMessageBoxSymbol {
+  width: 45px;
+  height: 100%;
+  display: inline-block;
+  position: absolute;
+}
+.lyteMessageBox .lyteMessageBoxSymbol:before {
+  content: "";
+  background: url(../images/lyte_ui_sprite.svg) no-repeat;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 12px;
+  top: 25%;
+  display: inline-block;
+}
+.lyteMessageBox .lyteMessageBoxSymbol:after {
+  content: "";
+  border-left: 8px solid #3fbd5f;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  position: absolute;
+  left: 43px;
+  top: 35%;
+}
+/* LYTE-MESSAGEBOX - CONTENT */
+.lyteMessageBox .lyteMessageBoxContent {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  padding: 10px 0 10px 60px;
+}
+/* LYTE-MESSAGEBOX - CLOSE */
+.lyteMessageBox .lyteMessageBoxClose {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -125px -4px;
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  position: absolute;
+  cursor: pointer;
+  top: 15px;
+  right: 15px;
+}
+/*Message band model design for success*/
+.lyteMessageBox.successMessageIcon {
+  border-color: #3fbd5f;
+}
+.lyteMessageBox.successMessageIcon .lyteMessageBoxSymbol {
+  background: #3fbd5f;
+}
+.lyteMessageBox.successMessageIcon .lyteMessageBoxSymbol:before {
+  content: "";
+  background-position: -166px 0;
+}
+.lyteMessageBox.successMessageIcon .lyteMessageBoxSymbol:after {
+  content: "";
+  border-left-color: #3fbd5f;
+}
+/*Message band model design for Error*/
+.lyteMessageBox.errorMessageIcon {
+  border-color: #ee4242;
+}
+.lyteMessageBox.errorMessageIcon .lyteMessageBoxSymbol {
+  background: #ee4242;
+}
+.lyteMessageBox.errorMessageIcon .lyteMessageBoxSymbol:before {
+  content: "";
+  background-position: -139px 0;
+  width: 21px !important;
+}
+.lyteMessageBox.errorMessageIcon .lyteMessageBoxSymbol:after {
+  content: "";
+  border-left-color: #ee4242;
+}
+/*Message band model design for Warning*/
+.lyteMessageBox.warningMessageIcon {
+  border-color: #e98432;
+}
+.lyteMessageBox.warningMessageIcon .lyteMessageBoxSymbol {
+  background: #e98432;
+}
+.lyteMessageBox.warningMessageIcon .lyteMessageBoxSymbol:before {
+  content: "";
+  background-position: -192px 0;
+}
+.lyteMessageBox.warningMessageIcon .lyteMessageBoxSymbol:after {
+  content: "";
+  border-left-color: #e98432;
+}
+/*Message band model design for INFO*/
+.lyteMessageBox.infoMessageIcon {
+  border-color: #188bc7;
+}
+.lyteMessageBox.infoMessageIcon .lyteMessageBoxSymbol {
+  background: #188bc7;
+}
+.lyteMessageBox.infoMessageIcon .lyteMessageBoxSymbol:before {
+  content: "";
+  background-position: -218px 0;
+}
+.lyteMessageBox.infoMessageIcon .lyteMessageBoxSymbol:after {
+  content: "";
+  border-left-color: #188bc7;
+}
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Default theme imported */
+/* lyte dragdrop styles */
+/* LYTE-DRAGDROP - DEFAULT VARIABLES*/
+/* LYTE-DRAGDROP - HEADING VARIABLES*/
+/* LYTE-DRAGDROP - SEARCH VARIABLES*/
+/* LYTE-DRAGDROP - UL VARIABLES*/
+/* LYTE-DRAGDROP - LI VARIABLES*/
+/* LYTE-DRAGDROP - ADD ICON VARIABLES*/
+/* LYTE-DRAGDROP - REMOVE ICON VARIABLES*/
+/* LYTE-DRAGDROP - SELECTED NONE VARIABLES*/
+/* LYTE-DRAGDROP - DROPPABLE VARIABLES*/
+/* LYTE-DRAGDROP - DRAGGABLE VARIABLES*/
+/* Loading theme in configuration */
+/* Loading final tweaks to your variables */
+/* LYTE-DRAGDROP */
+.lyteDragDropAvailable,
+.lyteDragDropSelected {
+  width: 280px;
+  border: 1px solid #e7e7e7;
+  box-sizing: border-box;
+  margin-right: 20px;
+}
+/* LYTE-DRAGDROP - COLUMNS */
+.lyteDragDropColumns:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+.lytePosRel {
+  position: relative;
+}
+.lyteDragDropFL {
+  float: left;
+}
+/* LYTE-DRAGDROP - HEADING */
+.lyteDragDropHeading {
+  display: block;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+/* LYTE-DRAGDROP - SEARCH */
+.lyteDradDropSearch {
+  height: 25px;
+  padding: 5px 30px 5px 35px;
+  border: none;
+  border-bottom: 1px solid #e7e7e7;
+  width: 213px;
+  outline: none;
+}
+.lyteSearchIcon {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -362px -2px;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+.lyteSearchClose {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -125px -4px;
+  width: 9px;
+  height: 9px;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 13px;
+  opacity: 0.5;
+}
+.lyteSearchClose:hover {
+  opacity: 1;
+}
+/* LYTE-DRAGDROP - UL */
+.lyteAvailableUL,
+.lyteSelectedUL {
+  height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.lyteSelectedUL {
+  height: 336px;
+}
+.lyteAvailableUL,
+.lyteSelectedUL {
+  margin: 0;
+  padding: 7px 7px;
+}
+/* LYTE-DRAGDROP - LI */
+.lyteAvailableUL li {
+  position: relative;
+}
+.lyteAvailableUL li,
+.lyteSelectedUL li {
+  list-style-type: none;
+  padding: 7px 20px;
+  cursor: move;
+}
+.lyteAvailableUL li:hover,
+.lyteSelectedUL li:hover {
+  background-color: #f7f7f7;
+}
+/* LYTE-DRAGDROP - ADD ICON */
+.lyteDragDropAdd {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -30px -1px;
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
+  float: right;
+  margin-top: 4px;
+  visibility: hidden;
+  opacity: 0.5;
+}
+/* LYTE-DRAGDROP - REMOVE ICON */
+.lyteDragDropRemove {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -1px -5px;
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
+  float: right;
+  margin-top: 7px;
+  visibility: hidden;
+  opacity: 0.5;
+}
+/* LYTE-DRAGDROP - SELECTED NONE */
+.lyteSelectedNone {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  opacity: 0.4;
+}
+.lyteDragDropDropable {
+  background-color: #F5F6CE;
+  border: 1px dashed #eee;
+}
+.lyteDraggableElem {
+  background-color: #f7f7f7;
+  z-index: 1001;
+}
+/* LYTE-DRAGDROP END*/
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Default theme imported */
+/* lyte tabs styles */
+/* LYTE-TABS - DEFAULT VARIABLES*/
+/* Loading theme in configuration */
+/* Loading final tweaks to your variables */
+/* LYTE-TABS */
+lyte-tabs {
+  display: block;
+  background-color: #fff;
+  position: relative;
+  min-width: 100%;
+  min-height: 400px;
+}
+.lyteTabShow {
+  display: block;
+}
+.lyteTabHide {
+  display: none;
+}
+lyte-tab-head {
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+lyte-tab-head:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+lyte-tab-title {
+  float: left;
+  color: black;
+  padding: 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: inline-block;
+  opacity: 0.5;
+}
+.lyteTabCloseIcon {
+  background: url(../images/lyte_ui_sprite.svg) no-repeat -124px -3px;
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  cursor: pointer;
+  top: 15px;
+  right: 15px;
+  padding: 5px 0px;
+  margin-left: 10px;
+}
+.lyteTabHover {
+  opacity: 1;
+}
+.lyteTabActive {
+  opacity: 1;
+  font-weight: bold;
+}
+lyte-tab-body {
+  height: calc(100% - 38px);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  border-radius: 3px;
+}
+lyte-tab-content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+/* Default Tab Css */
+.lyteTabDefaultLeft,
+.lyteTabDefaultRight,
+.lyteTabDefaultTop,
+.lyteTabDefaultBottom {
+  border: 1px solid #ddd;
+}
+.lyteTabDefaultLeft .lyteTabNav,
+.lyteTabDefaultRight .lyteTabNav {
+  width: 25%;
+  float: left;
+  box-sizing: border-box;
+}
+.lyteTabDefaultLeft lyte-tab-head,
+.lyteTabDefaultRight lyte-tab-head {
+  height: inherit;
+  overflow-y: auto;
+  background-color: #ededed;
+}
+.lyteTabDefaultLeft lyte-tab-title,
+.lyteTabDefaultRight lyte-tab-title {
+  float: initial;
+  z-index: 1;
+}
+.lyteTabDefaultLeft lyte-tab-title.lyteTabActive,
+.lyteTabDefaultRight lyte-tab-title.lyteTabActive,
+.lyteTabDefaultTop lyte-tab-title.lyteTabActive,
+.lyteTabDefaultBottom lyte-tab-title.lyteTabActive {
+  background-color: #fff;
+  position: relative;
+}
+.lyteTabDefaultLeft lyte-tab-title,
+.lyteTabDefaultRight lyte-tab-title {
+  width: 100%;
+}
+.lyteTabDefaultLeft lyte-tab-body,
+.lyteTabDefaultRight lyte-tab-body {
+  width: 75%;
+  float: left;
+  border: initial;
+  position: relative;
+  box-sizing: border-box;
+}
+.lyteTabDefaultLeft lyte-tab-body:after,
+.lyteTabDefaultRight lyte-tab-body:after {
+  content: '';
+  border-left: 1px solid #ddd;
+  position: absolute;
+  top: 0px;
+  left: -1px;
+}
+.lyteTabDefaultRight .lyteTabNav,
+.lyteTabDefaultRight lyte-tab-body {
+  float: right;
+}
+.lyteTabDefaultTop lyte-tab-head,
+.lyteTabDefaultBottom lyte-tab-head {
+  background-color: #ededed;
+}
+.lyteTabDefaultTop lyte-tab-title,
+.lyteTabDefaultBottom lyte-tab-title {
+  width: initial;
+  display: inline-block;
+}
+.lyteTabDefaultTop lyte-tab-body,
+.lyteTabDefaultBottom lyte-tab-body {
+  width: initial;
+  height: calc(100% - 37px);
+  border: initial;
+  box-sizing: border-box;
+  display: block;
+}
+.lyteTabDefaultRight lyte-tab-body:after {
+  content: '';
+  left: initial;
+  right: -1px;
+}
+.lyteTabDefaultTop lyte-tab-head {
+  /*border-bottom: 1px solid #ddd;*/
+}
+.lyteTabDefaultTop lyte-tab-title {
+  margin: 0 0 -1px 0;
+}
+.lyteTab.lyteTabDefaultBottom {
+  position: relative;
+}
+.lyteTabDefaultBottom .lyteTabNav {
+  position: absolute;
+  bottom: 0;
+  width: inherit;
+}
+.lyteTabDefaultBottom lyte-tab-head {
+  border-top: 1px solid #ddd;
+}
+.lyteTabDefaultBottom lyte-tab-title {
+  margin: -1px 0 0 0;
+}
+.lyteTabDefaultBottom .lyteTabNav,
+.lyteTabDefaultTop .lyteTabNav {
+  min-width: 100%;
+}
+.lyteTabCustomTitleWidth {
+  white-space: nowrap;
+  overflow: auto;
+}
+/* LYTE-TABS END*/
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Default theme imported */
+/* lyte colorpicker styles */
+/* LYTE-COLORPICKER - DEFAULT VARIABLES*/
+/* Loading theme in configuration */
+/* Loading final tweaks to your variables */
+/* LYTE-COLORPICKER */
+lyte-colorpicker {
+  display: none;
+}
+.lyteColorPicker {
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  border: 1px solid #e6e6e6;
+  border-radius: 3px;
+  background: #FFF;
+  box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.05882);
+  display: inline-block;
+  outline: none;
+  z-index: 1111;
+  position: absolute;
+}
+.lyteColorPicker * {
+  outline: none;
+}
+.lyteColorPicker__titlebar {
+  padding: 10px 15px 10px 15px;
+  margin: 0px 0px 0px 0px;
+  border: solid #e6e6e6;
+  border-width: 0 0 1px 0;
+  background: #FFF;
+  position: relative;
+}
+.lyteColorPicker__title {
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  color: #111;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  line-height: 1.2;
+}
+.lyteColorPicker__title:only-child {
+  padding-right: 0;
+}
+.lyteColorPicker__close {
+  width: 16px;
+  height: 16px;
+  margin: 0px 0px 0px 10px;
+  padding: 0 0 0 0;
+  border: 0 solid transparent;
+  background: transparent;
+  cursor: pointer;
+  position: absolute;
+  top: 14px !important;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  right: 15px;
+}
+.lyteColorPicker__close:hover {
+  border: 0 solid transparent;
+  background: transparent;
+}
+.lyteColorPicker__close:hover svg {
+  fill: #666666;
+}
+.lyteColorPicker__close:focus {
+  border: 0 solid transparent;
+  background: transparent;
+}
+.lyteColorPicker__close:focus svg {
+  fill: #666666;
+}
+.lyteColorPicker__close:active {
+  border: 0 solid transparent;
+  background: transparent;
+}
+.lyteColorPicker__close:active svg {
+  fill: #666666;
+}
+.lyteColorPicker__close .lyteColorPicker__icon {
+  width: 16px;
+  height: 16px;
+  fill: #666666;
+}
+.lyteColorPicker__close .lyteColorPicker__icon svg {
+  width: inherit;
+  height: inherit;
+}
+.lyteColorPicker__icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+.lyteColorPicker__icon svg {
+  width: inherit;
+  height: inherit;
+}
+.lyteColorPicker__showhidecontainer {
+  overflow: hidden;
+  white-space: nowrap;
+  height: 100%;
+  padding: 0 !important;
+  position: relative;
+}
+.lyteColorPicker__morecolorbutton {
+  width: 100%;
+  margin: 0 0 0 0;
+  padding: 10px 15px 12px 15px;
+  border: solid #e6e6e6;
+  border-width: 0 0 1px 0;
+  border-radius: 0;
+  background: #FFF;
+  font-size: 0;
+  color: #111;
+  display: block;
+  text-align: left;
+  cursor: pointer;
+  white-space: normal;
+  fill: #737373;
+}
+.lyteColorPicker__morecolorbutton:hover {
+  border: solid #e6e6e6;
+  border-width: 0 0 1px 0;
+  background: #f2f2f2;
+  color: #111;
+  fill: #737373;
+}
+.lyteColorPicker__morecolorbutton:active {
+  border: solid #e6e6e6;
+  border-width: 0 0 1px 0;
+  background: #FFF;
+  color: #111;
+  fill: #737373;
+}
+.lyteColorPicker__morecolorbutton:focus {
+  border: solid #e6e6e6;
+  border-width: 0 0 1px 0;
+  background: #FFF;
+  color: #111;
+  fill: #737373;
+  box-shadow: inset 0 0 0 1px #4190F2;
+}
+.lyteColorPicker__morecolorbutton .lyteColorPicker__text {
+  vertical-align: middle;
+  font-size: 12px;
+}
+.lyteColorPicker__morecolorbutton .lyteColorPicker__icon {
+  width: 16px;
+  height: 16px;
+  margin: 0 6px 0 0;
+  border: 0 solid transparent;
+  border-radius: 100%;
+}
+.lyteColorPicker__morecolorbutton .h-alignright {
+  float: right;
+  margin: 0;
+}
+.lyteColorPicker__palettecontainer {
+  padding: 10px 15px 12px 15px;
+  margin: 0px 0px 0px 0px;
+  border: solid #e6e6e6;
+  border-width: 0 0 1px 0;
+  background: transparent;
+  font-size: 0;
+  white-space: nowrap;
+}
+.lyteColorPicker__palettecontainer .lyteColorPicker__paletteheading {
+  margin: 0 0 3px 0;
+  padding: 0 0 0 0;
+  background: transparent;
+  font-size: 13px;
+  font-weight: normal;
+  color: #111;
+  display: block;
+}
+.lyteColorPicker__palettecontainer .lyteColorPicker__palette {
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  border: solid transparent;
+  border-width: 0 0 0 0;
+  background: transparent;
+}
+.lyteColorPicker__palettecontainer .lyteColorPicker__palette ul {
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+}
+.lyteColorPicker__palettecontainer .lyteColorPicker__palette ul:first-of-type .lyteColorPicker__addcolor button {
+  margin: 0;
+}
+.lyteColorPicker__colorfieldcontainer {
+  padding: 10px 15px 12px 15px;
+  margin: 0px 0px 0px 0px;
+  border: solid #e6e6e6;
+  border-width: 0 0 0 0;
+  background: transparent;
+  font-size: 0;
+  white-space: nowrap;
+}
+.lyteColorPicker__shades {
+  display: inline-block;
+}
+.lyteColorPicker__shades .lyteColorPicker__colorpan {
+  width: 16px;
+  height: 16px;
+  margin: 2px 2px 0px 0px;
+  margin-top: 0;
+  border-radius: 0;
+  list-style: none;
+  display: block;
+  cursor: pointer;
+  box-sizing: border-box;
+  border-color: transparent;
+}
+.lyteColorPicker__shades .lyteColorPicker__colorpan:first-child {
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  margin-top: calc(2px);
+  margin-bottom: calc(2px + 0px);
+}
+.lyteColorPicker__shades:last-child .lyteColorPicker__colorpan {
+  margin-right: 0;
+}
+.lyteColorPicker__colorpan {
+  width: 20px;
+  height: 20px;
+  margin: 2px 2px 0px 0px;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  border-radius: 2px;
+  list-style: none;
+  display: inline-block;
+  cursor: pointer;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+.lyteColorPicker__colorpan:last-child {
+  margin-right: 0;
+}
+.lyteColorPicker__colorpan:hover {
+  box-shadow: inset 0 0 0 1px #f2f2f2, 0 0 0 1px #333333;
+  z-index: 2;
+}
+.lyteColorPicker__colorpan:focus {
+  box-shadow: inset 0 0 0 1px transparent, 0 0 0 1px #333333;
+  z-index: 2;
+}
+.lyteColorPicker__colorpan.is-selected {
+  box-shadow: inset 0 0 0 1px #f2f2f2, 0 0 0 1px transparent;
+  z-index: 2;
+}
+.lyteColorPicker__colorfieldpreview {
+  width: 60px;
+  height: 25px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.lyteColorPicker__colorfield {
+  width: 220px;
+  margin: 0 0 0 0;
+  border: 1px solid #b3b3b3;
+  border-radius: 3px;
+  background: #FFF;
+  color: #111;
+  vertical-align: top;
+  box-sizing: border-box;
+  font-size: 0;
+  overflow: hidden;
+}
+.lyteColorPicker__colorfield .lyteColorPicker__textbox {
+  width: 100%;
+  padding: 3px 8px 3px 8px;
+  font-size: 12px;
+  margin: 0;
+  border: 0;
+  display: inline-block;
+  vertical-align: middle;
+  box-sizing: border-box;
+  line-height: 1.3;
+}
+.lyteColorPicker__colorfield.has-focus {
+  border: 1px solid #4190F2;
+  background: #FFF;
+}
+.lyteColorPicker__colorfieldpreview + .lyteColorPicker__textbox {
+  width: calc(100% - 39px);
+}
+.lyteColorPicker__dynamiccolor {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  cursor: pointer;
+}
+.lyteColorPicker__opacitycontainer {
+  margin: 12px 0 0 0;
+}
+.lyteColorPicker__opacitycontainer .zslider {
+  width: calc(100% - (15px + 40px));
+  margin: 0 15px 0 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+.lyteColorPicker__opacitycontainer .zslider canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.lyteColorPicker__opacitycontainer .zslider__track {
+  height: 12px;
+  border-radius: 1px;
+}
+.lyteColorPicker__opacitycontainer .zslider__track:before {
+  border-radius: 1px;
+  z-index: 1;
+}
+.lyteColorPicker__opacitycontainer .zslider__circlethumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+.lyteColorPicker__opacityfield {
+  margin: 0 0 0 0;
+  display: inline-block;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+.lyteColorPicker__opacityfield .zinputfield__textbox {
+  width: 40px;
+  padding: 4px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+.lyteColorPicker__commandbar {
+  margin: 0 0 0 0;
+  padding: 12px 20px 12px 20px;
+  border: solid #e6e6e6;
+  border-width: 0 0 0 0;
+  background: transparent;
+  text-align: center;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+}
+.lyteColorPicker__previewDiv {
+  margin: 0 0 0 0;
+  padding: 12px 5px 12px 5px;
+  border: solid #e6e6e6;
+  border-width: 0 0 0 0;
+  background: transparent;
+  text-align: center;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  border-bottom: 1px solid #e6e6e6;
+}
+.h-topradiusnone {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.h-bottomradiusnone {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.h-leftradiusnone {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.h-rightradiusnone {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.h-topleftradiusnone {
+  border-top-left-radius: 0;
+}
+.h-toprightradiusnone {
+  border-top-right-radius: 0;
+}
+.h-bottomleftradiusnone {
+  border-bottom-left-radius: 0;
+}
+.h-bottomrightradiusnone {
+  border-bottom-right-radius: 0;
+}
+.lyteColorPicker__default,
+.lyteColorPicker--advanced {
+  display: inline-block;
+  vertical-align: top;
+  transition: margin 350ms ease-in-out;
+}
+.lyteColorPicker--transition {
+  transition: width 300ms ease, height 300ms ease, left 300ms ease, top 300ms ease;
+}
+.lyteColorPicker--pointertransition {
+  transition: left 300ms ease, top 300ms ease;
+}
+.lyteColorPicker__maparea {
+  width: 270px;
+  height: 267px;
+  overflow: hidden;
+  position: relative;
+  float: left;
+}
+.lyteColorPicker__default table {
+  width: 100%;
+}
+.lyteColorPicker__backToBasic {
+  padding: 12px 0px !important;
+}
+.lyteColorPicker__backToBasic div {
+  border-width: 1px 0 1px 0 !important;
+}
+.colorDiv {
+  width: 256px;
+  height: 256px;
+  position: relative;
+  /*background-image: url(../images/bgGradient.png);*/
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOCAxOCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ij48c3R5bGUgdHlwZT0idGV4dC9jc3MiPi5zdDB7ZmlsbDojRkZGRkZGO29wYWNpdHk6Ljd9LmJsYWNrLXJvdW5ke29wYWNpdHk6Ljh9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNOSAxLjVjNC4xIDAgNy41IDMuNCA3LjUgNy41cy0zLjQgNy41LTcuNSA3LjVTMS41IDEzLjEgMS41IDkgNC45IDEuNSA5IDEuNU05IDAuMWMtNC45IDAtOC45IDQtOC45IDguOXM0IDkgOC45IDkgOS00IDktOVMxMy45IDAuMSA5IDAuMUw5IDAuMXoiLz48cGF0aCBjbGFzcz0iYmxhY2stcm91bmQiIGQ9Ik05IDIuNWMzLjYgMCA2LjUgMi45IDYuNSA2LjVzLTIuOSA2LjUtNi41IDYuNVMyLjUgMTIuNiAyLjUgOSA1LjQgMi41IDkgMi41TTkgMS4yQzQuNyAxLjIgMS4yIDQuNyAxLjIgOXMzLjUgNy44IDcuOCA3LjggNy44LTMuNSA3LjgtNy44UzEzLjMgMS4yIDkgMS4yTDkgMS4yeiIvPjwvc3ZnPg==") 8 8, auto;
+  margin: 5px 5px;
+}
+.colorSlider_palette_circleBlack {
+  background-image: url(../images/circle-selected-black.gif);
+}
+.colorSlider_palette_circle {
+  background-image: url(../images/circle-selected-black.gif);
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  z-index: 100000;
+  background-position: center center;
+  background-repeat: no-repeat;
+  padding: 0px;
+}
+.colorSlider {
+  margin: 2px;
+  width: 450px;
+  height: 210px;
+  padding-top: 10px;
+  padding-left: 10px;
+  position: relative;
+}
+.colorSlider_palette_border {
+  border: 1px solid #000;
+  width: 256px;
+  height: 256px;
+  margin-right: 5px;
+  position: relative;
+  right: 91px;
+}
+.colorSlider_hue {
+  width: 40px;
+  float: right;
+  height: 267px;
+  margin-right: 3px;
+}
+.colorSlider_sliderHandle {
+  width: 36px;
+  height: 9px;
+  background-image: url(../images/arrow-l.gif);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 15;
+  left: 272px;
+  top: 1px;
+  cursor: default;
+}
+.colorSlider_sliderHandle div {
+  background-image: url('../images/arrow-r.gif');
+  background-repeat: no-repeat;
+  background-position: top right;
+  height: 9px;
+}
+.colorSlider_hueBar_border {
+  border: 1px solid #000;
+  border-top: 0px;
+  border-bottom: 0px;
+  width: 18px;
+  height: 256px;
+  position: absolute;
+  left: 281px;
+  z-index: 10;
+  margin-top: 5px;
+}
+.colorSlider_hueBar {
+  background-image: url(../images/hueBar.png);
+  height: 100%;
+  width: 16px;
+}
+.selectFormat {
+  width: 90px;
+  float: left;
+}
+.showValue {
+  width: 155px;
+  float: left;
+  margin-left: 4px;
+}
+.previewDiv {
+  border: 1px solid #e4e4e4;
+  width: 50px;
+  height: 39px;
+  float: left;
+  border-radius: 3px;
+  border-left: 0;
+  cursor: pointer;
+}
+.colorPickerDD {
+  width: 83px !important;
+  border-radius: 3px;
+  height: 38px;
+  padding: 10px 10px !important;
+}
+.lytePopoverClose {
+  top: 14px !important;
+}
+.lyteColorpickerForwardArrow {
+  border-bottom: 2px solid black;
+  border-right: 2px solid;
+  -ms-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  width: 12px;
+  height: 12px;
+  margin-top: 3px !important;
+}
+.lyteColorpickerBackwardArrow {
+  border-bottom: 2px solid black;
+  border-right: 2px solid;
+  -ms-transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+  transform: rotate(135deg);
+  width: 12px;
+  height: 12px;
+  margin-top: 3px !important;
+  display: inline-block;
+}
+.lyteColorpickerText {
+  vertical-align: baseline !important;
+  font-size: 14px !important;
+  margin-left: 64px !important;
+}
+/* LYTE-COLORPICKER END*/
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */
+/* Default theme imported */
+/* lyte progressbar styles */
+/* LYTE-PROGRESSBAR - DEFAULT VARIABLES*/
+/* LYTE-PROGRESSBAR - PROGRESS CIRCLE VARIABLES*/
+/* LYTE-PROGRESSBAR - PROGRESS STATUS VARIABLES*/
+/* LYTE-PROGRESSBAR - PROGRESS PERCRNTAGE VARIABLES*/
+/* LYTE-PROGRESSBAR - STATUS MOVING VARIABLES*/
+/* LYTE-PROGRESSBAR - STATUS VARIABLES*/
+/* LYTE-PROGRESSBAR - PROGRESS CIRCLE VARIABLES*/
+/* Loading theme in configuration */
+/* Loading final tweaks to your variables */
+/* LYTE-PROGRESSBAR */
+.lyteProgressBar {
+  position: relative;
+}
+.lyteProgressBar.lyteHorizontal {
+  height: 12px;
+  background: #DCE0E3;
+  border-radius: 8px;
+}
+/* LYTE-PROGRESSBAR - CIRCLE */
+.lyteProgressBar.lyteCircle {
+  width: 100px;
+  height: 100px;
+}
+/* LYTE-PROGRESSBAR - PROGRESS STATUS */
+.lyteProgressBar .lyteProgressStatus {
+  background-color: #42a2eb;
+  color: #fff;
+}
+.lyteProgressBar.lyteProgressCompleted .lyteProgressStatus {
+  background-color: #3fbd5f;
+  color: #fff;
+}
+.lyteProgressBar .lyteProgressPercentage {
+  position: absolute;
+  top: 1px;
+  right: 5px;
+  font-size: 11px;
+  z-index: 10;
+}
+.lyteProgressBar .lyteProgressStatus .progressMovingObj {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  background-image: -webkit-linear-gradient(-45deg, rgba(221, 221, 221, 0.29) 25%, transparent 25%, transparent 50%, rgba(221, 221, 221, 0.29) 50%, rgba(221, 221, 221, 0.29) 75%, transparent 75%, transparent);
+  background-image: -moz-linear-gradient(-45deg, rgba(221, 221, 221, 0.29) 25%, transparent 25%, transparent 50%, rgba(221, 221, 221, 0.29) 50%, rgba(221, 221, 221, 0.29) 75%, transparent 75%, transparent);
+  background-image: -ms-linear-gradient(-45deg, rgba(221, 221, 221, 0.29) 25%, transparent 25%, transparent 50%, rgba(221, 221, 221, 0.29) 50%, rgba(221, 221, 221, 0.29) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(-45deg, rgba(221, 221, 221, 0.29) 25%, transparent 25%, transparent 50%, rgba(221, 221, 221, 0.29) 50%, rgba(221, 221, 221, 0.29) 75%, transparent 75%, transparent);
+  -webkit-background-size: 20px 20px;
+  -moz-background-size: 20px 20px;
+  -ms-background-size: 20px 20px;
+  background-size: 20px 20px;
+  -webkit-animation: move 1s linear infinite;
+  -moz-animation: move 1s linear infinite;
+  -ms-animation: move 1s linear infinite;
+  animation: move 1s linear infinite;
+  -webkit-border-top-right-radius: 20px;
+  -webkit-border-bottom-right-radius: 20px;
+  -moz-border-radius-topright: 20px;
+  -moz-border-radius-bottomright: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  -webkit-border-top-left-radius: 20px;
+  -webkit-border-bottom-left-radius: 20px;
+  -moz-border-radius-topleft: 20px;
+  -moz-border-radius-bottomleft: 20px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+.lyteProgressBar > .lyteProgressStatus {
+  /* For Safari 3.1 to 6.0 */
+  /* For Safari 3.1 to 6.0 */
+  display: block;
+  height: 100%;
+  -webkit-border-top-right-radius: 20px;
+  -webkit-border-bottom-right-radius: 20px;
+  -moz-border-radius-topright: 20px;
+  -moz-border-radius-bottomright: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  -webkit-border-top-left-radius: 20px;
+  -webkit-border-bottom-left-radius: 20px;
+  -moz-border-radius-topleft: 20px;
+  -moz-border-radius-bottomleft: 20px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  -moz-transition: width 0.25s;
+  /* For Safari 3.1 to 6.0 */
+  -webkit-transition: width 0.25s;
+  /* For Safari 3.1 to 6.0 */
+  transition: width 0.25s;
+}
+.lyteProgressBar.lyteCircle .svgValueEle {
+  transform: rotate(-90deg);
+}
+.lyteProgressBar.lyteCircle circle {
+  transition: stroke-dashoffset 0.25s linear;
+}
+.lyteProgressBar .lyteProgressCount {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 1rem;
+  transform: translate(-50%, -50%);
+}
+.lyteProgressBar .lyteProgressCount {
+  color: #42a2eb;
+}
+.lyteProgressBar .lyteCircleType {
+  position: relative;
+  display: inline-block;
+}
+/* PROGRESS BAR - ANIMATION */
+@-webkit-keyframes move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+}
+@-moz-keyframes move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+}
+@-ms-keyframes move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+}
+@keyframes move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+}
+/* LYTE-PROGRESSBAR END*/
+/* import theme overrides - styles */
+/* import custom css - final tweaks by the user */

@@ -1,0 +1,192 @@
+
+
+
+
+/* Disabled radiobuttons */
+.lyteRadioDisabled(){
+	@opacity: 0.5;
+}
+
+
+
+
+/* Basic radiobuttons */
+
+.lyteRadioDefaultRing(){
+	@background: @black; //changed
+	@width: 0.8125rem; //changed
+	@height: 0.8125rem; //changed
+	@border: 1px solid @white; //changed
+	@borderRadius: 50%;
+	@boxSizing: border-box;
+}
+
+.lyteRadioPrimaryRing(){
+	@background: @black; //changed
+	@width: 0.8125rem; //changed
+	@height: 0.8125rem; //changed
+	@border: 1px solid @primaryColor; //changed
+	@borderRadius: 50%;
+	@boxSizing: border-box;
+}
+
+.lyteRadioBlackRing(){
+	@background: @black; //changed
+	@width: 0.8125rem; //changed
+	@height: 0.8125rem; //changed
+	@border: 1px solid #04d8c2; //changed
+	@borderRadius: 50%;
+	@boxSizing: border-box;
+}
+
+
+/* radio check for all basic types */
+
+.lyteRadioCheck(){
+	@transition: .15s all ease-In-Out;
+	@borderRadius: 50%;
+	@width: 0.4325rem;
+	@height: 0.4325rem;
+	@border: 0;
+	@top: 2px;
+	@left: 2px;
+	@transform: scale(0);
+	@transformOrigin: center;
+}
+
+
+
+
+/* Background color for default */
+
+.lyteRadioDefault(){
+	@background: @white; // changed
+}
+
+
+
+
+/* Background color for primary */
+
+.lyteRadioPrimary(){
+	@background: @primaryColor; //changed
+}
+
+
+
+
+/* Background color for black */
+
+.lyteRadioBlack(){
+	@background: #04d8c2; //changed
+}
+
+
+
+
+/* After radiobutton is checked */
+
+.lyteRadioChecked(){
+	@transform: scale(1);
+}
+
+
+
+
+/* Label styles for basic radiobutton */
+
+.lyteRadioTextLabel(){
+	@fontSize: @regular!important;
+	@margin: 0 0.3125rem 0 0;
+	@verticalAlign: top;	
+}
+
+
+
+
+/* Switch radiobuttons */
+
+/* switch */
+
+.lyteRadioSwitchBasic(){
+	@verticalAlign: top;
+	@width: 2.1875rem;
+	@height: 1.25rem;
+	@borderRadius: 1.25rem;
+	@background: @lightGrey;	
+}
+
+
+
+
+/* switch button */
+
+.lyteRadioSwitchBtn(){
+	@width: 1rem;
+	@height: 1rem;
+	@background: @white;
+	@borderRadius: 1.25rem;
+	@left: 0.125rem;
+	@top: 0.125rem;
+	@transition: left 200ms ease;	
+}
+
+/* radio button gets checked so set left of the button */
+
+.lyteRadioSwitchChecked(){
+	@left: calc(1.1875rem - 0.125rem);
+}
+
+
+
+
+/* Sliders */
+
+.lyteRadioSliderBasic(){
+	@height: 1.40rem;
+	@padding: 0 0 0 4.25rem;
+	@verticalAlign: middle;
+	@boxSizing: border-box;
+}
+
+
+
+
+/* Slider button CSS */
+
+.lyteRadioSliderButton(){
+	@width: 1.40rem;
+	@height: 1.40rem;
+	@zIndex: 1;
+	@opacity: 1;
+	@backgroundColor: @white;
+	@boxShadow: 0 1px 2px 0 rgba(34,36,38,.15), 0 0 0 1px rgba(34,36,38,.15) inset;
+	@borderRadius: 50%;
+	@left: 0px;
+	@transition: left 200ms ease;
+}
+
+
+
+
+/* Slider */
+
+.lyteRadioSliderStyle(){
+	@zIndex: 0;
+	@width: 3.5rem;
+	@height: 0.20rem;
+	@top: 0.60rem;
+	@left: 0px;
+	@backgroundColor: @grey;	
+}
+
+/* slider checked */
+
+.lyteRadioSliderChecked(){
+	@left: 2.25rem;
+	@backgroundColor: @black;
+}
+
+
+
+

@@ -42,7 +42,7 @@ module.exports = {
 
 	configureFolders : function(options) {
 		path = options.path;
-		options.outputFolder = "dist"; /* Folder at which the built files are to be needed. */
+		options.outputFolder = "docs"; /* Folder at which the built files are to be needed. */
 		options.autoBundle = true ;/* autoBundle is to bundle all (routes,components,models,mixins ,helpers and router.js file)*/
 		buildUtils = require(path.join(options.cliRoot,'lib','utilities','buildUtils'));
 		var folders = { /* Available modules and its folder structures.*/

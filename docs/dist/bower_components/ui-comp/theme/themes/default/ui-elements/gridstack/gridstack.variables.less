@@ -1,0 +1,118 @@
+/* lyte-gridstack:not(.gridFreezeMode) .lyteGridStackLeft */
+
+   .gridStackLeft(){
+		    @height: 100%;
+    		@width: 15px;
+		    @left: 0px;
+		    @top: 0px;
+		    @bottom: 15px;
+		    @cursor: w-resize;
+		    @zIndex: 20;
+	}
+/*lyte-gridstack:not(.gridFreezeMode) .lyteGridStackRight */
+	.lyteGridStackRight(){
+		    @height: 100%;
+    		@width: 15px;
+		    @right: 0px;
+		    @top: 0px;
+		    @bottom: 15px;
+		    @cursor: e-resize;
+		    @zIndex: 20;
+	}
+/* lyte-gridstack:not(.gridFreezeMode) .lyteGridStackBottom */
+		.lyteGridStackBottom(){
+		    @height: 15px;
+    		@width: 100%;
+		    @left: 0px;
+		    @bottom: 0px;
+		    @cursor: s-resize;
+		    @zIndex: 18;
+	}
+/*lyte-gridstack:not(.gridFreezeMode) .lyteGridStackBottomLeft*/
+		.lyteGridStackBottomLeft(){
+			@height: 15px;
+			@width: 15px;
+			@bottom: 0px;
+			@left: 0px;
+			@cursor: sw-resize;
+			@zIndex: 20;
+	}
+/*lyte-gridstack:not(.gridFreezeMode) .lyteGridStackBottomRight*/
+		.lyteGridStackBottomRight(){
+			@height: 15px;
+			@width: 15px;
+			@bottom: 0px;
+			@right: 0px;
+			@cursor: se-resize;
+			@zIndex: 20;
+	}
+
+/* lyte-gridstack:not(.gridFreezeMode) .lyteGridStackTop */
+		.lyteGridStackTop(){
+		    @height: 15px;
+    		@width: 100%;
+		    @left: 0px;
+		    @top: 0px;
+		    @cursor: n-resize;
+		    @zIndex: 18;
+	}	
+
+/* lyte-gridstack:not(.gridFreezeMode) .lyteGridStackTopLeft */
+		.lyteGridStackTopLeft(){
+			@height: 15px;
+			@width: 15px;
+			@top: 0px;
+			@left: 0px;
+			@cursor: nw-resize;
+			@zIndex: 20;
+}
+
+/* lyte-gridstack:not(.gridFreezeMode) .lyteGridStackTopRight */
+		.lyteGridStackTopRight(){
+			@height: 15px;
+			@width: 15px;
+			@top: 0px;
+			@right: 0px;
+			@cursor: ne-resize;
+			@zIndex: 20;
+	}
+
+/*lyte-gridstack:not(.gridFreezeMode) div.lyteBestFit*/
+	.lyteGridBestFit(){
+		@border:black dotted;
+		@zIndex: 0;
+		@opacity: 0.4;
+
+	}
+	
+
+/*.lyteGridstackScope*/ 
+	.lyteGridStackScope(){
+	@outline : none;
+	@overflow: auto;
+	@backgroundColor: #EBEBEB;
+}
+
+/* .lyteGridstackHandler:not(.gridSelected)*/
+	.gridHandlerNotSelected(){
+	@transitionDuration: 0.4s;
+	@overflow: auto;
+	@msOverflowStyle: none;
+	@cursor : move;
+	@boxSizing: border-box;
+}
+
+/*.lyteGridstackHandler.gridSelected*/ 
+	.gridHandlerSelected(){
+	@opacity: 0.4;
+	@zIndex: 22;
+	@cursor : move;
+	@overflow: auto;
+	@boxSizing: border-box;
+	@transition: width 0s, height 0s;
+}
+
+/* lyte-gridstack:not(.gridFreezeMode) .lyteBestFit.lyteGrid */
+	.lyteBestFitlyteGrid(){
+		@backgroundColor: #9f9d9d;
+	}

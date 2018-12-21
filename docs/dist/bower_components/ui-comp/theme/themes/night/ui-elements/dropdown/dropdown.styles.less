@@ -1,0 +1,41 @@
+lyte-drop-box {
+	.lyteDropBox();
+	border-radius: @borderRadius;
+	min-width: @minWidth;
+}
+
+lyte-dropdown:not([lt-prop-type="multiple"]):not([lt-prop-type="multisearch"]) lyte-drop-button {
+	.lyteDropButtonNormal();
+	border-radius: @borderRadius;
+}
+
+lyte-drop-item {
+	.lyteDropItem();
+	transition: @transition;
+}
+
+lyte-drop-item:hover{
+    .lyteDropItemHover();
+    padding-left: @paddingLeft;
+}
+
+.lyteDropdownSelection{
+    .lyteDropItemSelected();
+    padding-left: @paddingLeft;
+}
+
+lyte-icon.dropdown
+{
+    .lyteDropOpener();
+   	margin: @margin;
+    border: @border;
+    width: @width;
+    height: @height;
+    border-width: @borderWidth;
+    display: inline-block;
+    padding: @padding;
+    background: @background;
+    opacity:@opacity;
+    transform: @transform;
+    -webkit-transform: @transform;
+}

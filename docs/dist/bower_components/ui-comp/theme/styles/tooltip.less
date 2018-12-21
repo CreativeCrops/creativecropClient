@@ -1,0 +1,134 @@
+
+/* Default theme imported */
+@import "../themes/default/ui-elements/tooltip/tooltip.variables.less";
+
+/* Loading theme in configuration */
+@import "../config.less";
+
+@import (optional) "../themes/@{tooltip}/ui-elements/tooltip/tooltip.variables.less";
+
+/* Loading custom themes */
+@import (optional) "../overrides/ui-elements/tooltip/tooltip.variables.less";
+
+span.lyteTooltip{
+	.lyteTooltip();
+    position: absolute !important;
+    background-color: @backgroundColor;
+    border-color: @borderColor;
+    color: @color;
+    text-align: @textAlign;
+    padding: @padding; 
+    border-radius: @borderRadius; 
+    font-size: @fontSize;
+    z-index: @zIndex;
+    pointer-events: none;
+}
+span.lyteTooltip.lyteLeft::before{
+	.lyteTooltipLeftBefore();
+    content: "";
+    position: absolute;
+    bottom: @bottom;
+    right: @right;
+    margin-left: @marginLeft;
+    border-width: @borderWidth;
+    border-style: @borderStyle;
+    border-color: @borderColor;
+    border-left-color: @borderLeftColor !important;
+}
+.lyteRight::after{
+	.lyteTooltipRightAfter();
+    content: "";
+    position: absolute;
+    bottom: @bottom;
+    left: @left;
+    margin-left: @marginLeft;
+    border-width: @borderWidth;
+    border-style: @borderStyle;
+    border-color:  @borderColor ;
+    border-right-color: @borderRightColor !important;
+}
+span.lyteTooltip.lyteBottom::after{
+	.lyteTooltipBottomAfter();
+	content: "";
+    position: absolute;
+    bottom: @bottom;
+    left: @left;
+    margin-left: @marginLeft;
+    border-width: @borderWidth;
+    border-style: @borderStyle;
+    border-color: @borderColor ;
+    border-bottom-color: @borderBottomColor !important;
+}
+span.lyteTooltip.lyteTop::after{
+	.lyteTooltipTopAfter();
+    content: "";
+    position: absolute;
+    top: @top;
+    left: @left;
+    margin-left: @marginLeft;
+    border-width: @borderWidth;
+    border-style: @borderStyle;
+    border-color: @borderColor;
+    border-top-color: @borderTopColor !important;
+}
+span.lyteTooltip.lyteBottomright::after{
+	.lyteTooltipBottomRightAfter();
+    content: "";
+    position: absolute;
+    bottom: @bottom;
+    left: @left;
+    margin-left: @marginLeft;
+    border-width: @borderWidth;
+    border-style: @borderStyle;
+    border-color:  @borderColor ;
+    border-bottom-color: @borderBottomColor !important;
+}
+span.lyteTooltip.lyteTopright::after{
+	 .lyteTooltipTopRightAfter();
+    content: "";
+    position: absolute;
+    top: @top;
+    left: @left;
+    margin-left: @marginLeft;
+    border-width: @borderWidth;
+    border-style: @borderStyle;
+    border-color: @borderColor ;
+    border-top-color: @borderTopColor !important;
+}
+span.lyteTooltip.lyteBottomleft::after{
+		.lyteTooltipBottomLeftAfter();
+    content: "";
+    position: absolute;
+    bottom: @bottom;
+    left: @left;
+    margin-left: @marginLeft;
+    border-width: @borderWidth;
+    border-style: @borderStyle;
+    border-color: @borderColor;
+    border-bottom-color: @borderBottomColor !important;
+}
+span.lyteTooltip.lyteTopleft::after{
+		.lyteTooltipTopLeftAfter();
+    content: "";
+    position: absolute;
+    top: @top;
+    left: @left;
+    margin-left: @marginLeft;
+    border-width: @borderWidth;
+    border-style: @borderStyle;
+    border-color: @borderColor;
+    border-top-color: @borderTopColor !important;
+}
+span.lyteTooltip.lyteTooltipHidden{
+    display: none !important;
+}
+
+
+    /* import theme overrides - styles */
+@import (optional) "../themes/@{tooltip}/ui-elements/tooltip/tooltip.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/tooltip.overrides.less";

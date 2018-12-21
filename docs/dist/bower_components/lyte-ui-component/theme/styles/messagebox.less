@@ -1,0 +1,210 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/messagebox/messagebox.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{messagebox}/ui-elements/messagebox/messagebox.variables.less";
+
+
+
+
+/* Loading final tweaks to your variables */
+@import (optional) "../overrides/ui-elements/messagebox.variables.less";
+
+
+
+/* LYTE-MESSAGEBOX */
+.lyteMessageBox {
+    .lyteMessageboxDefault();
+    box-shadow: @boxShadow;
+    padding: @padding;
+    z-index: @zIndex;
+    background: @background;
+    border-radius: @borderRadius;
+    color: @color;
+    font-size: @fontSize;
+    transition: @transition;
+    display: block;
+    -webkit-font-smoothing: @webkitFontSmoothing;
+    -moz-osx-font-smoothing: @mozOsxFontSmoothing;
+    
+    animation-duration: @animationDuration;
+    -webkit-animation-duration: @webkitAnimationDuration;
+    animation-fill-mode: @animationFillMode;
+    -webkit-animation-fill-mode: @webkitAnimationFillMode;
+
+    border : @border;
+    position: absolute;
+    top: @top;
+    min-width: @minWidth;
+}
+.llyteMessageBoxFadeIn{
+    animation-name: fadeIn;
+    -webkit-animation-name: fadeIn;
+}
+@keyframes fadeIn{
+    0%{opacity: 0;}
+    100%{opacity: 1;}
+}
+.lyteMessageBoxFadeOut{
+    animation-name: fadeOut;
+    -webkit-animation-name: fadeOut;
+}
+@keyframes fadeOut{
+    0%{opacity: 1;}
+    100%{opacity: 0;}
+}
+
+
+
+/* LYTE-MESSAGEBOX - SYMBOL */
+.lyteMessageBox .lyteMessageBoxSymbol {
+    .lyteMessageboxSymbol();
+    width: @width;
+    height: @height;
+    display: inline-block;
+    position: absolute;
+}
+.lyteMessageBox .lyteMessageBoxSymbol:before{
+    .lyteMessageboxSymbolBefore();
+    content: "";
+    background: @background;
+    width: @width;
+    height: @height;
+    position: absolute;
+    left: @left;
+    top: @top;
+    display: inline-block;
+}
+.lyteMessageBox .lyteMessageBoxSymbol:after{
+    .lyteMessageboxSymbolAfter();
+    content: "";
+    border-left: @borderLeft;
+    border-top: @borderTop;
+    border-bottom: @borderBottom;
+    position: absolute;
+    left: @left;
+    top: @top;
+}
+
+
+
+/* LYTE-MESSAGEBOX - CONTENT */
+.lyteMessageBox .lyteMessageBoxContent {
+    .lyetMessageboxContent();
+    display: inline-block;
+    max-width: @maxWidth;
+    vertical-align: top;
+    padding: @padding;
+}
+
+
+
+/* LYTE-MESSAGEBOX - CLOSE */
+.lyteMessageBox .lyteMessageBoxClose{
+    .lyteMessageboxClose();
+    background: @background;
+    width: @width;
+    height: @height;
+    display: inline-block;
+    position: absolute;
+    cursor: pointer;
+    top: @top;
+    right: @right;
+}
+
+/*Message band model design for success*/
+.lyteMessageBox.successMessageIcon{
+    .lyteMessageboxSuccess();
+    border-color: @borderColor;
+}
+.lyteMessageBox.successMessageIcon .lyteMessageBoxSymbol{
+    .lyteMessageboxSuccessSymbol();
+    background: @background;
+}
+.lyteMessageBox.successMessageIcon .lyteMessageBoxSymbol:before{
+    .lyteMessageboxSuccessSymbolBefore();
+    content: "";
+    background-position: @backgroundPosition;
+}
+.lyteMessageBox.successMessageIcon .lyteMessageBoxSymbol:after{
+    .lyteMessageboxSuccessSymbolAfter();
+    content: "";
+    border-left-color: @borderLeftColor;
+}
+
+/*Message band model design for Error*/
+.lyteMessageBox.errorMessageIcon{
+    .lyteMessageboxError();
+    border-color: @borderColor;
+}
+.lyteMessageBox.errorMessageIcon .lyteMessageBoxSymbol{
+    .lyteMessageboxErrorSymbol();
+    background: @background;
+}
+.lyteMessageBox.errorMessageIcon .lyteMessageBoxSymbol:before{
+    .lyteMessageboxErrorSymbolBefore();
+    content: "";
+    background-position: @backgroundPosition;
+    width: @width;
+}
+.lyteMessageBox.errorMessageIcon .lyteMessageBoxSymbol:after{
+    .lyteMessageboxErrorSymbolAfter();
+    content: "";
+    border-left-color: @borderLeftColor;
+}
+
+/*Message band model design for Warning*/
+.lyteMessageBox.warningMessageIcon{
+    .lyteMessageboxWarning();
+    border-color: @borderColor;
+}
+.lyteMessageBox.warningMessageIcon .lyteMessageBoxSymbol{
+    .lyteMessageboxWarningSymbol();
+    background: @background;
+}
+.lyteMessageBox.warningMessageIcon .lyteMessageBoxSymbol:before{
+    .lyteMessageboxWarningSymbolBefore();
+    content: "";
+    background-position: @backgroundPosition;
+}
+.lyteMessageBox.warningMessageIcon .lyteMessageBoxSymbol:after{
+    .lyteMessageboxWarningSymbolAfter();
+    content: "";
+    border-left-color: @borderLeftColor;
+}
+
+/*Message band model design for INFO*/
+.lyteMessageBox.infoMessageIcon{
+    .lyteMessageboxInfo();
+    border-color: @borderColor;
+}
+.lyteMessageBox.infoMessageIcon .lyteMessageBoxSymbol{
+    .lyteMessageboxInfoSymbol();
+    background: @background;
+}
+.lyteMessageBox.infoMessageIcon .lyteMessageBoxSymbol:before{
+    .lyteMessageboxInfoSymbolBefore();
+    content: "";
+    background-position: @backgroundPosition;
+}
+.lyteMessageBox.infoMessageIcon .lyteMessageBoxSymbol:after{
+    .lyteMessageboxInfoSymbolAfter();
+    content: "";
+    border-left-color: @borderLeftColor;
+}
+
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{messagebox}/ui-elements/messagebox/messagebox.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/messagebox.overrides.less";

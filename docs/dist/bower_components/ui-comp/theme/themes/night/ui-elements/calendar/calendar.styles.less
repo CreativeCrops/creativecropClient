@@ -1,0 +1,93 @@
+table.lyteCalDay td {
+	.lyteCalendarDateCells();
+	border: @border;
+}
+
+td.lyteCalGray {
+	.lyteCalendarDisabled();
+	border: @border;
+}
+
+.lyteCalendarPopup {
+	.lyteCalendarContainer();
+	border-radius: @borderRadius;
+}
+
+.lyteCaldLft {
+    .lyteLeftMonth();
+    margin: 1px;
+    right:0px;
+    border: solid @white;
+    width: 5px;
+    height: 5px;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 1px;
+    background: none;
+    opacity:@opacity;
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+}
+
+
+
+
+/* Right month button */
+
+.lyteCaldRgt{
+    .lyteRightMonth();
+    margin: 1px;
+    left:0px;
+    border: solid @white;
+    width: 5px;
+    height: 5px;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 1px;
+    background: none;
+    opacity:@opacity;
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+
+
+
+/* Left year button */
+
+.lyteCalyearNavLft {
+    .lyteLeftYear();
+    margin: 1px 5px;
+    right:0px;    
+    border: solid @white;
+    width: 5px;
+    height: 5px;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 1px;
+    background: none;
+    opacity:@opacity;
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+}
+
+
+
+
+/* Right year button */
+
+.lyteCalyearNavRgt {
+    .lyteRightYear();
+    margin: 1px 5px;
+    left:0px;
+    border: solid @white;
+    width: 5px;
+    height: 5px;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 1px;
+    background: none;
+    opacity:@opacity;
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}

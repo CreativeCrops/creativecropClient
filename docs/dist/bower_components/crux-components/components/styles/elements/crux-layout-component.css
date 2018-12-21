@@ -1,0 +1,54 @@
+.listview_layoutlists li.layoutElementList {
+	margin:0 5px 2px 0;
+	padding:1px 5px;
+	line-height:1;
+}
+.w230{
+	width : 230px;
+}
+.m0{
+	margin: 0px
+}
+.dIB{
+	display: inline-block;
+}
+.f12{
+	font-size: 12px;
+}
+.bR2{
+	border-radius: 2px;
+}
+.bdr1px {
+	border: 1px solid #DDDDDD;
+}
+.outerbox1{
+    border: 1px solid #ccc!important;
+    border-radius: 0;
+    min-width: 100px!important;
+    background-color: white;
+    cursor: pointer;
+    box-sizing: border-box!important;
+    display: flex!important;
+    align-items: center;
+}
+.singleItem{
+  margin: 2px 0 0 2px;
+    border-radius: 0;
+    background: #EDEDED;
+    color: #5A5A5A;
+    font-size: .800rem;
+    padding: 0px 0px 0px 0px;
+    border: 1px solid #ccc;
+    white-space: normal;
+}
+
+.boxclose{
+  margin: -3px -5px -3px 7px;
+    height: 19px;
+    width: 12px;
+    padding-top: 3px;
+    color: #999;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+ }

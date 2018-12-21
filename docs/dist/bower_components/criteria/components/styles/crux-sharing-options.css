@@ -1,0 +1,14 @@
+.showNoResultDiv {
+    padding: .55rem 1.1rem;
+}
+
+.wrapperdiv {
+	border-bottom: 1px solid #d6d6d6;
+}
+
+.shown {
+	display: block;
+}
+.hiden {
+	display: none;
+}

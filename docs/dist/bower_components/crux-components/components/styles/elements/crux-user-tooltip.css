@@ -1,0 +1,194 @@
+/*$Id$*/
+
+.userTooltipPopoverClass{
+	padding : 15px 8px 0px 20px;
+}
+.userbcpopup  {
+	z-index :1000 !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	position: fixed;
+	background-color: #fff;
+	padding: 10px 20px 15px 10px;
+	min-width: 300px;
+	min-height: 100px;
+}
+.userbcpopup:hover { display: block !important; }
+.mB8{
+	margin-bottom: 8px;
+}
+.dIB{
+	display: inline-block;
+}
+.vat{
+	vertical-align: top;
+}
+.lvttImg {
+    width: 25px;
+    border-radius: 30px;
+}
+.mR5{
+	margin-right: 5px;
+}
+.bold{
+	font-family: ProximaNovaLtSemibold, Arial,sans-serif;
+	font-weight: normal;
+}
+.color_1{ color:#111;}
+.dB{
+	display: block;
+}
+.mB3{
+	margin-bottom: 3px;
+}
+.color_9{
+	color:#999;
+}
+.f13{
+	font-size: 13px;
+}
+.mB5{
+	margin-bottom: 5px;
+}
+.vam{
+	vertical-align: middle;
+}
+.lvttMailIcon{
+	background: url(/crm/images/svgicons.svg) no-repeat -309px -6px;
+	width: 13px;
+	height: 9px;	
+}
+.mR10{
+	margin-right: 10px;
+}
+.color_6 {
+	color: #666;
+}
+.lvttPhoneIcon{
+	background: url(/crm/images/svgicons.svg) no-repeat -306px -30px;
+	width: 16px;
+	height: 16px;	
+}
+.pR{
+	position: relative;
+}
+.up_space {
+	background-color: #fff;
+	padding: 3px;
+	border-radius:50%;
+}
+.pA{
+	position: absolute;
+}
+.up_size {
+	max-width: 80px;
+	max-height: 80px;
+	border-radius:50%
+}
+.fL{
+	float: left;
+}
+.userbc_info{
+	margin-left:105px;
+	min-height:60px;
+}
+.proximas{
+	font-family: ProximaNovaLtSemibold;
+}
+.f15{
+	font-size: 15px;
+}
+.pT5{
+	padding-top: 5px;
+}
+.pB5{
+	padding-bottom: 5px;
+}
+.userinfoMax{
+	word-wrap: break-word;
+    max-width: 800px;
+}
+.mL5{
+	margin-left: 5px;
+}
+.proxima {
+	font-family: ProximaNovaRegular;
+}
+.normaltag{
+	font-size:0.786rem;
+	font-weight:normal;
+	padding:2px 5px;
+	border-radius:2px;
+	display:inline-block;
+}
+.normaltag{
+	color:#777;
+	border:1px solid #ddd;
+	border-radius:2px;
+}
+.emailicon,.phoneicon,.mobileicon{
+	background: transparent url(/crm/images/svgicons.svg) no-repeat;
+	padding-left:20px;
+	line-height:28px;
+	color:#000;
+	font-size: 0.929rem;
+}
+.emailicon{
+	background-position: -307px 3px;
+}
+.lh24 {
+	line-height: 1.714rem;
+}
+.black{border-top-color:#000;}
+.phoneicon{
+	background-position: -308px -59px; 
+}
+.mobileicon{
+	background-position: -306px -27px;
+}
+.aligncenter{
+	text-align:center !important;
+}
+.dismiss-btn {
+	min-width: 70px;
+	color: #ef7575;
+	background: #fff;
+	border: 1px solid #ffa9a9;
+	border-radius: 2px;
+	margin: 13px auto 0;
+	padding: 6px 10px;
+	display: inline-block;
+	cursor: pointer;
+	margin-right: 10px;
+	text-transform:capitalize;
+}
+.lvOwnerTooltipLeft:before {
+    border-left: 8px solid #a9c9de;
+    right: -9px;
+}
+.lvOwnerTooltipLeft:after {
+    border-left: 8px solid #fff;
+    right: -8px;
+}
+.lvOwnerTooltipRight:before {
+    border-right: 8px solid #a9c9de;
+    left: -9px;
+}
+.lvOwnerTooltipRight:after {
+    border-right: 8px solid #fff;
+    left: -8px;
+}
+.lvOwnerTooltip {
+    background-color: #fff;
+    border: 1px solid #a9c9de;
+    border-radius: 2px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    padding: 15px 20px;
+    z-index:31;
+}
+.lvOwnerTooltip:before, .lvOwnerTooltip:after{
+	content: '';
+    position: absolute;
+    top: 30px;
+    border-bottom: 8px solid transparent;
+    border-top: 8px solid transparent;
+}

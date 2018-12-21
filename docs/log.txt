@@ -1,0 +1,13 @@
+copying file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/bower.json => /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/bower.json
+copying folder /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/routes to /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/routes
+creating directory /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/routes/index
+copying folder /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/routes/index to /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/routes/index
+creating file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/routes/index/setup.js
+copying file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/routes/index/setup.js => /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/routes/index/setup.js
+creating file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/routes/index.js
+copying file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/routes/index.js => /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/routes/index.js
+copying file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/favicon.ico => /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/favicon.ico
+copying file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/index.html => /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/index.html
+copying file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/router.js => /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/router.js
+
+Copying the consolidated files to /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/app.js

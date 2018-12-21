@@ -1,0 +1,208 @@
+/* Breadcrumb styles */
+
+/* lyte-breadcrumb-structure */
+
+  .lyteBreadcrumbStructure(){
+	@lineHeight: 1;
+    @margin: 0 0;
+    @verticalAlign: middle;
+}
+
+/* lyte-breadcrumb-item */
+
+ 	.lyteBreadcrumbItem(){
+	@float: left;
+	@marginRight: 10px;
+	@padding : 0;
+	@fontSize: 0.875em;
+}
+
+/* 
+.lyteBreadcrumbSlash lyte-breadcrumb-item:not(:last-of-type), .lyteBreadcrumbArrow lyte-breadcrumb-item:not(:last-of-type) */
+
+	.lyteBreadcrumb(){
+	@marginRight: 20px;
+}
+
+/* lyte-breadcrumb-item.lyteActive */
+
+ 	.lyteBreadCrumbItemActive(){
+	@color: #2C7BD0;
+}
+
+/* .lyteBreadcrumbSlash lyte-breadcrumb-item:not(:last-of-type):after */
+
+	.lyteBreadcrumbSlashAfter(){
+	@content: '/';
+	@right: -12px;
+	@top:0;
+	@color: #666;
+	@opacity: 0.5;
+}
+
+/* .lyteBreadcrumbArrow lyte-breadcrumb-item:not(:last-of-type):after */
+
+.lyteBreadcrumbArrowAfter{
+	@content: '';
+	@background: url(../images/lyte_ui_sprite.svg) no-repeat -191px -29px;
+	@right: -12px;
+	@top:3px;
+	@color: #666;
+	@width: 4px;
+	@height: 7px;
+	@opacity: 0.5;
+}
+
+/* .lyteBreadcrumbBullet:before */
+
+	.lyteBreadcrumbBulletBefore(){
+	@content: "";
+    @top: 48%;
+    @bottom: 38px;
+    @left: 0;
+    @width: 100%;
+    @boxSizing: border-box;
+    @height: 1px;
+    @background: #e3e3e3;
+}
+
+/* .lyteBreadcrumbBullet .lyteCompleted lyte-breadcrumb-head*/
+
+	.lyteBreadcrumbBulletCompleted(){
+	@background: #2d7bd0 ;
+	@color: #fff;
+}
+
+/* .lyteBreadcrumbBullet .lyteCompleted:not(:first-child):before  */
+
+	.lyteBreadcrumbBulletCompleted(){
+	@content: "";
+    @top: 48%;
+    @bottom: 38px;
+    @left: 0;
+    @width: 100%;
+    @boxSizing: border-box;
+    @height: 1px;
+    @background: #2d7bd0;
+}
+
+/* .lyteBreadcrumbBullet lyte-breadcrumb-head */
+
+.lyteBreadcrumbBulletHead(){
+    @border: 1px solid #2d7bd0;
+    @borderRadius: 50%;
+    @background: #fff;
+    @textAlign: center;
+    @fontSize: 0.7em;
+    @boxSizing: border-box;
+    @padding: 2px 5px;
+}
+
+/* .lyteBreadcrumbBullet lyte-breadcrumb-item */
+
+	.lyteBreadcrumbBulletItem(){
+	@marginRight: 0;
+}
+
+/* .lyteBreadcrumbBullet lyte-breadcrumb-body */
+
+	.lyteBreadcrumbBulletBody(){
+	@top: -15px;
+	@right: 0;
+	@fontSize: 0.75em;
+	@color: #666;
+}
+
+/* .lyteBreadcrumbBullet lyte-breadcrumb-item:not(:first-child) */
+
+	.lyteBreadcrumbBulletItemNotfirst(){
+	@paddingLeft: 60px;
+}
+
+/* .lyteBreadcrumbPlain lyte-breadcrumb-item, .lyteBreadcrumbFlat lyte-breadcrumb-item  */
+
+	.lyteBreadcrumbFlatItem(){
+	@marginRight: 0px;
+}
+
+/* .lyteBreadcrumbPlain lyte-breadcrumb-body, .lyteBreadcrumbFlat lyte-breadcrumb-body */
+
+	.lyteBreadcrumbFlatBody(){
+	@float: left;
+	@background: #eaeaea;
+	@textAlign: center;
+	@padding: 10px 20px 10px 30px;
+	@margin: 0 2px 0 0; 
+	@fontSize: 0.875em;
+	@textDecoration: none;
+	@color: #333;
+}
+
+/* .lyteBreadcrumbPlain lyte-breadcrumb-body:after,.lyteBreadcrumbFlat lyte-breadcrumb-body:after */
+
+	.lyteBreadCrumbFlatBodyAfter(){
+	@content: "";  
+	@borderTop: 15px solid transparent;
+	@borderBottom: 17px solid transparent;
+	@borderLeft: 17px solid #eaeaea;
+	@right: -17px; 
+	@top: 0;
+	@zIndex: 1;
+}
+
+/* .lyteBreadcrumbPlain lyte-breadcrumb-body:before, .lyteBreadcrumbFlat lyte-breadcrumb-body:before  */
+
+	.lyteBreadCrumbFlatBodyBefore(){
+	@content: "";  
+	@borderTop: 15px solid transparent;
+	@borderBottom: 17px solid transparent;
+	@borderLeft: 17px solid #fff;
+	@left: 0; 
+	@top: 0;
+}
+
+/* .lyteBreadcrumbFlat .lyteActive lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteActive lyte-breadcrumb-body */
+
+	.lyteBreadcrumbFlatActiveBody(){
+	@background: #2d7bd0 ;
+	@color: #fff ;
+}
+
+/* .lyteBreadcrumbFlat .lyteActive lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteActive lyte-breadcrumb-body:after */
+
+	.lyteBreadcrumbFlatActiveBodyAfter(){
+	@borderLeftColor: #2d7bd0;
+}
+
+/* .lyteBreadcrumbFlat .lyteWarning lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteWarning lyte-breadcrumb-body */
+
+	.lyteBreadcrumbFlatWarningBody(){
+	@background: #ffb130 ;
+	@color: #fff ;
+}
+
+/* .lyteBreadcrumbFlat .lyteWarning lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteWarning lyte-breadcrumb-body:after */
+
+	.lyteBreadcrumbFlatWarningBodyAfter(){
+	@borderLeftColor: #ffb130;
+}
+
+/* .lyteBreadcrumbFlat .lyteCompleted lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteCompleted lyte-breadcrumb-body*/
+
+	.lyteBreadcrumbFlatCompletedBody(){
+	@background: #72c880 ;
+	@color: #fff ;
+}
+
+/* .lyteBreadcrumbFlat .lyteCompleted lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteCompleted lyte-breadcrumb-body:after */
+
+	.lyteBreadcrumbFlatCompletedBodyAfter(){
+	@borderLeftColor: #72c880 ;
+}
+
+
+/* .lyteBreadcrumbPlain lyte-breadcrumb-item:first-child lyte-breadcrumb-body:before */
+
+	.lyteBreadcrumbPlainBefore(){
+	@borderLeftColor: transparent;
+} 

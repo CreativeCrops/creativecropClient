@@ -1,0 +1,110 @@
+/* lyte tooltip */
+
+/* span.lyteTooltip */
+
+	.lyteTooltip(){
+    @backgroundColor: #222;
+    @borderColor: #222;
+    @color: #fff;
+    @textAlign: center;
+    @padding: 5px 5px; 
+    @borderRadius: 2px; 
+    @fontSize: 1em;
+    @zIndex: 99999;
+}
+
+/* span.lyteTooltip.lyteLeft::before */
+
+	.lyteTooltipLeftBefore(){
+    @bottom: 25%;
+    @right: -10px;
+    @marginLeft: -5px;
+    @borderWidth: 5px;
+    @borderStyle: solid;
+    @borderColor:  transparent transparent transparent #222;
+    @borderLeftColor: inherit ;
+}
+
+/*& .lyteRight::after */
+
+	.lyteTooltipRightAfter(){
+    @bottom: 25%;
+    @left: -5px;
+    @marginLeft: -5px;
+    @borderWidth: 5px;
+    @borderStyle: solid;
+    @borderColor:  transparent #222 transparent transparent ;
+    @borderRightColor: inherit ;
+}
+
+/* span.lyteTooltip.lyteBottom::after */
+
+	.lyteTooltipBottomAfter(){
+    @bottom: 100%;
+    @left: 50%;
+    @marginLeft: -5px;
+    @borderWidth: 5px;
+    @borderStyle: solid;
+    @borderColor:  transparent transparent #222 transparent ;
+    @borderBottomColor: inherit ;
+}
+
+/* span.lyteTooltip.lyteTop::after */
+
+	.lyteTooltipTopAfter(){
+    @top: 100%;
+    @left: 50%;
+    @marginLeft: -5px;
+    @borderWidth: 5px;
+    @borderStyle: solid;
+    @borderColor: #222 transparent transparent transparent;
+    @borderTopColor: inherit ;
+}
+
+/* span.lyteTooltip.lyteBottomright::after */
+
+	.lyteTooltipBottomRightAfter(){
+    @bottom: 100%;
+    @left: 20%;
+    @marginLeft: -5px;
+    @borderWidth: 5px;
+    @borderStyle: solid;
+    @borderColor:  transparent transparent #222 transparent ;
+    @borderBottomColor: inherit;
+}
+
+/* span.lyteTooltip.lyteTopright::after */
+
+	 .lyteTooltipTopRightAfter(){
+    @top: 100%;
+    @left: 20%;
+    @marginLeft: -5px;
+    @borderWidth: 5px;
+    @borderStyle: solid;
+    @borderColor:  #222 transparent transparent transparent ;
+    @borderTopColor: inherit;
+}
+
+/* span.lyteTooltip.lyteBottomleft::after */
+
+		.lyteTooltipBottomLeftAfter(){
+    @bottom: 100%;
+    @left: 80%;
+    @marginLeft: -5px;
+    @borderWidth: 5px;
+    @borderStyle: solid;
+    @borderColor:  transparent transparent #222 transparent ;
+    @borderBottomColor: inherit;
+}
+
+/* span.lyteTooltip.lyteTopleft::after */
+
+		.lyteTooltipTopLeftAfter(){
+    @top: 100%;
+    @left: 80%;
+    @marginLeft: -5px;
+    @borderWidth: 5px;
+    @borderStyle: solid;
+    @borderColor:   #222 transparent transparent transparent ;
+    @borderTopColor: inherit ;
+}
