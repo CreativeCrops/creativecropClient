@@ -1,0 +1,28 @@
+button.lyteDefaultBtn:active {
+	.lyteDefaultButtonActive();
+	background: @background;
+	color: @color;
+}
+
+button.lytePrimaryBtn:active {
+	.lytePrimaryButtonActive();
+	background: @background;
+	border-color: @borderColor;
+}
+
+lyte-button button {
+	.lyteButtonCommon();
+	font-weight: @fontWeight
+}
+
+button.lyteSuccess:not(.lyteDefaultBtn):active {
+	.lyteSuccessButtonActive();
+	background: @backgroundColor;
+	border-color: @borderColor;
+}
+
+button.lyteFailure:not(.lyteDefaultBtn):active {
+	.lyteFailureButtonActive();
+	background: @backgroundColor;
+	border-color: @borderColor;
+}

@@ -1,0 +1,260 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/calendar/calendar.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{calendar}/ui-elements/calendar/calendar.variables.less";
+
+
+
+
+/* Loading final tweaks to your variables */
+@import (optional) "../overrides/ui-elements/calendar.variables.less";
+
+
+
+
+/* Calendar Container */
+
+.lyteCalendarPopup{
+    .lyteCalendarContainer();
+	background: @background;
+    z-index: @zIndex;
+    padding: @padding;
+    border: @border;
+    box-shadow: @boxShadow;
+    -webkit-box-shadow:  @boxShadow;
+    font-family: @fontFamily; 
+    font-size: @fontSize;
+    display: inline-block;
+}
+
+
+
+
+/* Navigation Panel */
+
+.lyteCalendarNavigator {
+    .lyteCalendarNavPanel();
+	text-align: @textAlign;
+	margin-bottom: @marginBottom;
+}
+
+
+
+
+/* Common for all navigation buttons */
+
+.lyteCalNav{
+    width: 20px;
+    height: 15px; 
+    display: inline-block; 
+    cursor: pointer;
+}
+
+
+
+
+/* Left month button */
+
+.lyteCaldLft {
+    .lyteLeftMonth();
+    right:10px;
+    background: url('../images/lyte_ui_sprite.svg') no-repeat -273px -1px;
+    opacity:@opacity; 
+}
+
+
+
+
+/* Right month button */
+
+.lyteCaldRgt{
+    .lyteRightMonth();
+    left:10px;
+    background: url('../images/lyte_ui_sprite.svg') no-repeat -298px -1px;
+    opacity:@opacity;
+}
+
+
+
+
+/* Left year button */
+
+.lyteCalyearNavLft {
+    .lyteLeftYear();
+    right:15px;    
+    background: url('../images/lyte_ui_sprite.svg') no-repeat -244px -1px;
+    opacity:@opacity;
+}
+
+
+
+
+/* Right year button */
+
+.lyteCalyearNavRgt {
+    .lyteRightYear();
+    left:15px;
+    background:url('../images/lyte_ui_sprite.svg') no-repeat -322px -1px;
+    opacity:@opacity;
+}
+
+.lyteCalyearNavLft:hover,.lyteCalyearNavRgt:hover,.lyteCaldRgt:hover,.lyteCaldLft:hover{
+    .lyteCalendarNavButtonHover();
+    opacity:@opacity;
+}
+
+
+
+
+/* Calendar Header */
+
+.lyteCalsCalMon {
+    .lyteCalendarHeader();
+    cursor: default; 
+    width: @width; 
+    display: inline-block; 
+    color: @color; 
+    font-size: @fontSize; 
+    vertical-align: @verticalAlign;
+}
+
+
+/* Table Layout using divs */
+
+.lyteCalTableRow, .lyteCalTableRowHeader {
+    display: table-row;
+}
+
+
+/* Date container - all days and dates */
+
+.lyteCalTableContainerHeader {
+    .lyteDateContainerHeader();
+    color: @color; 
+    border-spacing: @borderSpacing; 
+    width: @width;
+    display: table;
+}
+
+.lyteCalTableContainer {
+    .lyteDateContainer();
+    color: @color; 
+    border-spacing: @borderSpacing; 
+    width: @width;
+    display: table;
+}
+
+
+
+/* Individual cell */
+
+.lyteCalTableCellHeader {
+    .lyteCalendarIndividualCellHeader(); 
+    font-size: @fontSize; 
+    cursor:default;
+    border-radius: @borderRadius; 
+    text-align:@textAlign;  
+    padding: @padding;
+    font-family: @fontFamily;
+    display: table-cell;  
+}
+
+.lyteCalTableCell {
+    .lyteCalendarIndividualCell(); 
+    font-size: @fontSize; 
+    cursor:default;
+    border-radius: @borderRadius; 
+    text-align:@textAlign;  
+    padding: @padding;
+    font-family: @fontFamily;
+    display: table-cell;  
+    cursor:pointer
+}
+
+.lyteCalEmpty {
+    display: table-cell;
+}
+
+
+
+/* More Day Styles */
+
+.lyteCalTableCellHeader{
+    .lyteCalendarMore();
+    color: @color; 
+    padding:@padding; 
+    width: @width; 
+}
+
+.lyteCalGray {
+    .lyteCalendarDisabled();
+    color: @color;
+}
+
+
+
+
+/* calendar selected */
+
+.lyteCalSel{
+    .lyteCalendarSelected();
+    box-shadow: @boxShadow;
+    
+}
+
+.lyteCalToday {
+    .lyteCalendarTodayDate();
+    color: @color; 
+    background: @background; 
+    border-radius: @borderRadius;
+}
+
+.lyteCalSel:hover {
+    .lyteCalendarSelectedHover();
+    color:@color; 
+    background:@background; 
+    border-radius:@borderRadius;
+}
+
+
+
+
+/* Calendar Hover */
+
+.lyteCalTableCell:hover:not(.lyteCalSel) {
+    .lyteCalendarDateHover();
+    background: @background; 
+}
+
+
+
+
+
+/* Today Style */
+
+.lyteCalBtns .lyteCalCurrentDate {
+    .lyteCalendarToday();
+	float: @float;
+}
+
+
+.lyteCalBtns .lyteCalCurrentDate a {
+	cursor: pointer;
+}
+
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{calendar}/ui-elements/calendar/calendar.styles.less";
+
+
+
+
+/* import custom css */
+@import (optional) "../overrides/ui-elements/calendar.overrides.less";

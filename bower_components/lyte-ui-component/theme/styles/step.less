@@ -1,0 +1,311 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/step/step.variables.less";
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{step}/ui-elements/step/step.variables.less";
+
+/* Loading custom themes */
+@import (optional) "../overrides/ui-elements/step/step.variables.less";
+
+/* step Styles */
+
+lyte-step-structure{
+	.lyteStepStructure();
+	line-height: @lineHeight;
+    display: inline-block;
+    margin: @margin;
+    vertical-align: @verticalAlign;
+}
+
+.lyteStepSlash lyte-step-item:not(last-of-type), .lyteStepArrow lyte-step-item:not(last-of-type){
+	.lyteStepStructureDividerSlashItem();
+	margin-right: @marginRight;
+}
+
+ lyte-step-item {
+	.lyteStepStructureItem();
+	float: @float;
+	margin-right: @marginRight;
+	padding : @padding;
+	font-size: @fontSize;
+	position: relative;
+}
+lyte-step-item.lyteActive{
+	.lyteStepStructureItemActive();
+	color: @color;
+}
+.lyteStepSlash lyte-step-item:not(:last-of-type):after{
+	.lyteStepStructureDividerSlashItemLastOfTypeAfter();
+	content: @content;
+	position: absolute;
+	right: @right;
+	top: @top;
+	color: @color;
+	opacity: @opacity;
+}
+.lyteStepSlash .lyteWarning{
+	.lyteStepStructureDividerSlashWarning();
+	color: @color;
+}
+.lyteStepSlash .lyteCompleted{
+	.lyteStepStructureDividerSlashCompleted();
+	color: @color;
+}
+.lyteStepArrow lyte-step-item:not(:last-of-type):after{
+	.lyteStepStructureDividerArrowItemAfter();
+	content: '';
+	background: @background;
+	position: absolute;
+	right: @right;
+	top: @top;
+	color: @color;
+	width: @width;
+	height: @height;
+	opacity: @opacity;
+}
+/*Stage css*/
+.lyteStepBullet, .lyteStepFlat{
+	.lyteStepStructureStageOneAndTwo();
+	position: relative;
+	white-space: @whiteSpace;
+}
+.lyteStepBullet:before{
+	.lyteStepStructureStageOneBefore();
+	content: "";
+    display: block;
+    position: absolute;
+    top: @top;
+    bottom: @bottom;
+    left: @left;
+    width: @width;
+    box-sizing: @boxSizing;
+    height: @height;
+    background: @background;
+}
+.lyteStepBullet .lyteCompleted lyte-step-head{
+	.lyteStepStructureStageOneCompletedHead();
+	background: @background !important;
+	color: @color;
+	border: @border !important;
+}
+.lyteStepBullet lyte-step-item.lyteCompleted:not(:first-of-type):before {
+	.lyteStepStructureStageOneItemCompletedBefore();
+	content: "";
+	display: block;
+    position: absolute;
+    top: @top;
+    bottom: @bottom;
+    left: @left;
+    width: @width;
+    box-sizing: @boxSizing;
+    height: @height;
+    background: @background;
+}
+.lyteStepBullet lyte-step-head{
+	.lyteStepStructureStageOneItemHead();
+    border: @border;
+    border-radius: @borderRadius;
+    display: inline-block;
+    background: @background;
+    position: relative;
+    text-align: @textAlign;
+    font-size: @fontSize;
+    box-sizing: @boxSizing;
+    padding: @padding;
+}
+.lyteStepBullet lyte-step-item{
+	.lyteStepStructureStageOneItem();
+	margin-right: @marginRight;
+}
+.lyteStepBullet lyte-step-body{
+	.lyteStepStructureStageOneItemBody();
+	position: absolute;
+	top: @top;
+	right: @right;
+	font-size: @fontSize;
+	color: @color;
+}
+.lyteStepBullet lyte-step-item:not(:first-of-type) {
+	.lyteStepStructureStageOneItemNotFirst();
+	padding-left: @paddingLeft;
+}
+.lyteStepBullet .lyteWarning lyte-step-head {
+	.lyteStepStructureStageOneItemWarningHead();
+	border: @border;
+	background: @background !important;
+    color: @color;
+}
+.lyteStepBullet lyte-step-item.lyteWarning:not(:first-of-type):before {
+	.lyteSteoStructureStageOneItemWarningNotFirstBefore();
+	background: @background;
+	content: "";
+    display: block;
+    position: absolute;
+    top: @top;
+    bottom: @bottom;
+    left: @left;
+    width: @width;
+    box-sizing: @boxSizing;
+    height: @height;
+}
+.lyteStepFlat lyte-step-item, .lyteStepPlain lyte-step-item {
+	.lyteStepStructureStageTwoItem();
+	margin-right: @marginRight;
+}
+.lyteStepFlat lyte-step-body, .lyteStepPlain lyte-step-body{
+	.lyteStepStructureStageTwoItemBody();
+	display: block;
+	float: @float;
+	background: @background;
+	text-align: @textAlign;
+	padding: @padding;
+	position: relative;
+	margin: @margin; 
+	font-size: @fontSize;
+	text-decoration: @textDecoration;
+	color: @color;
+}
+.lyteStepFlat lyte-step-body:after, .lyteStepPlain lyte-step-body:after {
+	.lyteStepStructureStageTwoItemBodyAfter();
+	content: "";  
+	border-top: @borderTop;
+	border-bottom: @borderBottom;
+	border-left: @borderLeft;
+	position: absolute; right: @right; top: @top;z-index: @zIndex;
+}
+.lyteStepFlat lyte-step-body:before, .lyteStepPlain lyte-step-body:before {
+	.lyteStepStructureStageTwoItemBodyBefore();
+	content: "";  
+	border-top: @borderTop;
+	border-bottom: @borderBottom;
+	border-left: @borderLeft;
+	position: absolute; left: @left; top: @top;
+}
+/*On progress css*/
+.lyteStepFlat .lyteActive lyte-step-body, .lyteStepPlain .lyteActive lyte-step-body{
+	.lyteStepStructureStageTwoActiveBody();
+	background: @background !important;
+	color: @color !important;
+}
+.lyteStepFlat .lyteActive lyte-step-body:after, .lyteStepPlain .lyteActive lyte-step-body:after{
+	.lyteStepStructureStageTwoActiveBodyAfter();
+	border-left-color: @borderLeftColor !important;
+}
+/*Warning css*/
+.lyteStepFlat .lyteWarning lyte-step-body, .lyteStepPlain .lyteWarning lyte-step-body{
+	.lyteStepStructureStageTwoWarningBody();
+	background: @background !important;
+	color: @color !important;
+}
+.lyteStepFlat .lyteWarning lyte-step-body:after, .lyteStepPlain .lyteWarning lyte-step-body:after{
+	.lyteStepStructureStageTwoWarningBodyAfter();
+	border-left-color: @borderLeftColor !important;
+}
+/*Completed css*/
+.lyteStepFlat .lyteCompleted lyte-step-body, .lyteStepPlain .lyteCompleted lyte-step-body{
+	.lyteStepStructureStageTwoCompletedBody();
+	background: @background !important;
+	color: @color !important;
+}
+.lyteStepFlat .lyteCompleted lyte-step-body:after, .lyteStepPlain .lyteCompleted lyte-step-body:after{
+	.lyteStepStructureStageTwoCompletedBodyAfter();
+	border-left-color: @borderLeftColor !important;
+}
+.lyteStepPlain lyte-step-item:first-child lyte-step-body:before{
+	.lyteStepStructureStageTwoPlainItemBodyBefore();
+	border-left-color: @borderLeftColor;
+} 
+.lyteStepBox {
+	.lyteStepBox();
+  display: @display;
+  margin: @margin;
+  line-height: @lineHeight;
+  border: @border;
+  counter-reset: @counterReset;
+}
+.lyteStepBox lyte-step-item {
+	.lyteStepBoxItem();
+  align-items: @alignItems;
+  margin: @margin ;
+  padding: @padding;
+  background: @background;
+  color: @color;
+  border: @border;
+  border-right: @borderRight;
+}
+.lyteStepBox lyte-step-item:last-of-type {
+	.lyteStepBoxItemLast();
+  border-right: @borderRight;
+}
+.lyteStepBox lyte-step-item.lyteCompleted:before {
+	.lyteStepBoxItemCompletedBefore();
+  content: @content;
+  background: @background;
+  color: @color;
+  height: @height;
+  width: @width;
+  margin-right: @marginRight;
+  display: @display;
+  vertical-align: @verticalAlign;
+  counter-increment: @counterIncrement;
+}
+.lyteStepBox lyte-step-item:not(.lyteCompleted):before {
+	.lyteStepBoxItemNotCompleted();
+  content: @content;
+  margin-right: @marginRight;
+  display: @display;
+  vertical-align: @verticalAlign;
+  height: @height;
+  width: @width;
+  font-size: @fontSize;
+  counter-increment: @counterIncrement;
+  position: @position;
+  top: @top;
+}
+.lyteStepBox lyte-step-item.lyteActive {
+	.lyteStepBoxItemActive();
+  background: @background;
+}
+.lyteStepBox lyte-step-item.lyteActive:before {
+	.lyteStepBoxItemActiveBefore();
+  content: @content;
+  color: @color;
+  margin-right: @marginRight;
+  font-size: @fontSize;
+  counter-increment: @counterIncrement;
+  font-weight: @fontWeight;
+  position: @position;
+  top: @top;
+}
+
+.lyteStepBox lyte-step-item:not(:last-of-type):after {
+	.lyteStepBoxItemNotLastAfter();
+  border-style: @borderStyle;
+  border-color: @borderColor;
+  border-width: @borderWidth;
+  -webkit-transform: @webkitTransform;
+  transform: @transform;
+  z-index: @zIndex;
+  content: @content;
+  background: @background;
+  position: absolute;
+  right: @right;
+  top: @top;
+  color: @color;
+  width: @width;
+  height: @height;
+  opacity: @opacity;
+}
+
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{step}/ui-elements/step/step.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/step.overrides.less";

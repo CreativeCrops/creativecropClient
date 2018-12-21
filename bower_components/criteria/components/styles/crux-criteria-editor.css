@@ -1,0 +1,41 @@
+/* $Id$ */
+#criteriaTable lyte-th{
+	border:none;
+}
+.addRemove{
+	vertical-align:bottom;
+}
+
+.shown{
+	display:block;
+}
+.hiden{
+	display:none;
+}
+.gBB{
+	border-bottom : 1px solid #ccc !important;
+}
+lyte-drop-button{
+	border : none !important;
+}
+
+.addCriteria{
+	width: 33px;
+    height: 33px;
+    display: inline-block;
+    cursor: pointer;
+    /*background: url(/crm/images/wf_spriteIcons.svg) no-repeat 5px 4px;*/
+    float: left;
+}
+.removeCriteria{
+    width: 33px;
+    margin-right: 0;
+    height: 33px;
+    display: inline-block;
+    cursor: pointer;
+    /*background: url(//img.zohostatic.com/crm/images/wf_spriteIcons_9f2ec_.svg) no-repeat 4px -22px;*/
+}
+.colorSpan {
+	color : #20b8a8;
+}
+

@@ -1,0 +1,162 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/nav/nav.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{nav}/ui-elements/nav/nav.variables.less";
+
+
+
+
+/* Loading final tweaks to your variables */
+@import (optional) "../overrides/ui-elements/nav.variables.less";
+
+
+
+
+/* Horizontal Nav */
+
+lyte-nav:not([lt-prop-alignment="vertical"]){
+	.lyteNavHorizontal();
+	display:flex;
+	flex-wrap:wrap;
+	width: @width;
+	background-color: @backgroundColor;
+	line-height: @lineHeight;
+}
+
+
+
+
+/* Horizontal Nav item */
+
+lyte-nav:not([lt-prop-alignment="vertical"]) lyte-nav-item{
+	.lyteNavHorizontalItem();
+	display: inline-block;
+	padding: @padding;
+	font-size: @fontSize;
+	font-family: @fontFamily;
+	color: @color;
+	cursor: pointer;	
+}
+
+
+
+
+/* Active Element */
+
+lyte-nav[lt-prop-alignment="vertical"] .lyteNavActive{
+	.lyteNavActiveItemVertical();
+	background-color: @backgroundColor;
+    color: @color;
+}
+
+lyte-nav:not([lt-prop-alignment="vertical"]) .lyteNavActive{
+	.lyteNavActiveItemHorizontal();
+	background-color: @backgroundColor;
+    color: @color;
+}
+
+
+
+
+/* Vertical Nav */
+
+lyte-nav[lt-prop-alignment="vertical"]{
+	.lyteNavVertical();
+	display: block;
+	list-style-type: none;
+	background-color: @backgroundColor;
+	width: @width;
+	height: @height;
+	overflow: hidden;
+}
+
+
+
+
+/* Vertical Nav - Scrollable Nav Div */
+
+lyte-nav[lt-prop-alignment="vertical"] .lyteNavDiv{
+	.lyteNavScrollableDiv();
+	height: @height;
+	position: relative;
+}
+
+
+
+
+/* vertical nav item */
+
+lyte-nav[lt-prop-alignment="vertical"] lyte-nav-item{
+	.lyteNavVerticalItem();
+	padding: @padding;
+	width: @width;
+	display: list-item;
+	box-sizing: @boxSizing;
+	font-family: @fontFamily;
+	color: @color;
+	cursor: pointer;
+}
+
+
+
+
+/* Nav Arrow */
+
+lyte-arrow{
+	.lyteNavArrow();
+	width: @width;
+	height: @height;
+	display: inline-block;
+	text-align: @textAlign;
+}
+
+
+
+
+/* Down Arrow */
+
+.arrow-down {
+	.lyteNavDownArrow();
+ 	width: @width; 
+ 	height: @height; 
+ 	border-left: @borderLeft;
+ 	border-right: @borderRight;
+ 	border-top: @borderTop;
+ 	position: relative;
+ 	top: @top;
+ 	left: @left;
+}
+
+
+
+
+/* Up Arrow */
+
+.arrow-up {
+	.lyteNavUpArrow();
+ 	width: @width; 
+ 	height: @height; 
+ 	position: relative;
+ 	top: @top;
+ 	left: @left;
+ 	border-left: @borderLeft;
+ 	border-right: @borderRight; 
+ 	border-bottom: @borderBottom;
+}
+
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{nav}/ui-elements/nav/nav.styles.less";
+
+
+
+
+/* import custom css */
+@import (optional) "../overrides/ui-elements/nav.overrides.less";

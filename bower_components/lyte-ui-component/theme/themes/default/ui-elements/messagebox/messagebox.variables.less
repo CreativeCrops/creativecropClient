@@ -1,0 +1,141 @@
+/* lyte messagebox styles */
+
+
+/* LYTE-MESSAGEBOX - DEFAULT VARIABLES*/
+.lyteMessageboxDefault(){
+    @boxShadow: 0 0 6px 2px rgba(0,0,0,0.2);
+    @padding: 0 50px 0 0;
+    @zIndex: 11000;
+    @background: #fff;
+    @borderRadius: 2px;
+    @color: #333;
+    @fontSize: 15px;
+    @transition: .3s all ease;
+    @webkitFontSmoothing: antialiased;
+    @mozOsxFontSmoothing: grayscale;
+    
+    @animationDuration: .5s;
+    @webkitAnimationDuration: .5s;
+    @animationFillMode: both;
+    @webkitAnimationFillMode: both;
+
+    @border : 1px solid;
+    @top: 20px;
+    @minWidth: 200px;
+}
+
+
+/* LYTE-MESSAGEBOX - SYMBOL VARIABLES*/
+.lyteMessageboxSymbol(){
+    @width: 45px;
+    @height: 100%;
+}
+
+.lyteMessageboxSymbolBefore(){
+    @background: url(../images/lyte_ui_sprite.svg) no-repeat;
+    @width: 20px;
+    @height: 20px;
+    @left: 12px;
+    @top: 25%;
+}
+
+.lyteMessageboxSymbolAfter(){
+    @borderLeft: 8px solid #3fbd5f;
+    @borderTop: 6px solid transparent;
+    @borderBottom: 6px solid transparent;
+    @left: 43px;
+    @top: 35%;
+}
+
+
+/* LYTE-MESSAGEBOX - CONTENT VARIABLES */
+.lyetMessageboxContent(){
+    @maxWidth: 100%;
+    @padding: 10px 0 10px 60px;
+}
+
+
+
+/* LYTE-MESSAGEBOX - CLOSE VARIABLES */
+.lyteMessageboxClose(){
+    @background: url(../images/lyte_ui_sprite.svg) no-repeat -125px -4px;
+    @width: 9px;
+    @height: 9px;
+    @top: 15px;
+    @right: 15px;
+}
+
+
+/* LYTE-MESSAGEBOX - SUCCESS VARIABLES */
+.lyteMessageboxSuccess(){
+    @borderColor: #3fbd5f;
+}
+
+.lyteMessageboxSuccessSymbol(){
+    @background: #3fbd5f;
+}
+
+
+.lyteMessageboxSuccessSymbolBefore(){
+    @backgroundPosition: -166px 0;
+}
+
+.lyteMessageboxSuccessSymbolAfter(){
+    @borderLeftColor: #3fbd5f;
+}
+
+
+/* LYTE-MESSAGEBOX - ERROR VARIABLES */
+.lyteMessageboxError(){
+    @borderColor: #ee4242;
+}
+
+.lyteMessageboxErrorSymbol(){
+    @background: #ee4242;
+}
+
+.lyteMessageboxErrorSymbolBefore(){
+    @backgroundPosition: -139px 0;
+    @width: 21px !important;
+}
+
+.lyteMessageboxErrorSymbolAfter(){
+    @borderLeftColor: #ee4242;
+}
+
+
+/* LYTE-MESSAGEBOX - WARNING VARIABLES */
+.lyteMessageboxWarning(){
+    @borderColor: #e98432;
+}
+
+.lyteMessageboxWarningSymbol(){
+    @background: #e98432;
+}
+
+.lyteMessageboxWarningSymbolBefore(){
+    @backgroundPosition: -192px 0;
+}
+
+.lyteMessageboxWarningSymbolAfter(){
+    @borderLeftColor: #e98432;
+}
+
+
+/* LYTE-MESSAGEBOX - INFO VARIABLES */
+.lyteMessageboxInfo(){
+    @borderColor: #188bc7;
+}
+
+.lyteMessageboxInfoSymbol(){
+    @background: #188bc7;
+}
+
+.lyteMessageboxInfoSymbolBefore(){
+    @backgroundPosition:-218px 0;
+}
+
+.lyteMessageboxInfoSymbolAfter(){
+    @borderLeftColor: #188bc7;
+}
+

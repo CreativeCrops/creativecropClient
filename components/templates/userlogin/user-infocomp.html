@@ -1,0 +1,84 @@
+<template tag-name="user-infocomp">
+
+        <div class="col l5 m5 hide-on-small-only center">
+            <div style="width: 100%;height: 100px;"></div>
+            <img src="components/images/img/logo/personal.svg" style="width: 60%"/>
+            <p class="center-align">One account. All of CreativeCrop's working for you.</p>
+        </div>
+        <div class="col l7 m7 s12">
+            <div class="col s12 left">
+                <img src="components/images/img/logo-man.svg" style="width: 40px;"><br> <label >Creative Crops's</label>
+            </div>
+            <div class="col s12">
+                <h5 class="left-align">welcome to CreativeCrops Account</h5>
+            </div>
+
+            <div class="col s12">
+                <div class="col s12 input-field">
+                    <input type="text" id="phone" required class="validate">
+                    <label for="phone">Phone</label>
+                    <span class="helper-text" data-error="wrong" data-success="right">We’ll use your number for account security. It won’t be visible to others.</span>
+                </div>
+
+            </div>
+
+            <div class="col s12">
+                <div class="col s4 input-field">
+                    <select class="">
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <label>year</label>
+                </div>
+                <div class="col s4 input-field">
+                    <input type="number" id="day" required class="validate">
+                    <label for="day">Day</label>
+                </div>
+
+
+                <div class="col s4 input-field">
+                    <input type="number" id="year" required class="validate">
+                    <label for="year">Year</label>
+                </div>
+
+                <div class="col s12">
+                    <label style="position: relative;top: -19px;">Your birthday</label>
+                </div>
+
+            </div>
+            <div class="col s12">
+                <div class="col s12 input-field">
+                    <select>
+                        <option value="2">Female</option>
+                        <option value="1">Male</option>
+                        <option value="3">Rather not say</option>
+                    </select>
+                    <label>Gender</label>
+                </div>
+            </div>
+
+
+            <div class="row ">
+                <div class="col s12">
+                    <br>
+                    <br>
+                    <button onclick="{{action('NextOption')}}"  class="btn-small waves-effect waves-light green white-text right"  style="margin-left: -25px">Next</button>
+                    <button onclick="{{action('preOption')}}"  class="btn-small waves-effect waves-light green white-text left"  style="margin-right: -25px">back</button>
+                </div>
+
+            </div>
+
+
+        </div>
+
+</template>

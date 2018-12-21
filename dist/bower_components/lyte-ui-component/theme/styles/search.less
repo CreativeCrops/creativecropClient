@@ -1,0 +1,28 @@
+/* Default theme imported */
+
+@import "../themes/default/ui-elements/search/search.variables.less";
+
+/* Loading theme in configuration */
+
+@import "../config.less";
+
+@import (optional) "../themes/@{search}/ui-elements/search/search.variables.less";
+
+/* Loading custom themes */
+
+@import (optional) "../overrides/ui-elements/search/search.variables.less";
+
+/* search Styles */
+
+lyte-search {
+	display: inline-block;
+}
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{search}/ui-elements/search/search.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/search.overrides.less";

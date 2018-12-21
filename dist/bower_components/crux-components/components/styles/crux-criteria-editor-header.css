@@ -1,0 +1,82 @@
+/* $Id$ */
+.andOr{
+    transform : translate(-5px,-30px);
+    position:  absolute;
+    width: 40px;
+    z-index: 2;
+    background: #fff;
+}
+crux-criteria-editor lyte-dropdown{
+    width : 150px;
+}
+.shown{
+    display:block;
+}
+.hiden{
+    display:none;
+}
+.boxclose{
+    margin: -3px -5px -3px 7px;
+    height: 19px;
+    width: 12px;
+    padding-top: 3px;
+    color: #999;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.singleItem{
+    border: 1px solid #ccc;
+    background: #EDEDED;
+    font-size: 0.8rem;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.w400{
+    width:400px;
+}
+
+.selectedTick{
+    content: '';
+    width: 12px;
+    height: 8px;
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    margin-top: -5px;
+    background: url(//img.zohostatic.com/crm/1677358/images/svgicons.svg) no-repeat -283px -34px;
+}
+
+.patterNum{
+    width: 30px;
+    pointer-events: none;
+    cursor: default;
+    background: #f6f6f6;
+    border: 1px solid #b3b3b3 !important;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    color: #333;
+    height: 30px;
+    padding-top: 0px;
+    z-index: 1;
+    position: relative;
+}
+
+.patternNumDiv{
+    width: 100%;
+    height: 0px;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0px !Important;
+    margin: 0px !important;
+}
+
+.dropdownDiv{
+    position : relative;
+}

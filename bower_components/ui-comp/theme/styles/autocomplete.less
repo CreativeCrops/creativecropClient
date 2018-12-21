@@ -1,0 +1,68 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/autocomplete/autocomplete.variables.less";
+
+/* Loading theme in configuration */
+
+@import "../config.less";
+
+@import (optional) "../themes/@{autocomplete}/ui-elements/autocomplete/autocomplete.variables.less";
+
+/* Loading custom themes */
+
+@import (optional) "../overrides/ui-elements/autocomplete/autocomplete.variables.less";
+
+/* Autocomplete styles */
+
+
+lyte-autocomplete-description{
+	.lyteAutoCompleteDescription();
+	opacity: @opacity;
+}
+
+.lyteautocompleteHighlight{
+	.lyteAutoCompleteHighlight();
+	background: @background;
+}
+
+lyte-autocomplete div.lyteDummyEventContainer{
+	outline: none;
+	width: 100%;
+	display: block !important;
+}
+
+lyte-autocomplete  lyte-drop-button{
+	border: 0px !important;
+	padding: 0px !important;
+}
+
+lyte-autocomplete lyte-dropdown {
+	width: 100%;
+}
+
+div.lyteautocompleteError {
+	.lyteAutoCompleteError();
+	display: none;
+	padding: @padding;
+}
+
+lyte-autocomplete {
+	display: inline-block;
+}
+
+.lyteSearchHidden{
+	display: none !important;
+}
+
+lyte-drop-item div.lyteAutoComplete{
+	display: inline-block !important;
+}
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{autocomplete}/ui-elements/autocomplete/autocomplete.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/autocomplete.overrides.less";

@@ -1,0 +1,737 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/colorpicker/colorpicker.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{colorpicker}/ui-elements/colorpicker/colorpicker.variables.less";
+
+
+
+
+/* Loading final tweaks to your variables */
+@import (optional) "../overrides/ui-elements/colorpicker.variables.less";
+
+
+
+/* LYTE-COLORPICKER */
+lyte-colorpicker{
+    display: none;
+}
+
+.lyteColorPicker {
+.lyteColorpicker();
+  margin: @margin;
+  padding: @padding;
+  border: @border;
+  border-radius: @borderRadius;
+  background: @background;
+  box-shadow: @boxShadow;
+  display: @display;
+  outline: @outline;
+  z-index: @zIndex;
+  position: absolute;
+}
+.lyteColorPicker * {
+  outline: none;
+}
+
+.lyteColorPicker__titlebar {
+    .lyteColorpickerTitlebar();
+  padding: @padding;
+  margin: @margin;
+  border: @border;
+  border-width: @borderWidth;
+  background: @background;
+  position: relative;
+}
+
+.lyteColorPicker__title {
+    .lyteColorpickerTitle();
+  width: @width;
+  font-size: @fontSize;
+  font-weight: @fontWeight;
+  color: @color;
+  display: @display;
+  vertical-align: @verticalAlign;
+  white-space: @whiteSpace;
+  overflow: @overflow;
+  text-overflow: @textOverflow;
+  box-sizing: @boxSizing;
+  line-height: @lineHeight;
+}
+.lyteColorPicker__title:only-child {
+    .lyteColorpickerTitleOnlyChild();
+  padding-right: @paddingRight;
+}
+
+.lyteColorPicker__close {
+    .lyteColorpickerClose();
+  background: @background;
+  width: @width;
+  height: @height;
+  margin: @margin;
+  padding: @padding;
+  border: @border;
+  cursor: @cursor;
+  position: absolute;
+  top: @top;
+  -webkit-transform: @webkitTransform;
+  -moz-transform: @mozTransform;
+  -o-transform: @oTransform;
+  -ms-transform: @msTransform;
+  transform: @transform;
+  right: @right;
+}
+.lyteColorPicker__close:hover {
+    .lyteColorpickerCloseHover();
+  border: @border;
+  background: @background;
+}
+.lyteColorPicker__close:hover svg {
+    .lyteColorpickerCloseHoverSVG();
+  fill: @fill;
+}
+.lyteColorPicker__close:focus {
+    .lyteColorpickerCloseFocus();
+  border: @border;
+  background: @background;
+}
+.lyteColorPicker__close:focus svg {
+    .lyteColorpickerCloseFocusSVG();
+  fill: @fill;
+}
+.lyteColorPicker__close:active {
+    .lyteColorpickerCLoseActive();
+  border: @border;
+  background: @background;
+}
+.lyteColorPicker__close:active svg {
+    .lyteColorpickerCloseActiveSVG();
+  fill: @fill;
+}
+.lyteColorPicker__close .lyteColorPicker__icon {
+    .lyteCOlorpickerIconClose();
+  width: @width;
+  height: @height;
+  fill: @fill;
+}
+.lyteColorPicker__close .lyteColorPicker__icon svg {
+    .lyteCOlorpickerIconCloseSVG();
+  width: @width;
+  height: @height;
+}
+
+.lyteColorPicker__nocolorbutton {
+    .lyteCOlorpickerNoColorBtn();
+  width: @width;
+  margin: @margin;
+  padding: @padding;
+  border: @border;
+  border-width: @borderwidth;
+  border-radius: @borderradius;
+  background: @background;
+  font-size: @fontsize;
+  color: @color;
+  display: @display;
+  text-align: @textalign;
+  cursor: @cursor;
+  fill: @fill;
+}
+.lyteColorPicker__nocolorbutton:hover {
+    .lyteCOlorpickerNoColorBtnHover();
+  border: @border;
+  border-width: @borderwidth;
+  background: @background;
+  color: @color;
+  fill: @fill;
+}
+.lyteColorPicker__nocolorbutton:active {
+    .lyteCOlorpickerNoColorBtnActive();
+  border: @border;
+  border-width: @borderwidth;
+  background: @background;
+  color: @color;
+  fill: @fill;
+}
+.lyteColorPicker__nocolorbutton:focus {
+    .lyteCOlorpickerNoColorBtnFocus();
+  border: @border;
+  border-width: @borderwidth;
+  background: @background;
+  color: @color;
+  fill: @fill;
+  box-shadow: @boxshadow;
+}
+.lyteColorPicker__nocolorbutton .lyteColorPicker__text {
+    .lyteCOlorpickerNoColorBtnText();
+  vertical-align: @verticalAlign;
+  font-size: @fontSize;
+}
+.lyteColorPicker__nocolorbutton .h-alignright {
+    .lyteCOlorpickerNoColorBtnAlignRight();
+  float: @float;
+  margin: @margin;
+}
+.lyteColorPicker__nocolorbutton .lyteColorPicker__icon {
+    .lyteCOlorpickerNoColorBtnIcon();
+  width: @width;
+  height: @height;
+  margin: @margin;
+  border: @border;
+  border-radius: @borderRadius;
+}
+
+.lyteColorPicker__icon {
+    .lyteColorpickerIcon();
+  display: @display;
+  vertical-align: @verticalAlign;
+}
+.lyteColorPicker__icon svg {
+    .lyteColorpickerIconSVG();
+  width: @width;
+  height: @height;
+}
+
+.lyteColorPicker__showhidecontainer {
+    .lyteColorpickerShowHideContainer();
+  overflow: @overflow;
+  white-space: @whiteSpace;
+  height: @height;
+  padding: @padding;
+  position: relative;
+}
+
+.lyteColorPicker__morecolorbutton {
+    .lyteColorpickerMoreClorButton();
+  width: @width;
+  margin: @margin;
+  padding: @padding;
+  border: @border;
+  border-width: @borderWidth;
+  border-radius: @borderRadius;
+  background: @background;
+  font-size: @fontSize;
+  color: @color;
+  display: @display;
+  text-align: @textAlign;
+  cursor: @cursor;
+  white-space: @whiteSpace;
+  fill: @fill;
+}
+.lyteColorPicker__morecolorbutton:hover {
+    .lyteColorpickerMoreClorButtonHover();
+  border: @border;
+  border-width: @borderWidth;
+  background: @background;
+  color: @color;
+  fill: @fill;
+}
+.lyteColorPicker__morecolorbutton:active {
+    .lyteColorpickerMoreClorButtonActive();
+  border: @border;
+  border-width: @borderWidth;
+  background: @background;
+  color: @color;
+  fill: @fill;
+}
+.lyteColorPicker__morecolorbutton:focus {
+    .lyteColorpickerMoreClorButtonFocus();
+  border: @border;
+  border-width: @borderWidth;
+  background: @background;
+  color: @color;
+  fill: @fill;
+  box-shadow: @boxShadow;
+}
+.lyteColorPicker__morecolorbutton .lyteColorPicker__text {
+    .lyteColorpickerMoreClorButtonText();
+  vertical-align: @verticalAlign;
+  font-size: @fontSize;
+}
+.lyteColorPicker__morecolorbutton .lyteColorPicker__icon {
+    .lyteColorpickerMoreClorButtonIcon();
+  width: @width;
+  height: @height;
+  margin: @margin;
+  border: @border;
+  border-radius: @borderRadius;
+}
+.lyteColorPicker__morecolorbutton .h-alignright {
+    .lyteColorpickerMoreClorButtonAlignRight();
+  float: @float;
+  margin: @margin;
+}
+
+.lyteColorPicker__palettecontainer {
+    .lyteColorpickerPalettecontainer();
+  padding: @padding;
+  margin: @margin;
+  border: @border;
+  border-width: @borderWidth;
+  background: @background;
+  font-size: @fontSize;
+  white-space: @whiteSpace;
+}
+.lyteColorPicker__palettecontainer .lyteColorPicker__paletteheading {
+    .lyteColorpickerPalettecontainerPaletteHeading();
+  margin: @margin;
+  padding: @padding;
+  background: @background;
+  font-size: @fontSize;
+  font-weight: @fontWeight;
+  color: @color;
+  display: @display;
+}
+.lyteColorPicker__palettecontainer .lyteColorPicker__palette {
+    .lyteColorpickerPalettecontainerPalette();
+  margin: @margin;
+  padding: @padding;
+  border: @border;
+  border-width: @borderWidth;
+  background: @background;
+}
+.lyteColorPicker__palettecontainer .lyteColorPicker__palette ul {
+    .lyteColorpickerPalettecontainerPaletteUL();
+  margin: @margin;
+  padding: @padding;
+  line-height: @lineHeight;
+}
+.lyteColorPicker__palettecontainer .lyteColorPicker__palette ul:first-of-type .lyteColorPicker__addcolor button {
+    .lyteColorpickerPalettecontainerPaletteULFirst();
+  margin: @margin;
+}
+
+.lyteColorPicker__colorfieldcontainer {
+    .lyteColorpickerColorfield();
+  padding: @padding;
+  margin: @margin;
+  border: @border;
+  border-width: @borderWidth;
+  background: @background;
+  font-size: @fontSize;
+  white-space: @whiteSpace;
+}
+
+.lyteColorPicker__shades {
+    .lyteColorpickerShades();
+  display: @display;
+}
+.lyteColorPicker__shades .lyteColorPicker__colorpan {
+    .lyteColorpickerShadesColorpan();
+  width: @width;
+  height: @height;
+  margin: @margin;
+  margin-top: @marginTop;
+  border-radius: @borderRadius;
+  list-style: @listStyle;
+  display: block;
+  cursor: @cursor;
+  box-sizing: @boxSizing;
+  border-color: @borderColor;
+}
+.lyteColorPicker__shades .lyteColorPicker__colorpan:first-child {
+    .lyteColorpickerShadesColorpanFirst();
+  border: @border;
+  margin-top: @marginTop;
+  margin-bottom: @marginBottom;
+}
+.lyteColorPicker__shades:last-child .lyteColorPicker__colorpan {
+    .lyteColorpickerShadesColorpanLast();
+  margin-right: @marginRight;
+}
+
+.lyteColorPicker__colorpan {
+    .lyteColorpickerColorpan();
+  width: @width;
+  height: @height;
+  margin: @margin;
+  border: @border;
+  border-radius: @borderRadius;
+  list-style: @listStyle;
+  display: @display;
+  cursor: @cursor;
+  box-sizing: @boxSizing;
+  position: relative;
+  z-index: @zIndex;
+}
+.lyteColorPicker__colorpan:last-child {
+    .lyteColorpickerColorpanLast();
+  margin-right: @marginRight;
+}
+.lyteColorPicker__colorpan:hover {
+    .lyteColorpickerColorpanHover();
+  box-shadow: @boxShadow;
+  z-index: @zIndex;
+}
+.lyteColorPicker__colorpan:focus {
+    .lyteColorpickerColorpanFocus();
+  box-shadow: @boxShadow;
+  z-index: @zIndex;
+}
+.lyteColorPicker__colorpan.is-selected {
+    .lyteColorpickerColorpanSelected();
+  box-shadow: @boxShadow;
+  z-index: @zIndex;
+}
+
+.lyteColorPicker__colorfieldpreview {
+    .lyteColorFieldPreview();
+  width: @width;
+  height: @height;
+  display: @display;
+  vertical-align: @verticalAlign;
+}
+
+.lyteColorPicker__colorfield {
+    .lyteColorField();
+  width: @width;
+  margin: @margin;
+  border: @border;
+  border-radius: @borderRadius;
+  background: @background;
+  color: @color;
+  vertical-align: @verticalAlign;
+  box-sizing: @boxSizing;
+  font-size: @fontSize;
+  overflow: @overflow;
+}
+.lyteColorPicker__colorfield .lyteColorPicker__textbox {
+    .lyteColorFieldTextBox();
+  width: @width;
+  padding: @padding;
+  font-size: @fontSize;
+  margin: @margin;
+  border: @border;
+  display: @display;
+  vertical-align: @verticalAlign;
+  box-sizing: @boxSizing;
+  line-height: @lineHeight;
+}
+.lyteColorPicker__colorfield.has-focus {
+    .lyteColorFieldFocus();
+  border: @border;
+  background: @background;
+}
+
+.lyteColorPicker__colorfieldpreview + .lyteColorPicker__textbox {
+    .lyteColorFieldPlusPreview();
+  width: @width;
+}
+
+.lyteColorPicker__dynamiccolor {
+    .lyetColorpickerDynamicColor();
+  width: @width;
+  height: @height;
+  display: @display;
+  cursor: @cursor;
+}
+
+.lyteColorPicker__opacitycontainer {
+  margin: 12px 0 0 0;
+}
+.lyteColorPicker__opacitycontainer .zslider {
+  width: calc(100% - (15px + 40px));
+  margin: 0 15px 0 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+.lyteColorPicker__opacitycontainer .zslider canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.lyteColorPicker__opacitycontainer .zslider__track {
+  height: 12px;
+  border-radius: 1px;
+}
+.lyteColorPicker__opacitycontainer .zslider__track:before {
+  border-radius: 1px;
+  z-index: 1;
+}
+.lyteColorPicker__opacitycontainer .zslider__circlethumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+
+.lyteColorPicker__opacityfield {
+  margin: 0 0 0 0;
+  display: inline-block;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+.lyteColorPicker__opacityfield .zinputfield__textbox {
+  width: 40px;
+  padding: 4px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.lyteColorPicker__commandbar {
+    .lyteColorpickerCommandbar();
+  margin: @margin;
+  padding: @padding;
+  border: @border;
+  border-width: @borderWidth;
+  background: @background;
+  text-align: @textAlign;
+  display: @display;
+  width: @width;
+  box-sizing: @boxSizing;
+  overflow: @overflow;
+  position: @position;
+}
+
+.lyteColorPicker__previewDiv{
+    .lyteColorpickerPreviewDiv();
+    margin: @margin;
+    padding: @padding;
+    border: @border;
+    border-width: @borderWidth;
+    background: @background;
+    text-align: @textAlign;
+    display: @display;
+    width: @width;
+    box-sizing: @boxSizing;
+    overflow: @overflow;
+    position: @position;
+    border-bottom: @borderBottom;
+}
+
+.h-topradiusnone {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.h-bottomradiusnone {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.h-leftradiusnone {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.h-rightradiusnone {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.h-topleftradiusnone {
+  border-top-left-radius: 0;
+}
+
+.h-toprightradiusnone {
+  border-top-right-radius: 0;
+}
+
+.h-bottomleftradiusnone {
+  border-bottom-left-radius: 0;
+}
+
+.h-bottomrightradiusnone {
+  border-bottom-right-radius: 0;
+}
+
+.lyteColorPicker__default, .lyteColorPicker--advanced {
+    .lyteColorpickerDefaultAdv();
+  display: @display;
+  vertical-align: @verticalAlign;
+  transition: @transition;
+}
+
+.lyteColorPicker--transition {
+  transition: width 300ms ease, height 300ms ease, left 300ms ease, top 300ms ease;
+}
+
+.lyteColorPicker--pointertransition {
+  transition: left 300ms ease, top 300ms ease;
+}
+
+.lyteColorPicker__maparea {
+    .lyteColorpickerMaparea();
+  width: @width;
+  height: @height;
+  overflow: @overflow;
+  position: relative;
+  float: @float;
+}
+
+.lyteColorPicker__default table{
+    width: 100%;
+}
+
+.lyteColorPicker__backToBasic{
+  padding: 12px 0px !important;
+}
+.lyteColorPicker__backToBasic div{
+  border-width: 1px 0 1px 0 !important;
+}
+
+.colorDiv{
+    .lyteColorpickerColorDiv();
+    width: @width;
+    height: @height;
+    position: relative;
+    /*background-image: url(../images/bgGradient.png);*/
+    cursor: @cursor;
+    margin: @margin;
+}
+.colorSlider_palette_circleBlack{
+    background-image: url(../images/circle-selected-black.gif);
+}
+.colorSlider_palette_circle{
+    .lyteColorpickerCircle();
+    background-image: url(../images/circle-selected-black.gif);
+    width: @width;
+    height: @height;
+    position: absolute;
+    z-index: @zIndex;
+    background-position: @backgroundPosition;
+    background-repeat: @backgroundRepeat;
+    padding: @padding;
+}
+.colorSlider{
+    .lyteColorpickerColorSlider();
+    margin: @margin;
+    width: @width;
+    height: @height;
+    padding-top: @paddingTop;
+    padding-left: @paddingLeft;
+    position: relative;
+}
+.colorSlider_palette_border{
+    .lyteColorpickerColorSliderBorder();
+    border:@border;
+    width:@width;
+    height:@height;
+    margin-right:@marginRight;
+    position:relative;
+    right:@right;
+}
+.colorSlider_hue{
+    .lyteColorpickerColorSliderHue();
+    width:@width;
+    float: @float;
+    height: @height;
+    margin-right: @marginRight;
+}
+.colorSlider_sliderHandle{
+    .lyteColorpickerColorSliderHandle();
+    width: @width;
+    height: @height;
+    background-image: url(../images/arrow-l.gif);
+    background-repeat: @backgroundRepeat;
+    position: absolute;
+    z-index: @zIndex;
+    left: @left;
+    top: @top;
+    cursor: @cursor;
+}
+.colorSlider_sliderHandle div{
+    .lyteColorpickerColorSliderHandleDiv();
+    background-image:url('../images/arrow-r.gif');
+    background-repeat:no-repeat;
+    background-position:top right;
+    height:@height;
+}
+.colorSlider_hueBar_border{
+    .lyteColorpickerColorSliderHueBarBorder();
+    border: @border;
+  border-top: @borderTop;
+  border-bottom: @borderBottom;
+    width: @width;
+    height: @height;
+    position: absolute;
+    left: @left;
+    z-index: @zIndex;
+    margin-top: @marginTop;
+}
+.colorSlider_hueBar{
+    .lyteColorpickerColorSliderHueBar();
+    background-image: url(../images/hueBar.png);
+    height: @height;
+    width: @width;
+}
+.selectFormat{
+    .lyteColorpickerSelectFormat();
+    width: @width;
+    float: @float;
+}
+.showValue{
+    .lyteColorpickerShowValue();
+    width: @width;
+    float: @float;
+    margin-left: @marginLeft;
+}
+.previewDiv{
+    .lyteColorpickerPreview();
+    border: @border;
+    width: @width;
+    height: @height;
+    float: @float;
+    border-radius: @borderRadius;
+    border-left: @borderLeft;
+    cursor: @cursor;
+}
+.colorPickerDD{
+    .lyteColorpickerDD();
+    width: @width; 
+    border-radius: @borderRadius; 
+    height:@height; 
+    padding: @padding;
+}
+// .lytePopoverClose{
+//     .lyteColorpickerClose();
+//   top: @top;
+// }
+.lyteColorpickerForwardArrow{
+    .lyteColorpickerFwArrow();
+    border-bottom: @borderBottom;
+    border-right: @borderRight;
+    -ms-transform: @msTransform;
+    -webkit-transform: @webkitTransform;
+    transform: @transform;
+    width: @width;
+    height: @height;
+    margin-top: @marginTop;
+}
+.lyteColorpickerBackwardArrow{
+    .lyteColorpickerBwArrow();
+    border-bottom: @borderBottom;
+    border-right: @borderRight;
+    -ms-transform: @msTransform;
+    -webkit-transform: @webkitTransform;
+    transform: @transform;
+    width: @width;
+    height: @height;
+    margin-top: @marginTop;
+    display: @display;
+}
+.lyteColorpickerText{
+  .lyteColorpickerBackToBasicText();
+  vertical-align: @verticalAlign;
+    font-size: @fontSize;
+    position: @position;
+    left: @left;
+    transform: @transform;
+}
+
+/* LYTE-COLORPICKER END*/
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{colorpicker}/ui-elements/colorpicker/colorpicker.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/colorpicker.overrides.less";

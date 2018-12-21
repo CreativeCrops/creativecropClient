@@ -1,0 +1,263 @@
+/* Default theme imported */
+
+@import "../themes/default/ui-elements/datselect/datselect.variables.less";
+
+/* Loading theme in configuration */
+
+@import "../config.less";
+
+@import (optional) "../themes/@{datselect}/ui-elements/datselect/datselect.variables.less";
+
+/* Loading custom themes */
+
+@import (optional) "../overrides/ui-elements/datselect/datselect.variables.less";
+
+
+lyte-item {
+    .lyteDateSelectItem();
+    position: relative;
+    cursor: @cursor;
+    display: block;
+    border: @border;
+    height: @height;
+    text-align: @textAlign;
+    line-height: @lineHeight;
+    color: @color;
+    padding: @padding;
+    font-size: @fontSize;
+    text-transform: @textTransform;
+    font-weight: @fontWeight;
+    box-shadow: @boxShadow;
+    outline: @outline;
+    -webkit-touch-callout: @webkitTouchCallout;
+}
+
+.lyteDateSelect .lyteCalendarPopup, .lyteDateSelect .lyteDateRangePickerRow {
+    box-shadow: none;
+}
+
+.lyteDateSelect .lyteCalendarPopup {
+    border: none !important;
+}
+
+.lyteDateRangePickerRow {
+    border: none;
+}
+  .lyteDateSelect > div  {
+    display: inline-block;
+    float: left;
+    height: 100%;
+}
+
+.lyteDateSelect .lyteDateRangePickerCol1 {
+    border-right: none !important;
+}
+
+.lyteDateSelect .lyteDateRangePickerCol1 .lyteCalTableContainer{
+    .lyteDateSelectBorder();
+    border-right: @border;
+}
+
+.lyteDateSelectHidden {
+    display: none !important;
+}
+
+.lyteDateSelect .lyteDateRangePickerRow {
+    width: auto;
+}
+
+.lyteDateSelect lyte-daterangepicker, .lyteDateSelect lyte-calendar .lyteCalendarPopup {
+    .lyteDateSelectBorder();
+    display: block;
+    width: 100%;
+    border-bottom: @border;
+}
+
+.lyteDateSelect .lyteDateRangePickerRow > div {
+    width: 100%;
+}
+
+.lyteDateSelect .lyteDateRPRightNav {
+    .lyteDateSelectNavbar();
+    left: auto;
+    right: 8px;
+}
+
+.lyteDateSelect #lyteSingleCalendar, .lyteDateSelect #lyteRangeCalendar {
+    transition-duration: 0.6s;
+    transition-property: max-width;
+    border-left: 1px solid #ddd;
+    overflow: hidden;
+    max-width: 800px;
+    height: 100%
+}
+
+.lyteDateSelect #lyteSingleCalendar {
+    padding-top: 15px;
+}
+
+.lyteDateSelect lyte-button {
+    margin : 10px;
+    float: right;
+}
+
+.lyteDateSelect .lytelist {
+    .lyteDateSelectLyteList()
+    width: @width;
+}
+
+.lyteDateSelectWrapper lyte-popover-content {
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+}
+
+.lyteDateSelectWrapper.opened .lytePopover{
+    transition-property: opacity, left !important;
+}
+
+.lyteCalendarSelected {
+    background: #4190f2;
+    color: #fff;
+    fill: #fff;
+}
+
+.lyteDateSelect .lyteCalTableCell {
+    cursor: pointer;
+    border-radius: 12.5px;
+    vertical-align: middle;
+    box-sizing: border-box;
+    position: relative;
+    height: 25px;
+    width: 25px;
+}
+
+/*.lyteDateSelect  .lyteDateRPMonthStartDate:not(.lyteCalWeekend),*/ .lyteDateSelect .lyteDateRPLastDateSelected, .lyteDateSelect .lyteDateRPFirstDateSelected, .lyteDateSelect .lyteDateRPTempFirstDateSelected, .lyteDateSelect .lyteDateRPFirstDateSelecteted/*, .lyteDateSelect .lyteDateRPMonthEndDate*/ {
+    background: #4190f2 !important;
+    color: white;
+    /*border: 1px solid #4190f2 !important;*/
+}
+
+.lyteDateSelect .lyteCalSel:not(.lyteCalGray), .lyteDateSelect .lyteCalSel:not(.lyteCalGray):hover {
+    /*border: 1px solid #4190f2 !important;*/
+    background: #4190f2 !important;
+    color: #fff;
+    box-shadow: none;
+}
+
+.lyteDateSelect .lyteCalSel.lyteCalGray {
+    box-shadow: none;
+}  
+
+.lyteDateSelect .lyteDateRPTempSelected:before, .lyteDateSelect .lyteDateRPFirstDateSelected:before, .lyteDateSelect .lyteDateRPTempFirstDateSelected:not(.lyteDateRPTempLastDateSelected):before, .lyteDateSelect .lyteDateRPMonthEndDate:not(.lyteDateRPTempFirstDateSelected):before, .lyteDateSelect .lyteDateRPMonthStartDate:before, .lyteDateSelect .lyteDateRPLastDateSelected:before, .lyteDateSelect .lyteDateRPTempLastDateSelected:not(.lyteDateRPTempFirstDateSelected):before{
+    content: "";
+    border: solid transparent;
+    border-width: 0 0 0 0;
+    border-radius: 0px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    background: #d9e9fc;
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: -6px;
+    right: -6px;
+    z-index: 1;
+}
+
+
+
+.lyteDateSelect .lyteCalTableCell span {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.lyteDateSelect .lyteDateRPFirstDateSelected:before, .lyteDateSelect .lyteDateRPTempFirstDateSelected:before{
+    border-radius: 0;
+    left: 50% !important;
+}
+
+.lyteDateSelect .lyteCalTableRow .lyteDateRPLastDateSelected:not(:first-of-type):before, .lyteDateSelect .lyteCalTableRow .lyteDateRPTempLastDateSelected:not(:first-of-type):before{
+    border-radius: 0;
+    right: 50% !important;
+}
+
+.lyteDateSelect  .lyteDateRPFirstDateSelected:after, .lyteDateSelect  .lyteDateRPTempLastDateSelected:after, .lyteDateSelect .lyteDateRPLastDateSelected:after, .lyteDateSelect .lyteDateRPTempFirstDateSelected:after{
+    content: "";
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: -1px;
+    right: -1px;
+    z-index: 1;
+    border: 0px solid transparent;
+    border-radius: 12.5px;
+    background: #4190f2;
+    color: white;
+}
+
+ .lyteDateSelect .lyteCalTableRow .lyteDateRPTempSelected:last-of-type:before, .lyteDateSelect .lyteCalTableRow .lyteDateRPMonthEndDate:before, .lyteDateSelect .lyteDateRPTempLastDateSelected:before{
+    border-radius: 0 12.5px 12.5px 0 !important;
+}
+
+.lyteDateSelect .lyteCalTableRow .lyteDateRPTempSelected:not(.lyteDateRPFirstDateSelected):first-of-type:before, .lyteDateSelect .lyteCalTableRow .lyteDateRPMonthStartDate:not(.lyteDateRPFirstDateSelected):not(.lyteDateRPTempFirstDateSelected):before {
+    border-radius: 12.5px 0 0 12.5px !important;
+}
+
+.lyteDateSelect  .lyteCalToday {
+    color: #555;
+    background: white
+}
+
+.lyteDateSelect  .lyteCalToday:after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: -1px;
+    right: -1px;
+    z-index: 1;
+    border: 0px solid transparent;
+    border-radius: 12.5px;
+    color: white;
+}
+
+.lyteDateSelect .lyteCalendarPopup {
+    padding: 0px 20px;
+}
+
+.lyteDateSelect .lyteCalTableCellHeader{
+    width: 20px;
+}
+
+#lyteSingleCalendar .lyteCalsCalMon {
+    width: 130px;
+}
+
+.lyteDateSelect lyte-daterangepicker > div {
+    padding-bottom: 0;
+}
+
+.lyteDateSelect .lyteCalTableContainer {
+    margin-top: 10px
+}
+
+.lyteDateSelect .lytePopoverClose{
+    right: 10px;
+    top: 8px;
+}
+
+.lyteCalTableRow .lyteCalCdate:first-of-type.lyteDateRPTempLastDateSelected:before, .lyteCalTableRow .lyteCalCdate:first-of-type.lyteDateRPLastDateSelected:before, .lyteCalTableRow .lyteCalCdate:last-of-type.lyteDateRPTempFirstDateSelected:before, .lyteCalTableRow .lyteCalCdate:last-of-type.lyteDateRPFirstDateSelected:before {
+    display: none;
+}
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{datselect}/ui-elements/datselect/datselect.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/datselect.overrides.less";

@@ -1,0 +1,88 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/daterangepicker/daterangepicker.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{daterangepicker}/ui-elements/daterangepicker/daterangepicker.variables.less";
+
+
+
+
+/* Loading final tweaks to your variables */
+@import (optional) "../overrides/ui-elements/daterangepicker.variables.less";
+
+
+
+/* LYTE-DATERANGEPICKER */
+.lyteDateRangePickerRow{
+  .lyteDateRangePickerRow();
+  display: @display;
+  box-shadow: @boxShadow;
+  -webkit-box-shadow: @webkitBoxShadow;
+  padding: @padding;
+  width: @width;
+}
+
+.lyteDateRangePickerCol1{
+  .lyteDateRangePickerCol1();
+  border-right: 1px solid grey;
+}
+.lyteDateRangePickerCol1,.lyteDateRangePickerCol2{
+  position: relative;
+}
+
+.lyteDateRangePickerRow .lyteCalendarPopup{
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  padding: 0;
+}
+
+.lyteDateRangePickerRow .lyteCalBtns{
+  display: none;
+}
+
+.lyteDateRPLeftNav{
+  .lyteDateRPLeftNav();
+  width: @width;
+  position: absolute;
+  top: @top;
+  left: @left;
+}
+
+.lyteDateRPRightNav{
+  .lyteDateRPRightNav();
+  position: absolute;
+    top: @top;
+    left: @left;
+}
+.lyteDateRPMonthHeader{
+  .lyteDateRPMonthHeader();
+  text-align: @textAlign;
+  font-size: @fontSize;
+}
+.lyteDateRPDateSelected{
+  .lyteDateRPDateSelected();
+    color: @color;
+    background: @background;
+}
+.lyteDateRPTempSelected{
+  .lyteDateRPTempSelected();
+  background: @background;
+}
+
+
+/* LYTE-DATERANGEPICKER END*/
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{daterangepicker}/ui-elements/daterangepicker/daterangepicker.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/daterangepicker.overrides.less";

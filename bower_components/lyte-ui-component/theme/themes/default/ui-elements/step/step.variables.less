@@ -1,0 +1,336 @@
+/* lyte step styles */
+
+/* lyte-step-structure */
+
+	.lyteStepStructure(){
+	@lineHeight: 1;
+    @margin: 0 0;
+    @verticalAlign: middle;
+}
+
+/* .lyteStepSlash lyte-step-item, .lyteStepArrow lyte-step-item */
+
+	.lyteStepStructureDividerSlashItem(){
+	@marginRight: 20px;
+}
+
+/*  lyte-step-item */
+
+	.lyteStepStructureItem(){
+	@float: left;
+	@marginRight: 10px;
+	@padding : 0;
+	@fontSize: 0.875em;
+}
+
+/* lyte-step-item.lyteActive */
+
+	.lyteStepStructureItemActive(){
+	@color: #2C7BD0;
+}
+
+/* .lyteStepSlash lyte-step-item:not(:last-of-type):after */
+
+	.lyteStepStructureDividerSlashItemLastOfTypeAfter(){
+	@content: '/';
+	@right: -12px;
+	@top:0;
+	@color: #666;
+	@opacity: 0.5;
+}
+
+/* .lyteStepSlash .lyteWarning */
+
+	.lyteStepStructureDividerSlashWarning(){
+	@color: #ffb130;
+}
+
+/*.lyteStepSlash .lyteCompleted */
+
+	.lyteStepStructureDividerSlashCompleted(){
+	@color: #72c880;
+}
+
+/* .lyteStepArrow lyte-step-item:not(:last-of-type):after */
+
+	.lyteStepStructureDividerArrowItemAfter(){
+	@background: url(../images/lyte_ui_sprite.svg) no-repeat -191px -29px;
+	@right: -12px;
+	@top:3px;
+	@color: #666;
+	@width: 4px;
+	@height: 7px;
+	@opacity: 0.5;
+}
+
+/* .lyteStepBullet, .lyteStepFlat */
+
+	.lyteStepStructureStageOneAndTwo(){
+	@whiteSpace: nowrap;
+}
+
+
+/* .lyteStepBullet:before */
+
+	.lyteStepStructureStageOneBefore(){
+    @top: 48%;
+    @bottom: 38px;
+    @left: 0;
+    @width: 100%;
+    @boxSizing: border-box;
+    @height: 1px;
+    @background: #e3e3e3;
+}
+
+/* .lyteStepBullet .lyteCompleted lyte-step-head */
+
+	.lyteStepStructureStageOneCompletedHead(){
+	@background: #72c880;
+	@color: #fff;
+	@border: 1px solid #72c880;
+}
+
+/* .lyteStepBullet lyte-step-item.lyteCompleted:not(:first-of-type):before */
+
+	.lyteStepStructureStageOneItemCompletedBefore(){
+	@top: 48%;
+    @bottom: 38px;
+    @left: 0;
+    @width: 100%;
+    @boxSizing: border-box;
+    @height: 1px;
+    @background: #72c880;
+}
+
+/* .lyteStepBullet lyte-step-head */
+
+	.lyteStepStructureStageOneItemHead(){
+    @border: 1px solid #2d7bd0;
+    @borderRadius: 50%;
+    @background: #fff;
+    @textAlign: center;
+    @fontSize: 0.7em;
+    @boxSizing: border-box;
+    @padding: 2px 5px;
+}
+
+/* .lyteStepBullet lyte-step-item */
+
+	.lyteStepStructureStageOneItem(){
+	@marginRight: 0;
+}
+
+/* .lyteStepBullet lyte-step-body */
+
+	.lyteStepStructureStageOneItemBody(){
+	@top: -15px;
+	@right: 0;
+	@fontSize: 0.75em;
+	@color: #666;
+}
+
+/* .lyteStepBullet lyte-step-item:not(:first-of-type) */
+
+	.lyteStepStructureStageOneItemNotFirst(){
+	@paddingLeft: 60px;
+}
+
+/* .lyteStepBullet .lyteWarning lyte-step-head  */
+
+	.lyteStepStructureStageOneItemWarningHead(){
+	@border: 1px solid #ffb130;
+	@background: #ffb130;
+    @color: #fff;
+}
+
+/* .lyteStepBullet lyte-step-item.lyteWarning:not(:first-of-type):before */
+
+	.lyteSteoStructureStageOneItemWarningNotFirstBefore(){
+	@background: #ffb130;
+    @top: 48%;
+    @bottom: 38px;
+    @left: 0;
+    @width: 100%;
+    @boxSizing: border-box;
+    @height: 1px;
+}
+
+/* .lyteStepFlat lyte-step-item, .lyteStepPlain lyte-step-item */
+
+	.lyteStepStructureStageTwoItem(){
+	@marginRight: 0px;
+}
+
+/* .lyteStepFlat lyte-step-body, .lyteStepPlain lyte-step-body */
+
+	.lyteStepStructureStageTwoItemBody(){
+	@float: left;
+	@background: #eaeaea;
+	@textAlign: center;
+	@padding: 10px 20px 10px 30px;
+	@position: relative;
+	@margin: 0 2px 0 0; 
+	@fontSize: 0.875em;
+	@textDecoration: none;
+	@color: #333;
+}
+
+/* .lyteStepFlat lyte-step-body:after, .lyteStepPlain lyte-step-body:after */
+
+ 	.lyteStepStructureStageTwoItemBodyAfter(){
+	@borderTop: 15px solid transparent;
+	@borderBottom: 17px solid transparent;
+	@borderLeft: 17px solid #eaeaea;
+	@right: -17px; 
+	@top: 0;
+	@zIndex: 1;
+}
+
+/* .lyteStepFlat lyte-step-body:before, .lyteStepPlain lyte-step-body:before */
+
+	.lyteStepStructureStageTwoItemBodyBefore(){
+	@borderTop: 15px solid transparent;
+	@borderBottom: 17px solid transparent;
+	@borderLeft: 17px solid #fff;
+	@left: 0; @top: 0;
+}
+
+/* .lyteStepFlat .lyteActive lyte-step-body, .lyteStepPlain .lyteActive lyte-step-body */
+
+	.lyteStepStructureStageTwoActiveBody(){
+	@background: #2d7bd0 ;
+	@color: #fff ;
+}
+
+/* .lyteStepFlat .lyteActive lyte-step-body:after, .lyteStepPlain .lyteActive lyte-step-body:after */
+
+	.lyteStepStructureStageTwoActiveBodyAfter(){
+	@borderLeftColor: #2d7bd0;
+}
+
+/* .lyteStepFlat .lyteWarning lyte-step-body, .lyteStepPlain .lyteWarning lyte-step-body */
+
+	.lyteStepStructureStageTwoWarningBody(){
+	@background: #ffb130;
+	@color: #fff;
+}
+
+/* .lyteStepFlat .lyteWarning lyte-step-body:after, .lyteStepPlain .lyteWarning lyte-step-body:after */
+
+	.lyteStepStructureStageTwoWarningBodyAfter(){
+	@borderLeftColor : #ffb130;
+}
+
+/* .lyteStepFlat .lyteCompleted lyte-step-body,  .lyteStepPlain .lyteCompleted lyte-step-body */
+
+	.lyteStepStructureStageTwoCompletedBody(){
+	@background: #72c880 ;
+	@color: #fff ;
+}
+
+/* .lyteStepFlat .lyteCompleted lyte-step-body:after, .lyteStepPlain .lyteCompleted lyte-step-body:after */
+
+	.lyteStepStructureStageTwoCompletedBodyAfter(){
+	@borderLeftColor: #72c880;
+}
+
+/* .lyteStepPlain lyte-step-item:first-child lyte-step-body:before */
+
+	.lyteStepStructureStageTwoPlainItemBodyBefore(){
+	@borderLeftColor: transparent;
+} 
+
+/* .lyteStepBox */
+
+	.lyteStepBox(){
+	  @display: -webkit-inline-box;
+	  @margin: 1em;
+	  @lineHeight: 1.14285714em;
+	  @border: 1px solid rgba(34, 36, 38, 0.15);
+	  @counterReset: ordered;
+}
+
+/* .lyteStepBox lyte-step-item */
+
+	.lyteStepBoxItem(){
+	  @alignItems: center;
+	  @margin: 0 0 ;
+	  @padding: 1.14285714em 2em;
+	  @background: #fff;
+	  @color: rgba(0, 0, 0, 0.87);
+	  @border: none;
+	  @borderRight: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+/* .lyteStepBox lyte-step-item:last-of-type */
+
+	.lyteStepBoxItemLast(){
+  	@borderRight: none;
+}
+
+/* .lyteStepBox lyte-step-item.lyteCompleted:before */
+
+	.lyteStepBoxItemCompletedBefore(){
+	  @content: '';
+	  @background: url(../images/lyte_ui_sprite.svg) no-repeat -1px -18px;
+	  @color: #21ba45;
+	  @height: 30px;
+	  @width: 30px;
+	  @marginRight: 1rem;
+	  @display: inline-block;
+	  @verticalAlign: middle;
+	  @counterIncrement: ordered;
+}
+
+/* .lyteStepBox lyte-step-item:not(.lyteCompleted):before */
+
+	.lyteStepBoxItemNotCompleted(){
+	  @content: counters(ordered, ".");
+	  @marginRight: 1rem;
+	  @display: inline-block;
+	  @verticalAlign: middle;
+	  @height: 30px;
+	  @width: 30px;
+	  @fontSize: 2em;
+	  @counterIncrement: ordered;
+	  @position: relative;
+	  @top: 5px;
+}
+
+/* .lyteStepBox lyte-step-item.lyteActive */
+
+	.lyteStepBoxItemActive(){
+  	@background: #f3f4f5;
+}
+
+/* .lyteStepBox lyte-step-item.lyteActive:before */
+
+	.lyteStepBoxItemActiveBefore(){
+	  @content: counters(ordered, ".");
+	  @color: #21ba45;
+	  @marginRight: 1rem;
+	  @fontSize: 2em;
+	  @counterIncrement: ordered;
+	  @fontWeight: 700;
+	  @position: relative;
+	  @top: 5px;
+}
+
+/* .lyteStepBox lyte-step-item:not(:last-of-type):after */
+
+	.lyteStepBoxItemNotLastAfter(){
+	  @borderStyle: solid;
+	  @borderColor: rgba(34, 36, 38, 0.15);
+	  @borderWidth: 0 1px 1px 0;
+	  @webkitTransform: translateY(-50%) translateX(50%) rotate(-45deg);
+	  @transform: translateY(-50%) translateX(50%) rotate(-45deg);
+	  @zIndex: 2;
+	  @content: '';
+	  @background: inherit;
+	  @right: 0;
+	  @top: 50%;
+	  @color: #666;
+	  @width: 1.14285714em;
+	  @height: 1.14285714em;
+	  @opacity: 1;
+}

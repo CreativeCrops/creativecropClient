@@ -1,0 +1,28 @@
+lyte-autocomplete-description{
+	opacity: 0.4;
+}
+.lyteautocompleteHighlight{
+	background: yellow;
+}
+lyte-autocomplete lyte-dropdown div.lyteDummyEventContainer{
+	outline: none;
+	width: 100%;
+	display: block !important;
+}
+lyte-autocomplete  lyte-drop-button{
+	border: 0px!important;
+	padding: 0px!important;
+}
+lyte-autocomplete lyte-dropdown {
+	width: 100%;
+}
+div.lyteautocompleteError {
+	display: none;
+	padding: 10px 20px;
+}
+lyte-autocomplete {
+	display: inline-block;
+}
+lyte-drop-item div.lyteAutoComplete{
+	display: inline-block !important;
+}

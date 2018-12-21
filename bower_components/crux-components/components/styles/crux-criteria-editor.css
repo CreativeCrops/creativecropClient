@@ -1,0 +1,130 @@
+/* $Id$ */
+#criteriaTable lyte-th{
+    border:none;
+}
+
+.shown{
+    display:block;
+}
+.hiden{
+    display:none;
+}
+
+.addCriteria{
+    width: 33px;
+    height: 33px;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+    background: url(/crm/CRMClient/images/wf_sprite.svg) no-repeat 5px 4px;
+    float: left;
+}
+.removeCriteria{
+    width: 33px;
+    margin-right: 0;
+    height: 33px;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+    background: url(/crm/CRMClient/images/wf_sprite.svg) no-repeat 4px -22px;
+}
+.colorSpan {
+    color : #20b8a8;
+}
+
+
+
+
+
+
+
+
+crux-criteria-editor lyte-tr:hover{
+    background: transparent;
+    cursor: default;
+}
+crux-criteria-editor lyte-td{
+    padding: 0;
+    border: none;
+}
+crux-criteria-editor .newApCriteriaTable lyte-td{
+    border-bottom: none;
+    overflow: visible;
+    padding: 0;
+    min-width: initial;
+    padding-left: 10px;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    padding-top: 35px;
+}
+crux-criteria-editor .lyteDropdown-disabled, crux-criteria-editor .lyteField input:disabled{
+    opacity: 0.6;
+}
+crux-criteria-editor .lyteField{
+    border: none !Important;
+    top: 0px;
+    padding: 0;
+    width: 100%;
+}
+crux-criteria-editor .lyteField:hover{
+    border: none;
+}
+crux-criteria-editor .lyteField input, .criteriaPatternText{
+    border: 1px solid #ddd !Important;
+    padding: 5px 5px;
+    height: auto;
+    box-sizing: border-box;
+    font-size: 0.9rem !Important;
+}
+crux-criteria-editor .lyteField:hover input{
+    border: 1px solid #ddd;
+}
+crux-criteria-editor .andOr input{
+    transform: scale(1) !Important;
+    font-size: 0.8rem !Important;
+    padding: 0;
+    text-align: center;
+    color: #111 !Important;
+}
+crux-criteria-editor lyte-dropdown:not([lt-prop-type="multiple"]):not([lt-prop-type="multisearch"]) lyte-drop-button
+{
+    color: #111 !Important;
+}
+crux-criteria-editor .newApCriteriaTable lyte-tr:nth-child(1) lyte-td{
+    padding-top: 0;
+}
+crux-criteria-editor .newApCriteriaTable lyte-tr:nth-child(1) lyte-td:nth-child(1):before{
+    display: none;
+}
+crux-criteria-editor-header .header lyte-td:nth-child(1):before{
+    content: "";
+    display: inline-block;
+    width: 1px;
+    height: 100%;
+    background: #ccc;
+    position: absolute;
+    left: 25px;
+    top: -3px;
+}
+crux-criteria-editor .newApCriteriaTable lyte-td:nth-child(4){
+    width: 300px;
+}
+
+.fieldSearchStyle1 .lyteInputBox > div.lyteInputBoxSearch, .conditionSearchStyle1 .lyteInputBox > div.lyteInputBoxSearch{
+    border: none; 
+    border-radius: 0;
+    padding: 5px 20px;
+    border-bottom: 1px solid #d6d6d6;
+    top: 0;
+}
+crux-number-component lyte-input:not(.lyteInputBox){
+    border-bottom: none;
+}
+crux-number-component#betweenComponent1 > div, crux-number-component#betweenComponent2 > div{
+    width: 49%; 
+    display: inline-block;
+}
+
+#changePattern lyte-td{
+    vertical-align: top
+}

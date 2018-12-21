@@ -1,0 +1,209 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/tabs/tabs.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{tabs}/ui-elements/tabs/tabs.variables.less";
+
+
+
+
+/* Loading final tweaks to your variables */
+@import (optional) "../overrides/ui-elements/tabs.variables.less";
+
+
+
+/* LYTE-TABS */
+lyte-tabs{
+    .lyteTabs();
+    display: block;
+    background-color: @backgroundColor;
+    position : relative;
+    min-width: @minWidth;
+    min-height: @minHeight;
+}
+.lyteTabShow{
+    display: block;
+}
+.lyteTabHide{
+    display: none;
+}
+lyte-tab-head{
+    .lyteTabHead();
+    margin: @margin;
+    padding: @padding;
+    display: block;    
+}
+lyte-tab-head:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+lyte-tab-title{
+    .lyteTabTitle();
+    float: @float;
+    color: @color;
+    padding: @padding;
+    cursor: @cursor;
+    box-sizing: @boxSizing;
+    display: @display;
+    opacity: @opacity;
+}
+.lyteTabCloseIcon{
+    .lyteTabClose();
+    background: @background;
+    width: @width;
+    height: @height;
+    display: @display;
+    cursor: @cursor;
+    top: @top;
+    right: @right;
+    padding: @padding;
+    margin-left: @marginLeft;
+}
+.lyteTabHover {
+    .lyteTabsHover();
+    opacity: @opacity;
+}
+.lyteTabActive {
+    .lyteTabsActive();
+    opacity: @opacity;
+    font-weight: @fontWeight;
+}
+lyte-tab-body{
+    .lyteTabBody();
+    height: @height;
+    background-color: @backgroundColor;
+    border: @border;
+    box-sizing: @boxSizing;
+    border-radius: @borderRadius;
+}
+lyte-tab-content{
+    .lyteTabContent();
+    height: @height;
+    overflow-y: @overflowY;
+    padding: @padding;
+    box-sizing: @boxSizing;
+}
+
+/* Default Tab Css */
+.lyteTabDefaultLeft, .lyteTabDefaultRight, .lyteTabDefaultTop, .lyteTabDefaultBottom {
+    .lyteTabDefaultStyle();
+    border: @border;
+}
+.lyteTabDefaultLeft .lyteTabNav, .lyteTabDefaultRight .lyteTabNav{
+    .lyteTabsNav();
+    width: @width;
+    float: @float;
+    box-sizing: @boxSizing;
+}
+.lyteTabDefaultLeft lyte-tab-head, .lyteTabDefaultRight lyte-tab-head{
+    .lyteTabsHeadLR();
+    height: @height;
+    overflow-y: @overflowY;
+    background-color: @backgroundColor;
+}
+.lyteTabDefaultLeft lyte-tab-title, .lyteTabDefaultRight lyte-tab-title{
+    .lyteTabsTitleLR();
+    float: @float;
+    z-index: @zIndex;
+}
+.lyteTabDefaultLeft lyte-tab-title.lyteTabActive, .lyteTabDefaultRight lyte-tab-title.lyteTabActive,
+.lyteTabDefaultTop lyte-tab-title.lyteTabActive, .lyteTabDefaultBottom lyte-tab-title.lyteTabActive {
+    .lyteTabsTitleLRTB();
+    background-color: @backgroundColor;
+    position: relative;
+}
+.lyteTabDefaultLeft lyte-tab-title, .lyteTabDefaultRight lyte-tab-title {
+    .lyteTabsTitleDefaultLR();
+    width: @width;
+}
+.lyteTabDefaultLeft lyte-tab-body, .lyteTabDefaultRight lyte-tab-body {
+    .lyteTabsBodyLR();
+    width: @width;
+    float: @float;
+    border: @border;
+    position: relative;
+    box-sizing: @boxSizing;
+}
+.lyteTabDefaultLeft lyte-tab-body:after, .lyteTabDefaultRight lyte-tab-body:after {
+    .lyteTabsBodyLRAfter();
+    content: '';
+    border-left: @borderLeft;
+    position: absolute;
+    top: @top;
+    left: @left;
+}
+.lyteTabDefaultRight .lyteTabNav, .lyteTabDefaultRight lyte-tab-body {
+    float: right;
+}
+.lyteTabDefaultTop lyte-tab-head, .lyteTabDefaultBottom lyte-tab-head {
+    .lyteTabHeadTB();
+    background-color: @backgroundColor;
+}
+.lyteTabDefaultTop lyte-tab-title, .lyteTabDefaultBottom lyte-tab-title {
+    width: initial;
+    display: inline-block;
+}
+.lyteTabDefaultTop lyte-tab-body, .lyteTabDefaultBottom lyte-tab-body {
+    .lyteTabsBodyTB();
+    width: initial;
+    height: @height;
+    border: @border;
+    box-sizing: @boxSizing;
+    display: block;
+}
+.lyteTabDefaultRight lyte-tab-body:after {
+    .lyteTabsBodyR();
+    content: '';
+    left: @left;
+    right: @right;
+}
+.lyteTabDefaultTop lyte-tab-head {
+    /*border-bottom: 1px solid #ddd;*/
+}
+.lyteTabDefaultTop lyte-tab-title {
+    .lyteTabTitleTop();
+    margin: @margin;
+}
+.lyteTab.lyteTabDefaultBottom {
+    position: relative;
+}
+.lyteTabDefaultBottom .lyteTabNav {
+    .lyteTabNavBottom();
+    position: absolute;
+    bottom: @bottom;
+    width: @width;
+}
+.lyteTabDefaultBottom lyte-tab-head {
+    .lyteTabHeadBotttom();
+    border-top: @borderTop;
+}
+.lyteTabDefaultBottom lyte-tab-title {
+    .lyteTabTitleBottom();
+    margin: @margin;
+}
+.lyteTabDefaultBottom .lyteTabNav,.lyteTabDefaultTop .lyteTabNav{
+    .lyteTabNavBT();
+    min-width: @minWidth;
+}
+.lyteTabCustomTitleWidth{
+    .lyteTabsCustomTitle();
+    white-space: @whiteSpace;
+    overflow: @overflow;
+}
+/* LYTE-TABS END*/
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{tabs}/ui-elements/tabs/tabs.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/tabs.overrides.less";

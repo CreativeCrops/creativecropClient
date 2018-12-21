@@ -1,0 +1,90 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/scrollbar/scrollbar.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{scrollbar}/ui-elements/scrollbar/scrollbar.variables.less";
+
+
+
+
+/* Loading custom themes */
+@import (optional) "../overrides/ui-elements/scrollbar.variables.less";
+
+
+
+/* CSS Common for all scrollbars */
+
+
+.lyteScrollBar{
+	overflow : hidden !important;
+	position : relative !important;
+	width : 100%;
+	height: 100%;
+	outline: none;
+}
+
+ .lyteScrollContainer{
+ 	.lyteScrollContainer();
+ 	position : absolute;
+ 	border-radius: @borderRadius;
+ 	 z-index : @zIndex;
+ }
+
+  .lyteScrollContainer:hover, .lyteScrollingY > .lyteScrollContainerY, .lyteScrollingX > .lyteScrollContainerX {
+  	.scrollContainerHover();
+ 	background-color: @backgroundColor;
+    opacity: @opacity;
+ }
+
+ .lyteScrollingY > .lyteScrollContainerY > div, .lyteScrollingX > .lyteScrollContainerX > div, .lyteScrollContainer div:hover{
+	.scrollHandler();
+	background: @background;
+}
+
+.lyteScrollContainer.lyteScrollContainerY{
+	.verticalContainer();
+  	width : @width;
+  	top : @top;
+  	left : auto ;
+  	right : 0px;
+  	bottom : 0px;
+ 	height : auto; 
+}
+.lyteScrollContainer.lyteScrollContainerX{
+	.horizontalContainer();
+	height : @height;
+}
+.lyteScrollContainer div{
+	.innerScrollHandler();
+	background: @background;
+	position : relative;
+	border-radius: @borderRadius;
+}
+.lyteScrollContainer.lyteScrollContainerY div{
+	width:100%;
+}
+.lyteScrollContainer.lyteScrollContainerX div{
+	height:100%;
+}
+.lyteScrollContainer.lyteScrollContainerX.top{
+	top : 0px;
+ 	bottom : auto
+}
+.lyteScrollContainer.lyteScrollContainerY.left{
+	left : 0px;
+ 	right : auto 
+}
+	               
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{scrollbar}/ui-elements/scrollbar/scrollbar.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/scrollbar.overrides.less";    

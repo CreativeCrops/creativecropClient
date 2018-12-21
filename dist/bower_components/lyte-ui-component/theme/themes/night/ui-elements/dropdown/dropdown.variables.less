@@ -1,0 +1,335 @@
+
+
+
+
+/* DROP LABEL STYLES */
+
+.lyteDropLabel(){
+	@fontWeight: 700;
+}
+
+
+
+
+/* MULTISELECT WIDTH */
+
+.lyteMultiSelectDropTag(){
+	@width: 100%;	
+}
+
+
+
+
+/* DROP BODY */
+
+.lyteDropBody(){
+	@maxHeight: 12.5rem;
+}
+
+
+
+
+/* DROP BOX STYLES */
+
+.lyteDropBox(){
+	@borderRadius: 0.250rem; //new
+	@minWidth: 300px;
+	@backgroundColor: @black;
+	@boxSizing: content-box;
+	@margin: 0;
+	@verticalAlign: middle;
+	@border: 0.125rem solid @white!important;
+	@boxShadow: 0rem 0.125rem 0.3125rem rgba(0,0,0,0.2);
+	@width: auto;
+	@top: 1.6875rem;
+	@left: 0;
+	@zIndex: 10002;	
+}
+
+
+
+
+/* DROP ICON */
+
+.lyteDropIcon(){
+	@marginRight: 1.25rem;
+}
+
+.lyteDropOpener(){
+	@margin: 1px;
+    @border: solid @white;
+    @width: 5px;
+    @height: 5px;
+    @borderWidth: 0 3px 3px 0;
+    @padding: 1px;
+    @transform: rotate(45deg) translateY(-50%) translateX(-50%);
+	@background: none;
+    @opacity: 1;
+    @right: 10px;
+    @top: 50%;
+}
+
+
+/* LYTE DROP ITEM */
+
+.lyteDropItem(){
+	@transition: padding-left 0.3s ease; //new
+	@border: none;
+	@height: auto;
+	@textAlign: auto;
+	@borderTop: none;
+	@lineHeight: .9rem;
+	@color: @white;  //changed
+	@padding: .45rem 1.1rem;
+	@fontSize: .855rem;
+	@textTransform: none;
+	@fontWeight: 700; //changed
+	@boxShadow: none;
+}
+
+
+
+
+/* DROP ITEM HOVER */
+
+.lyteDropItemHover(){
+	// @backgroundColor: #d6d6d6; //changed
+	// @color: @black; //new
+	@backgroundColor: none;
+	@paddingLeft: 60px;
+}
+
+
+
+
+/* DROP BUTTON NORMAL */
+
+.lyteDropButtonNormal(){
+	@width: 100%;
+	@textAlign: left;
+	@whiteSpace: nowrap;
+	@padding: 0.3125rem 0.625rem;
+	@borderRadius: 0.250rem; // new
+	@border: 0.125rem solid @lightGrey; //changed
+	@color: @white; // changed
+	@fontSize: 0.855rem;
+	@boxSizing: content-box;
+}
+
+
+
+
+/* DROP BUTTON FOCUS */
+
+.lyteDropButtonFocus(){
+	@borderColor: #2185d0;
+	@outline: none;	
+}
+
+
+
+
+/* MULTI SELECT DROP BUTTON */
+
+.lyteMultiDropButton(){
+	@border: 1px solid @lightGrey;
+	@minWidth: 100%;
+	@padding: 0.4375rem 0.625rem 0.4375rem 0.3125rem;
+	@boxSizing: content-box;
+	@minHeight: 2.5rem;
+}
+
+.lyteMultiBox() {
+	@borderBottom: 1px solid @lightGrey;
+	@padding: 0;
+	@margin: 0;
+}
+
+
+
+
+/* INDIVIDUAL ITEMS OF MULTISELECT */
+
+.lyteMultiSelectedItem() {
+	@padding: 0.125rem 1.125rem 0.125rem 0.4375rem!important;
+	@backgroundColor: #dedede;
+	@color: #333;
+	@fontSize: 0.855rem;
+	@borderRadius: 3px;
+	@margin: 0.125rem 0.625rem 0.125rem 0;
+}
+
+
+
+
+/* MULTI SELECT INPUT */
+
+.lyteMultiSelectInput(){
+	@border: none;
+	@backgroundColor: transparent;
+	@fontSize: 0.855rem;
+	@color: #333;
+	@padding: 0.5rem 0.625rem;
+	@boxSizing: content-box;
+}
+
+
+
+
+/* TEXT LABEL */
+
+.lyteDropTextSpacing(){
+	@margin: 0 1.25rem 0 0;
+}
+
+
+
+
+/* DISABLED DROPDOWN OPACITY */
+
+.lyteDropDisabled(){
+	@opacity: 0.5;
+}
+
+
+
+
+/* DROPDOWN ITEM SELECTED */
+
+.lyteDropItemSelected(){
+	@backgroundColor: none;
+	@paddingLeft: 60px;
+	// @backgroundColor: #d6d6d6; //changed
+	// @color: @black; //new
+}
+
+
+
+
+/* LYTE ARROW ICON */
+.lyteDropArrow(){
+	@width: 0;
+	@height: 0;
+	@borderBottom: 0.5rem solid @white;
+}
+
+
+
+
+/* TOP ARROW */
+
+.lyteDropTopArrow(){
+	@top: 0px;
+	@bottom: 100%;
+	@left: 50%;
+	@border: solid transparent;
+	@height: 0;
+	@width: 0;
+}
+
+.lyteDropTopArrowBefore(){
+	@borderColor: rgba(255, 255, 255, 0);
+	@borderBottomColor: @white;
+	@borderWidth: 0.5rem;
+	@marginLeft: -0.5rem;	
+}
+
+.lyteDropTopArrowAfter(){
+	@borderColor: rgba(221, 221, 221, 0);
+	@borderBottomColor: @lightGrey;
+	@borderWidth: 0.5625rem;
+	@marginLeft: -0.5625rem;
+}
+
+
+
+
+/* BOTTOM ARROW */
+
+.lyteDropBottomArrow(){
+	@bottom: -0.5rem;
+	@left: 50%;
+	@top: 100%;
+	@border: solid transparent;
+	@height: 0;
+	@width: 0;	
+}
+
+.lyteDropBottomArrowAfter(){
+	@borderColor: rgba(255, 255, 255, 0);
+	@borderTopColor: @white;
+	@borderWidth: 0.5rem;
+	@marginLeft: -0.5rem;
+}
+
+
+.lyteDropBottomArrowBefore(){
+	@borderColor: rgba(221, 221, 221, 0);
+	@borderTopColor: @lightGrey;
+	@borderWidth: 0.5625rem;
+	@marginLeft: -0.5625rem;
+}
+
+
+
+
+/* RIGHT ARROW */
+
+.lyteDropRightArrow(){
+	@right: 0px;
+	@left: 100%;
+	@top: 50%;
+	@border: solid transparent;
+	@height: 0;
+	@width: 0;	
+}
+
+.lyteDropRightArrowAfter(){
+	@borderColor: rgba(255, 255, 255, 0);
+	@borderLeftColor: @white;
+	@borderWidth: 0.5rem;
+	@marginTop: -0.5rem;
+}
+
+.lyteDropRightArrowBefore(){
+	@borderColor: rgba(221, 221, 221, 0);
+	@borderLeftColor: @lightGrey;
+	@borderWidth: 0.5625rem;
+	@marginTop: -0.5625rem;
+}
+
+
+
+
+/* LEFT ARROW */
+
+.lyteDropLeftArrow(){
+	@left: 0px;
+	@right: 100%;
+	@top: 50%;
+	@border: solid transparent;
+	@height: 0;
+	@width: 0;
+}
+
+.lyteDropLeftArrowAfter(){
+	@borderColor: rgba(255, 255, 255, 0);
+	@borderRightColor: @white;
+	@borderWidth: 0.5rem;
+	@marginTop: -0.5rem;	
+}
+
+.lyteDropLeftArrowBefore(){
+	@borderColor: rgba(221, 221, 221, 0);
+	@borderRightColor: @lightGrey;
+	@borderWidth: 0.5625rem;
+	@marginTop: -0.5625rem;
+}
+
+
+
+
+
+
+
+

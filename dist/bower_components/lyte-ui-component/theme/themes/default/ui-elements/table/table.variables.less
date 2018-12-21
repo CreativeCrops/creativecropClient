@@ -1,0 +1,164 @@
+/* navigator styles */
+
+/* lyte-tr */
+
+@tableBorderColor : #e5e5e5;
+
+.lyteTableTr(){
+	@backgroundColor : white;
+}
+
+/* lyte-td, lyte-th */
+
+.lyteTableCell(){
+	@backgroundColor: inherit;
+    @minWidth: 50px;
+    @boxSizing: border-box;
+    @overflowWrap: break-word;
+}
+
+/* lyte-table-structure */
+
+.lyteTableStructure(){
+	@background: #fff;
+    @borderRadius: 3px;
+    @textAlign: left;
+    @color: rgba(0,0,0,.87);
+    @borderCollapse: separate;
+    @borderSpacing: 0;
+    @border : none;
+}
+
+/* lyte-table.border lyte-th, lyte-table.border lyte-td */
+
+.lyteTableCellBorder(){
+	@border :1px solid;
+  @borderRight: none;
+}
+
+/* lyte-table.border lyte-td  */
+
+.lyteTableBodyCellBorderTop(){
+	@borderTop: none;
+}
+
+/* lyte-table.border lyte-th:last-of-type, lyte-table.border lyte-td:last-of-type */
+
+.lyteTableCellsLastOfTypeBorder(){
+	 @borderRight: 1px solid;
+}
+
+/* lyte-table.border lyte-tbody lyte-tr:last-of-type lyte-td */
+
+  .lyteTableBodyLastRowBorderBottom(){
+  	@borderBottom: 1px solid;
+}
+
+/* lyte-th */
+
+.lyteTableHeaderCell() {
+      @cursor: auto;
+      @background: #fff;
+      @textAlign: inherit;
+      @color: #000;
+      @fontSize: .929rem;
+      @outline: none;
+      @padding: 8px 10px 8px 10px;
+      @verticalAlign: middle;
+      @borderBottom: 3px double;
+ }
+
+/* lyte -td */
+
+.lyteTableBodyCell(){
+      @padding: 8px 10px 8px 10px;
+      @fontSize: 1rem;
+      @overflow: hidden;
+      @emptyCells: show;
+      @borderBottom: 1px solid;
+      @whiteSpace: normal;
+      @textOverflow: initial;
+      @verticalAlign: top;
+      @wordWrap: break-word;
+      @color: #666;
+ } 
+
+ /*  lyte-tbody lyte-tr:hover */
+
+  .lyteTableBodyRowHover(){
+ 	 @backgroundColor: #f7f7f7;
+  	 @cursor: pointer;
+}
+
+ /* lyte-tablehead-resize */
+
+    .lyteTableHeadResize(){	
+	  @cursor: ew-resize;
+	  @position: absolute;
+	  @height: 100%;
+	  @width: 15px;
+	  @zIndex: 9;
+}  
+
+/* lyte-table-resize */
+
+  .lyteTableResize(){
+	  @width: 15px;
+	  @height: 15px;
+	  @cursor: se-resize;
+	  @zIndex: 10;
+  }
+
+ /* lyte-table-horizontal-resize */ 
+
+  .lyteTableHorizontalResize(){
+  	@width: 15px;
+  	@cursor: col-resize;
+   	@zIndex: 9;
+}  
+
+/* lyte-table-vertical-resize */
+
+	.lyteTableVerticalResize(){
+	  @height: 15px;
+	  @cursor: row-resize;
+	  @zIndex: 9;
+}
+
+/* lyteTableFixed*/
+
+  .lyteTableFixedCell(){
+  @zIndex: 7;
+}
+
+/* lyte-th.lyteFixedColumn:not(.lytePreventIcon):after */
+
+    .headerFixedColumnAfter(){	
+      @top: 50%;
+      @right: 5px;
+      @marginLeft: -5px;
+      @borderWidth: 5px;
+      @borderStyle: solid;
+      @borderColor: #222 transparent transparent transparent;
+      @zIndex: 7
+  }
+
+/* lyte-th.tableRowFixed */
+
+ .lyteTableHeaderFixed(){	
+  @zIndex: 6;
+} 
+
+/* lyte-th.tableRowFixed.lyteTableFixed */
+
+ .lyteTableHeaderRowFixed(){	
+  @zIndex: 8;
+}
+
+/* div.lyteTableDummy */
+
+	.lyteTableColumnSortable(){
+		@background: #e5cce6;
+		@opacity: 0.4;
+		@zIndex: 10;
+}

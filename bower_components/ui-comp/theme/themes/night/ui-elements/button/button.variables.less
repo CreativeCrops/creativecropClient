@@ -1,0 +1,126 @@
+
+
+
+
+/* STYLES COMMON TO ALL BUTTONS */
+
+.lyteButtonCommon(){
+	@borderRadius: 0.250rem;
+	@fontWeight: 700;
+}
+
+
+
+
+/* DISABLED BUTTON */
+
+.lyteButtonCommon(){
+	@opacity: 0.5;
+}	
+
+
+
+
+/* DEFAULT BUTTON */
+
+.lyteDefaultButton(){
+	@backgroundColor: transparent;
+	@color: @white;
+	@border: solid 0.125rem #fff;
+}
+
+.lyteDefaultButtonHover(){
+	@border: solid 0.125rem #fff;
+	@borderBottom: solid 0.125rem #fff;
+}
+
+.lyteDefaultButtonActive(){
+	@background: @white;
+	@color: @black;
+}
+
+
+/* PRIMARY BUTTON */
+
+.lytePrimaryButton(){
+	@backgroundColor: @primaryColor;
+	@color: @white;
+	@border: solid 0.125rem @primaryColor;
+}
+
+.lytePrimaryButtonHover(){
+	@border: 0.125rem solid @primaryColor;
+	@backgroundColor: @primaryColor;
+	@borderBottom: solid 0.125rem @primaryColor;
+}
+
+.lytePrimaryButtonActive(){
+	@background: darken(@primaryColor,10%);
+	@borderColor: darken(@primaryColor,10%);
+}
+
+
+/* SUCCESS BUTTON */
+
+.lyteSuccessButton(){
+	@backgroundColor: @successColor;
+	@color: @white;
+	@border: 0.125rem solid @successColor
+}
+
+.lyteSuccessButtonHover(){
+	@border: 0.125rem solid @successColor;
+	@backgroundColor: @successColor;
+	@color: @white;
+	@borderBottom: solid 0.125rem @successColor;
+}
+
+.lyteSuccessButtonActive(){
+	@backgroundColor: darken(@successColor,10%);
+	@borderColor: darken(@successColor,10%);
+}
+
+.lyteSuccessDefaultButton(){
+	@color: @successColor;
+	@borderColor: @successColor;
+}
+
+.lyteSuccessDefaultButtonHover(){
+	@backgroundColor: @successColor !important;
+	@color: @white !important;
+	@borderBottom: solid 0.125rem @successColor;
+}
+
+
+
+
+/* FAILURE BUTTON */
+
+.lyteFailureButton(){
+	@backgroundColor: @failureColor;
+	@color: @white;
+	@border: 0.125rem solid @failureColor;
+}
+
+.lyteFailureDefaultButton(){
+	@color: @redText;
+	@borderColor: @failureColor;
+}
+
+.lyteFailureButtonActive(){
+	@backgroundColor: darken(@failureColor,10%);
+	@borderColor: darken(@failureColor,10%);
+}
+
+.lyteFailureButtonHover(){
+	@border: 0.125rem solid #f35652;
+	@backgroundColor: #f35652;
+	@borderBottom: solid 0.125rem #B11814;
+}
+
+.lyteFailureDefaultButtonHover(){
+	@border:0.125rem solid @failureColor !important;
+	@backgroundColor: @failureColor !important;
+	@color: @white;
+	@borderBottom: solid 0.125rem #B11814 !important;
+}

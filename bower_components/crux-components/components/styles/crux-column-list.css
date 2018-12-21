@@ -1,0 +1,41 @@
+/* $Id$ */
+.lyteBodyPosition{
+	position: relative;
+	border: none !important;
+	box-shadow: none;
+	top :0px;
+}
+.columnListSearchIcon span.searchIcon{
+	left :-8px;
+}
+.sortIcon {
+	width: 18px;
+	height: 15px;
+	background: url('../images/crux-sprite-icons.svg') no-repeat -131px -55px;
+	position: absolute;
+	top: 15px;
+	right: 30px;
+	display:  none;
+}
+.topBarColor{
+	    border-bottom:1px solid #33d1fb !important;
+}
+.ccNotSelected {
+	padding: 6px 25px 5px 5px;
+	height: 29px;
+	font-size: 16.5px;	
+}
+.columnListCheckbox{
+	width:94%;
+	height:100%;
+}
+.madatory::after {
+  content: "*"; 
+  color:#f22626;
+}
+.divBorder{
+	padding-top:10px;
+}
+.columnListCheckbox:before{
+	margin:-2px 1px 0px 0px;
+}

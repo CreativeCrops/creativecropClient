@@ -1,0 +1,96 @@
+/* Default theme imported */
+
+@import "../themes/default/ui-elements/navigator/navigator.variables.less";
+
+/* Loading theme in configuration */
+
+@import "../config.less";
+
+@import (optional) "../themes/@{navigator}/ui-elements/navigator/navigator.variables.less";
+
+/* Loading custom themes */
+
+@import (optional) "../overrides/ui-elements/navigator/navigator.variables.less";
+
+/* Navigator Styles */
+lyte-navigator {
+  display: inline-block;
+}
+
+.lyteNavigator {
+  .lyteNavigator();
+  width: 100%;
+  white-space: @whiteSpace;
+  display: inline-block;
+}
+
+.lyteDoubleBack, .lyteSingleBack, .lyteNavigatorMidPoint, .lyteDoubleFront, .lyteSingleFront {
+  .lyteNavigatorHeight();
+  display: inline-block;
+  margin-right: @marginRight;
+}
+
+.lyteNavigatorMidPoint {
+  .lyteNavigatorMidPoint();
+  vertical-align: @verticalAlign;
+}
+
+.lyteIconDoubleBack, .lyteIconSingleBack, .lyteIconSingleFront, .lyteIconDoubleFront {
+  .lyteNavigatorIcons();
+  cursor: @cursor;
+  opacity: @opacity;
+} 
+
+.lyteIconDoubleBack {
+  .lyteNavigatorDoubleBack();
+  background: @background;
+  width: @width;
+  height: @height;
+  display: inline-block;
+}
+
+.lyteIconSingleBack {
+  .lyteNavigatorSingleBack();
+  background: @background;
+  width: @width;
+  height: @height;
+  display: inline-block;
+}
+
+.lyteIconSingleFront {
+  .lyteNavigatorSingleFront();
+  background: @background;
+  width: @width;
+  height: @height;
+  display: inline-block;
+}
+
+.lyteIconDoubleFront {
+  .lyteNavigatorDoubleFront();
+  background: @background;
+  width: @width;
+  height: @height;
+  display: inline-block;
+}
+
+div.lyteDisabled{
+  .lyteNavigatorDisabledIcon();
+  pointer-events: none;
+  opacity: @opacity;
+}
+
+span.lyteNavigatorText{
+  .lyteNavigatorText();
+  display: inline-block;
+  color: @color;
+}
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{navigator}/ui-elements/navigator/navigator.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/navigator.overrides.less";

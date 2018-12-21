@@ -1,0 +1,35 @@
+.homebg {
+    background-color: #e4e8ea;
+    background-image: url(components/images/blue-triangle.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+.z-depth-g{
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(211,209,209,0.75);
+    border: none;
+    background-color: white;
+    padding: 20px;
+}
+
+.anm{
+    animation: 0.31s ease-in-out  anm;
+}
+
+
+@keyframes anm {
+    0%{transform: translateX(100%)}
+    100%{transform: translateX(0%)}
+}
+
+.anm1{
+    animation: 0.31s ease-in-out  anm1;
+}
+
+
+@keyframes anm1 {
+    0%{transform: translateX(-100%)}
+    100%{transform: translateX(0%)}
+}

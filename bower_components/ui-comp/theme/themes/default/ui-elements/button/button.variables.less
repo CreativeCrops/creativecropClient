@@ -1,0 +1,162 @@
+
+
+
+
+/* STYLES COMMON TO ALL BUTTONS */
+
+.lyteButtonCommon(){
+	@borderRadius: 0.125rem;
+	@fontSize: 0.909rem;
+	@padding: 0.5rem 1rem;
+	@boxSizing: content-box;
+	@fontFamily: "ProximaNovaRegular",arial,sans-serif;
+	@background: transparent;
+}
+
+
+
+
+/* DISABLED BUTTON */
+
+.lyteButtonCommon(){
+	@opacity: 0.5;
+}	
+
+
+
+
+/* DEFAULT BUTTON */
+
+.lyteDefaultButton(){
+	@backgroundColor: @defaultColor;
+	@color: #3c3c3c;
+	@border: solid 1px #c4c4c4;
+}
+
+.lyteDefaultButtonHover(){
+	@border: 1px solid #abaaaa;
+	@borderBottom: solid 1px #777;
+}
+
+
+
+
+/* PRIMARY BUTTON */
+
+.lytePrimaryButton(){
+	@backgroundColor: @primaryColor;
+	@color: @white;
+	@border: solid 1px @primaryColor;
+}
+
+.lytePrimaryButtonHover(){
+	@border: 1px solid @primaryColorDark;
+	@backgroundColor: @primaryColorDark;
+	@borderBottom: solid 1px #1b70b0;
+}
+
+
+
+
+/* SECONDARY BUTTON */
+
+.lyteSecondaryButton() {
+	@backgroundColor: #fd6611;
+    @color: #fff;
+    @border: solid 1px #fd6611;
+}
+
+.lyteSecondaryButtonHover() {
+	@backgroundColor: lighten(#fd6611,15%);
+	@color: @white;
+	@border: solid 1px lighten(#fd6611,15%);
+}
+
+
+
+
+/* SUCCESS BUTTON */
+
+.lyteSuccessButton(){
+	@backgroundColor: @successColor;
+	@color: @white;
+	@border: 1px solid @successColor
+}
+
+.lyteSuccessButtonHover(){
+	@border: 1px solid @successColor;
+	@backgroundColor: @successColor;
+	@color: @white;
+	@borderBottom: solid 1px #148157;
+}
+
+.lyteSuccessDefaultButton(){
+	@color: @successColor;
+	@backgroundColor: @white;
+	@borderColor: @successColor;
+
+}
+
+.lyteSuccessDefaultButtonHover(){
+	@backgroundColor: @successColor;
+	@color: @white;
+	@borderBottom: solid 1px #148157;
+}
+
+
+
+
+/* FAILURE BUTTON */
+
+.lyteFailureButton(){
+	@backgroundColor: @failureColor;
+	@color: @white;
+	@border: 1px solid @failureColor;
+}
+
+.lyteFailureDefaultButton(){
+	@color: @failureColor;
+	@borderColor: @failureColor;
+	@backgroundColor: @white;
+}
+
+.lyteFailureButtonHover(){
+	@border: 1px solid #f35652;
+	@backgroundColor: #f35652;
+	@borderBottom: solid 1px #B11814;
+}
+
+.lyteFailureDefaultButtonHover(){
+	@border:1px solid @failureColor;
+	@backgroundColor: @failureColor;
+	@color: @white;
+	@borderBottom: solid 1px #B11814;
+}
+
+
+
+
+/* BUTTON SIZES */
+
+//Large
+.lyteLargeButton(){
+	@padding: 0.625rem 1rem;
+	@fontSize: @large;
+	@lineHeight: 1.3333333;	
+}
+
+//Small
+.lyteSmallButton(){
+	@padding: 0.3125rem 0.625rem;
+	@fontSize: @small;
+	@lineHeight: 1.5;	
+}
+
+
+//Extra small
+.lyteExtraSmall(){
+	@padding: 0.0625rem 0.3125rem;
+	@fontSize: @extraSmall;
+	@lineHeight: 1.5;
+}
+

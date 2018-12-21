@@ -1,0 +1,26 @@
+.outerbox1{  
+    white-space:normal;
+    cursor: pointer;
+}
+
+.singleItem{
+  margin: 2px 0 0 2px;
+    border-radius: 0;
+    background: #EDEDED;
+    color: #5A5A5A;
+    font-size: .800rem;
+    padding: 0px 0px 0px 0px;
+    border: 1px solid #ccc;
+    white-space: normal;
+}
+
+.boxclose{
+  margin: -3px -5px -3px 7px;
+    height: 19px;
+    width: 12px;
+    padding-top: 3px;
+    color: #999;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+ }

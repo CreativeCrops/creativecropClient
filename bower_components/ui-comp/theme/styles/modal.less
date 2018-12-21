@@ -1,0 +1,171 @@
+/* Default theme imported */
+
+@import "../themes/default/ui-elements/modal/modal.variables.less";
+
+/* Loading theme in configuration */
+
+@import "../config.less";
+
+@import (optional) "../themes/@{modal}/ui-elements/modal/modal.variables.less";
+
+/* Loading custom themes */
+
+@import (optional) "../overrides/ui-elements/modal/modal.variables.less";
+
+/* modal Styles */
+
+
+.bodyWrapper{
+	.modalBodyWrapper();
+	overflow: hidden;
+    position: absolute;
+    z-index: @zIndex;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+.modalWrapper{
+	.modalWrapper();
+	overflow: @overflow;
+    width: @width;
+    height: @height;
+    position: fixed;
+    top: @top;
+    left: @left;
+    z-index: @zIndex;
+}
+.lyteModal{
+	.lyteModal();
+	background-color: @backgroundColor;
+    border: @border;
+    box-shadow: @boxShadow;
+	position: absolute;
+	z-index: @zIndex;
+    opacity: @opacity;
+    box-sizing: @boxSizing;
+    overflow: hidden;
+}
+lyte-modal-header{
+	.lyteModalHeader();
+	display: block;
+	font-size: @fontSize;
+	font-weight: @fontWeight;
+	padding: @padding;
+	border-bottom: @borderBottom;
+}
+lyte-modal-content{
+	.lyteModalContent();
+	display: block;
+	padding: @padding;
+	box-sizing: @boxSizing;
+}
+lyte-modal-footer{
+	.lyteModalFooter();
+	display: block;
+	padding: @padding;
+	border-top: @borderTop;
+}
+
+.modalWrapper.scrollable{
+	overflow: hidden;
+}
+.modalWrapper.scrollable lyte-modal-content{
+	overflow: auto;
+}
+
+lyte-modal-freeze{ 
+	.lyteModalFreezeLayer();
+	width:@width;
+	position:fixed;
+	top:0px;
+	left:0px;
+	right:0;
+	bottom:0;
+	z-index:@zIndex;
+	height:@height;
+	background:@background; 
+	display: block;
+	opacity: @opacity;
+	transition-property: @transitionProperty;
+	transition-timing-function: @transitionTimingFunction;
+	transition-duration:@transitionDuration;
+}
+.lyteModalClose{
+	.lyteModalClose();
+	background: @background;
+	width: @width;
+	height: @height;
+	opacity: @opacity;
+	cursor: @cursor;
+	position: absolute;
+    top: @top;
+    right: @right;
+    z-index:@zIndex;
+}
+.lyteModalClose:hover {
+	.lyteMenuCloseHover();
+    opacity: @opacity;
+}
+lyte-modal-header.draggable{
+	.lyteModalHeaderDraggable();
+	cursor: @cursor;
+}
+lyte-modal-footer.left{
+	.lyteModalFooterLeft();
+	text-align: @textAlign;
+}
+lyte-modal-footer.center{
+	.lyteModalFooterCenter();
+	text-align: @textAlign;
+}
+lyte-modal-footer.right{
+	.lyteModalFooterRight();
+	text-align: @textAlign;
+}
+lyte-modal-footer lyte-button {
+	.lyteModalFooterButton();
+	margin-left: @marginLeft;
+}
+lyte-modal-footer lyte-button:first-child{
+	.lyteModalFooterButtonFirstChild();
+	margin-left: @marginLeft;	
+}
+/*------- transition styles starts ------*/
+.lyteModalFromTop{
+	.lyteModalFromTop();
+	transition-property: @transitionProperty;
+	transition-timing-function: @transitionTimingFunction;
+}
+.lyteModalFromBottom {
+	.lyteModalFromBottom();
+	transition-property: @transitionProperty;
+	transition-timing-function: @transitionTimingFunction;
+}
+.lyteModalFromLeft {
+	.lyteModalFromLeft();
+	transition-property: @transitionProperty;
+	transition-timing-function: @transitionTimingFunction;
+}
+.lyteModalFromRight {
+	.lyteModalFromRight();
+	transition-property: @transitionProperty;
+	transition-timing-function: @transitionTimingFunction;
+}
+.lyteModalFadeIn {
+	.lyteModaFadeIn();
+	opacity: @opacity;
+	transition-property: @transitionProperty;
+	transition-timing-function: @transitionTimingFunction;
+}
+/*------- transition styles starts ------*/
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{modal}/ui-elements/modal/modal.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/modal.overrides.less";

@@ -1,0 +1,156 @@
+/* lyte modal styles */
+
+
+/* .bodyWrapper */
+
+	.modalBodyWrapper(){
+    @zIndex: 9999;
+}
+
+/* .modalWrapper */
+
+	.modalWrapper(){
+	@overflow: auto;
+    @width: 100%;
+    @height: 100%;
+    @top: 0;
+    @left: 0;
+    @zIndex: 10001;
+}
+
+/* lyteModal */
+
+	.lyteModal(){
+	@backgroundColor: #fff;
+    @border: 1px solid #f7f7f7;
+    @boxShadow: 0px 1px 5px rgba(0,0,0,0.4);
+	@zIndex: 10001;
+    @opacity: 1;
+    @boxSizing: border-box;
+}
+
+/* lyte-modal-header */
+
+	.lyteModalHeader(){
+	@fontSize: 20px;
+	@fontWeight: bold;
+	@padding: 10px 30px;
+	@borderBottom: 1px solid rgba(34,36,38,.15);
+}
+
+/* lyte-modal-content */
+
+	.lyteModalContent(){
+	@padding: 20px 30px;
+	@boxSizing: border-box;
+}
+
+/* lyte-modal-footer */
+
+	.lyteModalFooter(){
+	@padding: 10px 30px;
+	@borderTop: 1px solid rgba(34,36,38,.15);
+}
+
+/* lyte-modal-freeze */
+
+	.lyteModalFreezeLayer(){
+	@width:100%;
+	@zIndex:10000;
+	@height:auto;
+	@background:#000; 
+	@opacity: 0;
+	@transitionProperty: opacity;
+	@transitionTimingFunction: ease;
+	@transitionDuration:1s;
+}
+
+/* lyteModalClose */
+
+	.lyteModalClose(){
+	@background: url(../images/lyte_ui_sprite.svg) no-repeat -14px -1px;
+	@width: 12px;
+	@height: 11px;
+	@opacity: .5;
+	@cursor: pointer;
+    @top: 20px;
+    @right: 30px;
+    @zIndex:10001;
+}
+
+/* .lyteModalClose:hover */
+	.lyteMenuCloseHover(){
+    @opacity: 1;
+}
+
+/* lyte-modal-header.draggable */
+
+	.lyteModalHeaderDraggable(){
+	@cursor: move;
+}
+
+/* lyte-modal-footer.left */
+
+	.lyteModalFooterLeft(){
+	@textAlign: left;
+}
+
+/* lyte-modal-footer.center */
+
+	.lyteModalFooterCenter(){
+	@textAlign: center;
+}
+
+/* lyte-modal-footer.right */
+
+	.lyteModalFooterRight(){
+	@textAlign: right;
+}
+
+/* lyte-modal-footer lyte-button */
+
+	.lyteModalFooterButton(){
+	@marginLeft: 7px;
+}
+
+/* lyte-modal-footer lyte-button:first-child */
+
+	.lyteModalFooterButtonFirstChild(){
+	@marginLeft: 0px;	
+}
+
+/* .lyteModalFromTop */
+
+	.lyteModalFromTop(){
+	@transitionProperty: top;
+	@transitionTimingFunction: ease;
+}
+
+/* .lyteModalFromBottom */
+
+	.lyteModalFromBottom(){
+	@transitionProperty: top;
+	@transitionTimingFunction: ease;
+}
+
+/* .lyteModalFromLeft  */
+
+	.lyteModalFromLeft(){
+	@transitionProperty: left;
+	@transitionTimingFunction: ease;
+}
+
+/* .lyteModalFromRight  */
+
+	.lyteModalFromRight(){
+	@transitionProperty: left;
+	@transitionTimingFunction: ease;
+}
+
+/* .lyteModalFadeIn */
+
+	.lyteModaFadeIn(){
+	@opacity: 0;
+	@transitionProperty: opacity;
+	@transitionTimingFunction: ease;
+}

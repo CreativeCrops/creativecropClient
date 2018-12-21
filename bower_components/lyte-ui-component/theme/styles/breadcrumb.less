@@ -1,0 +1,230 @@
+/* Default theme imported */
+
+@import "../themes/default/ui-elements/breadcrumb/breadcrumb.variables.less";
+
+/* Loading theme in configuration */
+
+@import "../config.less";
+
+@import (optional) "../themes/@{breadcrumb}/ui-elements/breadcrumb/breadcrumb.variables.less";
+
+/* Loading custom themes */
+
+@import (optional) "../overrides/ui-elements/breadcrumb/breadcrumb.variables.less";
+
+/* Breadcrumb styles */
+
+lyte-breadcrumb-structure{
+	.lyteBreadcrumbStructure();
+	line-height: @lineHeight;
+    margin: @margin;
+    vertical-align: @verticalAlign;
+    display: inline-block;
+}
+
+ lyte-breadcrumb-item {
+ 	.lyteBreadcrumbItem();
+	float: @float;
+	margin-right: @marginRight;
+	padding : @padding;
+	font-size: @fontSize;
+	position: relative;
+}
+
+.lyteBreadcrumbSlash lyte-breadcrumb-item:not(:last-of-type), .lyteBreadcrumbArrow lyte-breadcrumb-item:not(:last-of-type){
+	.lyteBreadcrumb();
+	margin-right: @marginRight;
+}
+
+ lyte-breadcrumb-item.lyteActive{
+ 	.lyteBreadCrumbItemActive();
+	color: @color;
+}
+
+.lyteBreadcrumbSlash lyte-breadcrumb-item:not(:last-of-type):after{
+	.lyteBreadcrumbSlashAfter();
+	content: @content;
+	position: absolute;
+	right: @right;
+	top: @top;
+	color: @color;
+	opacity: @opacity;
+}
+
+.lyteBreadcrumbArrow lyte-breadcrumb-item:not(:last-of-type):after{
+	.lyteBreadcrumbArrowAfter();
+	content: @content;
+	background: @background;
+	position: absolute;
+	right: @right;
+	top:@top;
+	color: @color;
+	width: @width;
+	height: @height;
+	opacity: @opacity;
+}
+
+/*Stage css*/
+.lyteBreadcrumbBullet , .lyteBreadcrumbPlain, .lyteBreadcrumbFlat{
+	position: relative;
+	white-space: nowrap;
+}
+
+.lyteBreadcrumbBullet:before{
+	.lyteBreadcrumbBulletBefore();
+	content: @content;
+    display: block;
+    position: absolute;
+    top: @top;
+    bottom: @bottom;
+    left: @left;
+    width: @width;
+    box-sizing: @boxSizing;
+    height: @height;
+    background: @background;
+}
+
+.lyteBreadcrumbBullet .lyteCompleted lyte-breadcrumb-head{
+	.lyteBreadcrumbBulletCompleted();
+	background: @background !important;
+	color: @color;
+}
+
+.lyteBreadcrumbBullet .lyteCompleted:not(:first-child):before  {
+	.lyteBreadcrumbBulletCompleted();
+	content: @content;
+	display: block;
+    position: absolute;
+    top: @top;
+    bottom: @bottom;
+    left: @left;
+    width: @width;
+    box-sizing: @boxSizing;
+    height: @height;
+    background: @background;
+}
+
+.lyteBreadcrumbBullet lyte-breadcrumb-head{
+	.lyteBreadcrumbBulletHead();
+    border: @border;
+    border-radius: @borderRadius;
+    display: inline-block;
+    background: @background;
+    position: relative;
+    text-align: @textAlign;
+    font-size: @fontSize;
+    box-sizing: @boxSizing;
+    padding: @padding;
+}
+
+.lyteBreadcrumbBullet lyte-breadcrumb-item{
+	.lyteBreadcrumbBulletItem();
+	margin-right: @marginRight;
+}
+
+.lyteBreadcrumbBullet lyte-breadcrumb-body{
+	.lyteBreadcrumbBulletBody();
+	position: absolute;
+	top: @top;
+	right: @right;
+	font-size: @fontSize;
+	color: @color;
+}
+
+.lyteBreadcrumbBullet lyte-breadcrumb-item:not(:first-child) {
+	.lyteBreadcrumbBulletItemNotfirst();
+	padding-left: @paddingLeft;
+}
+
+.lyteBreadcrumbPlain lyte-breadcrumb-item, .lyteBreadcrumbFlat lyte-breadcrumb-item {
+	.lyteBreadcrumbFlatItem();
+	margin-right: @marginRight;
+}
+
+.lyteBreadcrumbPlain lyte-breadcrumb-body, .lyteBreadcrumbFlat lyte-breadcrumb-body{
+	.lyteBreadcrumbFlatBody();
+	display: block;
+	float: @float;
+	background: @background;
+	text-align: @textAlign;
+	padding: @padding;
+	position: relative;
+	margin: @margin; 
+	font-size: @fontSize;
+	text-decoration: @textDecoration;
+	color: @color;
+}
+
+.lyteBreadcrumbPlain lyte-breadcrumb-body:after,.lyteBreadcrumbFlat lyte-breadcrumb-body:after {
+	.lyteBreadCrumbFlatBodyAfter();
+	content: @content;  
+	border-top: @borderTop;
+	border-bottom: @borderBottom;
+	border-left: @borderLeft;
+	position: absolute; right: @right; top: @top;z-index: @zIndex;
+}
+
+.lyteBreadcrumbPlain lyte-breadcrumb-body:before, .lyteBreadcrumbFlat lyte-breadcrumb-body:before  {
+	.lyteBreadCrumbFlatBodyBefore();
+	content: @content;  
+	border-top: @borderTop;
+	border-bottom: @borderBottom;
+	border-left: @borderLeft;
+	position: absolute; left: @left; top: @top;
+}
+
+/*On progress css*/
+.lyteBreadcrumbFlat .lyteActive lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteActive lyte-breadcrumb-body{
+	.lyteBreadcrumbFlatActiveBody();
+	background: @background !important;
+	color: @color !important;
+}
+
+.lyteBreadcrumbFlat .lyteActive lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteActive lyte-breadcrumb-body:after{
+	.lyteBreadcrumbFlatActiveBodyAfter();
+	border-left-color: @borderLeftColor !important;
+}
+
+/*Warning css*/
+.lyteBreadcrumbFlat .lyteWarning lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteWarning lyte-breadcrumb-body{
+	.lyteBreadcrumbFlatWarningBody();
+	background: @background !important;
+	color: @color !important;
+}
+
+.lyteBreadcrumbFlat .lyteWarning lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteWarning lyte-breadcrumb-body:after{
+	.lyteBreadcrumbFlatWarningBodyAfter();
+	border-left-color: @borderLeftColor !important;
+}
+
+/*Completed css*/
+.lyteBreadcrumbFlat .lyteCompleted lyte-breadcrumb-body, .lyteBreadcrumbPlain .lyteCompleted lyte-breadcrumb-body{
+	.lyteBreadcrumbFlatCompletedBody();
+	background: @background !important;
+	color: @color !important;
+}
+
+.lyteBreadcrumbFlat .lyteCompleted lyte-breadcrumb-body:after, .lyteBreadcrumbPlain .lyteCompleted lyte-breadcrumb-body:after{
+	.lyteBreadcrumbFlatCompletedBodyAfter();
+	border-left-color: @borderLeftColor !important;
+}
+
+.lyteBreadcrumbPlain lyte-breadcrumb-item:first-child lyte-breadcrumb-body:before{
+	.lyteBreadcrumbPlainBefore();
+	border-left-color: @borderLeftColor;
+} 
+
+lyte-breadcrumb{
+	display: inline-block;
+}
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{breadcrumb}/ui-elements/breadcrumb/breadcrumb.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/breadcrumb.overrides.less";

@@ -1,0 +1,347 @@
+/* Default theme imported */
+
+@import "../themes/default/ui-elements/menu/menu.variables.less";
+
+/* Loading theme in configuration */
+
+@import "../config.less";
+
+@import (optional) "../themes/@{menu}/ui-elements/menu/menu.variables.less";
+
+/* Loading custom themes */
+
+@import (optional) "../overrides/ui-elements/menu/menu.variables.less";
+
+/* Menu styles */
+
+
+lyte-menu-box {
+  .lyteMenuBox();
+  margin: @margin;
+  z-index: @zIndex !important;
+  vertical-align: @verticalAlign;
+  width: @width;
+  position: absolute;
+  outline: @outline
+}
+lyte-menu-body {
+  .lyteMenuBody();
+  overflow: @overflow;
+  display: block;
+  outline: @outline;
+  background-color: @backgroundColor;
+  box-sizing : @boxSizing;
+  border: @border !important;
+  box-shadow: @boxShadow;
+}
+
+lyte-menu-header {
+  .lyteMenuHeader();
+  display: block;
+  height: @height;
+  padding: @padding;
+  font-weight: @fontWeight;
+  font-size: @fontSize;
+  text-align: @textAlign;
+}
+
+lyte-menu-header div {
+  display: inline-block;
+}
+
+ lyte-menu-item {
+  .lyteMenuItem();	
+  position: relative;
+  cursor: @cursor;
+  display: block;
+  border: @border;
+  height: @height;
+  text-align: @textAlign;
+  line-height: @lineHeight;
+  color: @color;
+  padding: @padding;
+  font-size: @fontSize;
+  text-transform: @textTransform;
+  font-weight: @fontWeight;
+  box-shadow: @boxShadow;
+  outline: @outline;
+  -webkit-touch-callout: @webkitTouchCallout;
+}
+
+lyte-menu-item:hover {
+	.lyteMenuItemHover();
+  background-color: @backgroundColor;
+}
+
+ lyte-menu-item ~ lyte-menu-group {
+    .lyteMenuGroup();
+  border-top: @borderTop;
+  border-bottom: @borderBottom;
+}
+
+lyte-menu-description {
+    .lyteMenuDescription();	
+  opacity: @opacity;
+}
+
+lyte-menu-box lyte-arrow {
+	.lyteMenuArrow();
+  width: 100% !important;
+  height: @height !important;
+  display: inline-block;
+  text-align: center;
+  position: absolute;
+  background: @background;
+}
+
+ lyte-arrow.menuArrow-down {
+ 	.lyteMenuArrowDown();
+  bottom: @bottom;
+}
+
+lyte-arrow.menuArrow-down i {
+	.lyteMenuArrowDownI();
+  width: 0;
+  height: 0;
+  border-left: @borderLeft;
+  border-right: @borderRight;
+  border-top: @borderTop;
+  position: relative;
+  top: @top;
+  left: @left;
+}
+
+lyte-menu-box lyte-arrow.menuArrow-up {
+	.lyteMenuArrowUp();
+  top: @top;
+}
+
+lyte-menu-box lyte-arrow.menuArrow-up i {
+	.lyteMenuArrowUpI();
+  width: 0;
+  height: 0;
+  position: relative;
+  top: @top;
+  left: @left;
+  border-left: @borderLeft;
+  border-right: @borderRight;
+  border-bottom: @borderBottom;
+}
+
+lyte-menu-group {
+	.lyteMenuGroup();
+  border-bottom: @borderBottom;
+  display: inherit;
+}
+
+ lyte-menu-group:first-of-type {
+ 	.lyteMenuGroupFirstOfType();
+  border-top: @borderTop;
+}
+
+ lyte-menu-group:last-of-type {
+ 	.lyteMenuGroupLaseOfType();
+  border-bottom: @borderBottom;
+}
+
+lyte-menu-group:last-of-type ~ lyte-menu-item {
+	.lyteMenuGroupLaseOfTypeItem();
+  border-top: @borderTop;
+}
+
+lyte-menu {
+  display: inline-block;
+  width: auto;
+}
+
+.lyteArrowIcon {
+    .lyteArrowIcon();
+  width: @width;
+  height: @height;
+  border-bottom: @borderBottom;
+  position: absolute;
+}
+
+.lyteArrowTop {
+  top: 1px;
+}
+
+.lyteArrowTop:after,
+.lyteArrowTop:before {
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.lyteArrowTop:after {
+	.lyteArrowTopAfter();
+  border-color: @borderColor;
+  border-bottom-color: @borderBottomColor;
+  border-width: @borderWidth;
+  margin-left: @marginLeft;
+}
+
+.lyteArrowTop:before {
+	 .lyteArrowTopBefore();
+  border-color: @borderColor;
+  border-bottom-color: @borderBottomColor;
+  border-width: @borderWidth;
+  margin-left: @marginLeft;
+}
+
+/*Arrow bottom*/
+.lyteArrowBottom {
+  bottom: -7px;
+}
+
+.lyteArrowBottom:after,
+.lyteArrowBottom:before {
+  top: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.lyteArrowBottom:after {
+	.lyteArrowBottomAfter();
+  border-color: @borderColor;
+  border-top-color: @borderTopColor;
+  border-width: @borderWidth;
+  margin-left: @marginLeft;
+}
+
+.lyteArrowBottom:before {
+	.lyteArrowBottomBefore();
+  border-color: @borderColor;
+  border-top-color: @borderTopColor;
+  border-width: @borderWidth;
+  margin-left: @marginLeft;
+}
+
+/*Arrow Right*/
+.lyteArrowRight {
+  right: 1px;
+}
+
+.lyteArrowRight:after,
+.lyteArrowRight:before {
+  left: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.lyteArrowRight:after {
+	.lyteMenuArrowRightAfter();
+  border-color: @borderColor;
+  border-left-color: @borderLeftColor;
+  border-width: @borderWidth;
+  margin-top: @marginTop;
+}
+
+.lyteArrowRight:before {
+	.lyteMenuArrowRightBefore();
+  border-color: @borderColor;
+  border-left-color: @borderLeftColor;
+  border-width: @borderWidth;
+  margin-top: @marginTop;
+}
+
+/*Arrow Left*/
+.lyteArrowLeft:not(.lyteScaleOption) {
+  left: 1px;
+}
+
+.lyteArrowLeft:not(.lyteScaleOption):after,
+.lyteArrowLeft:not(.lyteScaleOption):before {
+  right: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.lyteArrowLeft:not(.lyteScaleOption):after {
+	.lyteMenyArrowLeftAfter();
+  border-color: @borderColor;
+  border-right-color: @borderRightColor;
+  border-width: @borderWidth;
+  margin-top: @marginTop;
+}
+
+.lyteArrowLeft:not(.lyteScaleOption):before {
+	.lyteMenyArrowLeftBefore();
+  border-color: @borderColor;
+  border-right-color: @borderRightColor;
+  border-width: @borderWidth;
+  margin-top: @marginTop;
+}
+
+div.lytemenufreezelayer {
+	.lyteMenuFreezeLayer();
+  opacity: @opacity;
+  background: @background;
+  position: fixed;
+  z-index: @zIndex;
+}
+
+div.lytemenufreezelayer.top {
+  top: 0px;
+  width: 100%;
+}
+
+div.lytemenufreezelayer.bottom {
+  bottom: 0px;
+  width: 100%;
+}
+
+div.lytemenufreezelayer.left {
+  left: 0px;
+}
+
+div.lytemenufreezelayer.right {
+  right: 0px;
+  width: 100%;
+}
+
+div.lytemenufreezelayer.nogroup {
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: fixed;
+}
+
+.lyteMenuHidden {
+  display: none !important;
+}
+
+.lyteMenuWrapperDiv {
+  overflow: auto;
+}
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{menu}/ui-elements/menu/menu.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/menu.overrides.less";

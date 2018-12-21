@@ -1,0 +1,234 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/table/table.variables.less";
+
+/* Loading theme in configuration */
+@import "../config.less";
+
+@import (optional) "../themes/@{table}/ui-elements/table/table.variables.less";
+
+/* Loading custom themes */
+@import (optional) "../overrides/ui-elements/table/table.variables.less";
+
+/* table Styles */
+
+    lyte-table-structure {
+      display: table;
+      position: relative;
+    }
+    lyte-tr {
+      .lyteTableTr();
+      display: table-row;
+      background-color: @backgroundColor;
+    }
+    lyte-td, lyte-th {
+      .lyteTableCell();
+      display: table-cell;
+      vertical-align: inherit;
+      background-color: @backgroundColor;
+      min-width: @minWidth;
+      box-sizing: @boxSizing;
+      overflow-wrap: @overflowWrap;
+    }
+    lyte-thead {
+      display: table-header-group;
+    }
+    lyte-tbody {
+      display: table-row-group;
+    }
+    lyte-tfoot {
+      display: table-footer-group;
+    }
+    lyte-table-structure {
+	    .lyteTableStructure();
+	    background: @background;
+	    border-radius: @borderRadius;
+	    text-align: @textAlign;
+	    color: @color;
+	    border-collapse: @borderCollapse;
+	    border-spacing: @borderSpacing;
+	    border: @border;
+    }
+    lyte-table.border lyte-th, lyte-table.border lyte-td{
+      .lyteTableCellBorder();
+      border: @border;
+      border-right: @borderRight;
+      border-color : @tableBorderColor;
+    }
+    lyte-table.border lyte-td {
+      .lyteTableBodyCellBorderTop();
+      border-top: @borderTop;
+      border-color : @tableBorderColor;
+    }
+    lyte-table.border lyte-th:last-of-type, lyte-table.border lyte-td:last-of-type{
+      .lyteTableCellsLastOfTypeBorder();
+      border-right: @borderRight;
+      border-color : @tableBorderColor;
+    }
+    lyte-table.border lyte-tbody lyte-tr:last-of-type lyte-td{
+      .lyteTableBodyLastRowBorderBottom();	
+      border-bottom: @borderBottom;
+      border-color : @tableBorderColor;
+    }
+    lyte-th{
+      .lyteTableHeaderCell();	
+      cursor: @cursor;
+      background: @background;
+      text-align: @textAlign;
+      color: @color;
+      font-size: @fontSize;
+      outline: @outline;
+      padding: @padding;
+      vertical-align: @verticalAlign;
+      border-bottom: @borderBottom;
+      border-color : @tableBorderColor;
+    }
+    lyte-td{
+      .lyteTableBodyCell();	
+      padding: @padding;
+      font-size: @fontSize;
+      overflow: @overflow;
+      empty-cells: @emptyCells;
+      border-bottom: @borderBottom;
+      white-space: @whiteSpace;
+      text-overflow: @textOverflow;
+      vertical-align: @verticalAlign;
+      word-wrap: @wordWrap;
+      color: @color;
+      border-color : @tableBorderColor;
+    }
+    /*Table hover class*/
+    lyte-tbody lyte-tr:hover{
+      .lyteTableBodyRowHover();	
+      background-color: @backgroundColor;
+      cursor: @cursor;
+    }
+    lyte-th, lyte-td{
+      position: relative;
+    }
+    lyte-tablehead-resize{
+      .lyteTableHeadResize();	
+      cursor: @cursor;
+      position: @position;
+      right: 0px;
+      height: @height;
+      width: @width;
+      top: 0px;
+      z-index: @zIndex;
+    }
+    lyte-table-resize{
+      .lyteTableResize();
+      width: @width;
+      height: @height;
+      right: 0px;
+      bottom: 0px;
+      position: absolute;
+      cursor: @cursor;
+      z-index: @zIndex;
+    }
+    lyte-table-horizontal-resize{
+      .lyteTableHorizontalResize();
+      width: @width;
+      height: 100%;
+      right: 0px;
+      bottom: 0px;
+      position: absolute;
+      cursor: @cursor;
+       z-index: @zIndex;
+    }
+    lyte-table-vertical-resize{
+      .lyteTableVerticalResize();
+      width: 100%;
+      height: @height;
+      right: 0px;
+      bottom: 0px;
+      position: absolute;
+      cursor: @cursor;
+       z-index: @zIndex;
+    }
+    .lyteTableFixed{
+      .lyteTableFixedCell();
+      z-index: @zIndex;
+    }
+    lyte-th.lyteFixedColumn:not(.lytePreventIcon):after{
+      .headerFixedColumnAfter();	
+      content: "";
+      position: absolute;
+      top: @top;
+      right: @right;
+      margin-left: @marginLeft;
+      border-width: @borderWidth;
+      border-style: @borderStyle;
+      border-color: @tableBorderColor;
+      z-index: @zIndex;
+    }
+    lyte-th:last-of-type lyte-tablehead-resize{
+      cursor: default;
+      position: absolute;
+      right: 0px;
+      height: 0px;
+      width: 0px;
+      top: 0px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    lyte-table{
+      display: block;
+      height : inherit;
+    }
+
+   lyte-table > div{
+      overflow: auto;
+      width: 100%;
+      height: 100%;
+    }
+
+    lyte-th.tableRowFixed{
+      .lyteTableHeaderFixed();	
+      position: relative !important;
+      z-index: @zIndex;
+    }
+
+    lyte-th.tableRowFixed.lyteTableFixed{
+     .lyteTableHeaderRowFixed();	
+      z-index: @zIndex !important;
+    }
+
+    lyte-col{
+      display: table-column;
+    }
+
+    lyte-colgroup{
+      display: table-column-group;
+    }
+
+    div.lyteTableDummy {
+    	.lyteTableColumnSortable();
+        background: @background;
+        position: absolute;
+        opacity: @opacity;
+        z-index: @zIndex;
+    }
+
+    lyte-tr.lyteTableDummyRow {
+      position: relative;
+    }
+  
+    lyte-table > div > lyte-yield {
+        display: block;
+        width: 100%;
+    }
+
+    // .lyteTableResize {
+    //   width: fit-content;
+    // }
+
+
+    /* import theme overrides - styles */
+@import (optional) "../themes/@{table}/ui-elements/table/table.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/table.overrides.less";

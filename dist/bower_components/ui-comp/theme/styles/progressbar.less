@@ -1,0 +1,185 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/progressbar/progressbar.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{progressbar}/ui-elements/progressbar/progressbar.variables.less";
+
+
+
+
+/* Loading final tweaks to your variables */
+@import (optional) "../overrides/ui-elements/progressbar.variables.less";
+
+
+
+/* LYTE-PROGRESSBAR */
+.lyteProgressBar {
+  position: relative;
+}
+.lyteProgressBar.lyteHorizontal{
+  .lyteProgressBarHorizontal();
+  height: @height;
+  background: @background;
+  border-radius: @borderRadius;
+}
+
+/* LYTE-PROGRESSBAR - CIRCLE */
+.lyteProgressBar.lyteCircle{
+  .lyteProgressBarCircle();
+  width: @width;
+  height: @height;
+}
+
+/* LYTE-PROGRESSBAR - PROGRESS STATUS */
+.lyteProgressBar .lyteProgressStatus{
+  .lyteProgressBarStatus();
+  background-color: @backgroundColor;
+  color: @color;
+}
+.lyteProgressBar.lyteProgressCompleted .lyteProgressStatus {
+  .lyteProgressBarStatusCompleted();
+  background-color: @backgroundColor;
+  color: @color;
+}
+.lyteProgressBar .lyteProgressPercentage {
+  .lyteProgressBarPercentage();
+  position: absolute;
+    top: @top;
+    right: @right;
+    font-size: @fontSize;
+    z-index: @zIndex;
+} 
+.lyteProgressBar .lyteProgressStatus .progressMovingObj{
+  .lyteProgressBarStatusMoving();
+  width: @width;
+  height: @height;
+  display: @display;
+  position: absolute;
+    top: @top;
+  -webkit-box-sizing:@webkitBoxSizing;
+  -moz-box-sizing:@mozBoxSizing;
+  -ms-box-sizing:@msBoxSizing;
+  box-sizing:@boxSizing;
+  background-image:@backgroundImageWebkitLinear;
+  background-image:@backgroundImageMozLinear;
+  background-image:@backgroundImageMsLinear;
+  background-image:@backgroundImageLinear;
+  -webkit-background-size:@webkitBackgroundSize;
+  -moz-background-size:@mozBackgroundSize;
+  -ms-background-size:@msBackgroundSize;
+  background-size:@backgroundSize;
+  -webkit-animation:@webkitAnimation;
+  -moz-animation:@mozAnimation;
+  -ms-animation:@msAnimation;
+  animation:@animation;
+  -webkit-border-top-right-radius: @webkitBorderTopRightRadius;
+  -webkit-border-bottom-right-radius: @webkitBorderBottomRightRadius;
+         -moz-border-radius-topright: @mozBorderRadiusTopright;
+      -moz-border-radius-bottomright: @mozBorderRadiusBottomright;
+             border-top-right-radius: @borderTopRightRadius;
+          border-bottom-right-radius: @borderBottomRightRadius;
+      -webkit-border-top-left-radius: @webkitBorderTopLeftRadius;
+   -webkit-border-bottom-left-radius: @webkitBorderBottomLeftRadius;
+          -moz-border-radius-topleft: @mozBorderRadiusTopleft;
+       -moz-border-radius-bottomleft: @mozBorderRadiusBottomleft;
+              border-top-left-radius: @borderTopLeftRadius;
+           border-bottom-left-radius: @borderBottomLeftRadius;
+}
+.lyteProgressBar > .lyteProgressStatus {
+  .lyteProgressBarProgressStatus();
+  display: block;
+  height: @height;
+     -webkit-border-top-right-radius: @webkitBorderTopRightRadius;
+  -webkit-border-bottom-right-radius: @webkitBorderBottomRightRadius;
+         -moz-border-radius-topright: @mozBorderRadiusTopright;
+      -moz-border-radius-bottomright: @mozBorderRadiusBottomright;
+             border-top-right-radius: @borderTopRightRadius;
+          border-bottom-right-radius: @borderBottomRightRadius;
+      -webkit-border-top-left-radius: @webkitBorderTopLeftRadius;
+   -webkit-border-bottom-left-radius: @webkitBorderBottomLeftRadius;
+          -moz-border-radius-topleft: @mozBorderRadiusTopleft;
+       -moz-border-radius-bottomleft: @mozBorderRadiusBottomleft;
+              border-top-left-radius: @borderTopLeftRadius;
+           border-bottom-left-radius: @borderBottomLeftRadius;
+  position: relative;
+  overflow: @overflow;
+  -moz-transition: @mozTransition; /* For Safari 3.1 to 6.0 */
+  -webkit-transition: @webkitTransition; /* For Safari 3.1 to 6.0 */
+    transition: @transition;
+}
+.lyteProgressBar.lyteCircle .svgValueEle {
+  .lyteProgressBarCircleSVG();
+  transform: @transform;
+}
+.lyteProgressBar.lyteCircle circle {
+  .lyteProgressBarlyteCircle();
+  transition: stroke-dashoffset .25s linear;
+}
+.lyteProgressBar .lyteProgressCount{
+  .lyteProgressBarProgressCount();
+  position: absolute;
+  top: @top;
+    left: @left;
+    font-size: @fontSize;
+    transform: @transform;
+}
+.lyteProgressBar .lyteProgressCount{
+  .lyteProgressBarProgressCountColor();
+  color: @color;
+}
+.lyteProgressBar .lyteCircleType {
+  position: relative;
+  display: inline-block;
+}
+
+/* PROGRESS BAR - ANIMATION */
+@-webkit-keyframes move{
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+} 
+@-moz-keyframes move{
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+} 
+@-ms-keyframes move{
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+} 
+@keyframes move{
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+}
+
+
+/* LYTE-PROGRESSBAR END*/
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{progressbar}/ui-elements/progressbar/progressbar.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/progressbar.overrides.less";

@@ -1,0 +1,199 @@
+/* Alert Wrapper */
+
+.lyteAlertWrapper(){
+	@zIndex: 10001;
+}
+
+
+
+/* CLOSE ICON */
+
+.lyteAlertClose() {
+	@backgroundImage: url(../images/lyte_ui_sprite.svg);
+	@backgroundPosition: -14px -1px;
+	@width: 12px;
+	@height: 11px;
+	@opacity: .5;
+	@top: 20px;
+	@right: 30px;
+}
+
+.lyteAlertCloseHover() {
+	@opacity: 1;
+}
+
+
+
+/* LYTE ALERT SHOW */
+
+.lyteAlertShow() {
+	@zIndex: 1000;
+}
+
+
+
+
+/* ALERT POPUP CONTAINER */
+
+.lyteAlertPopupContainer(){
+	@backgroundColor: #fff;
+	@border: 1px solid #f7f7f7;
+	@boxShadow: 0px 1px 5px rgba(0,0,0,0.4);
+	@zIndex: 10001;
+	@top: -100%;
+	@left: 50%;
+	@transform: translate(-50%,0%);
+	@opacity: 1;
+	@minWidth: 500px;
+	@maxWidth: 900px;
+	@transitionProperty: top;
+	@transitionTimingFunction: ease;
+	@transitionDuration: .8s;
+}
+
+.lyteAlertShowAlertPopUp() {
+	@opacity: 1;
+}
+
+
+
+
+/* HEADER */
+
+.lyteAlertHeader() {
+	@padding: 15px 40px 15px 30px;
+	@backgroundColor: #fff;
+	@fontSize: 20px;
+	@fontWeight: bold;
+}
+
+
+
+
+/* CONTENT */
+
+.lyteAlertContent() {
+	@padding: 15px 40px 15px 30px;
+}
+
+.lyteAlertContentMiddle() {
+	@display: table-cell;
+	@verticalAlign: middle;
+}
+
+
+
+
+/* FOOTER */
+
+.lyteAlertFooter() {
+	@padding: 15px 30px;
+	@textAlign: right;
+}
+
+
+
+
+/* PRIMARY MESSAGE */
+
+.lyteAlertPrimary() {
+	@marginBottom: 5px;
+	@fontWeight: bold;
+}
+
+
+
+
+/* STATUS ICON */
+
+.lyteAlertStatusIcon (){
+	@backgroundImage: url(../images/lyte_ui_sprite.svg);
+	@width: 30px;
+	@height: 30px;
+	@marginRight: 15px;
+}
+
+
+
+
+/* SUCCESS ICON */
+
+.lyteAlertSuccessIcon (){
+	@backgroundPosition: -1px -18px;
+}
+
+
+
+
+/* ERROR ICON */
+
+.lyteAlertErrorIcon (){
+	@backgroundPosition: -34px -19px;
+}
+
+
+
+
+/* WARNING ICON */
+
+.lyteAlertWarningIcon() {
+	@backgroundPosition: -100px -19px;
+}
+
+
+
+
+/* INFO ICON */
+
+.lyteAlertInfoIcon() {
+	@backgroundPosition: -66px -19px;
+}
+
+
+
+
+/* CONFIRM ICON */
+
+.lyteAlertConfirmIcon() {
+	@backgroundPosition: -133px -23px;
+}
+
+
+
+
+/* FREEZE LAYER */
+
+.lyteAlertFreezeLayer() {
+	@zIndex: 1000;
+}
+
+
+
+
+/* WHITE FREEZE */
+
+.lyteAlertWhiteFreeze() {
+	@backgroundColor: rgba(255,255,255,.5);
+}
+
+
+
+
+/* BLACK FREEZE */
+
+.lyteAlertBlackFreeze() {
+	@backgroundColor: rgba(0,0,0,.5);
+}
+
+
+
+
+/* ALL BUTTONS */
+
+.lyteAlertFooterAllButtons() {
+	@marginLeft: 7px;
+}
+
+.lyteAlertFooterFirstButton() {
+	@marginLeft: 0px;
+}

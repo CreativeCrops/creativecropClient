@@ -1,0 +1,119 @@
+/* Default theme imported */
+@import "../themes/default/ui-elements/accordion/accordion.variables.less";
+
+
+
+
+/* Loading theme in configuration */
+@import "../config.less";
+@import (optional) "../themes/@{accordion}/ui-elements/accordion/accordion.variables.less";
+
+
+
+
+/* Loading final tweaks to your variables */
+@import (optional) "../overrides/ui-elements/accordion.variables.less";
+
+
+
+
+/* LYTE-ACCORDION TAG STYLES */
+
+lyte-accordion{
+    display: block;
+}
+
+
+
+
+/* LYTE-ACCORDION-HEADER TAG STYLES */
+
+lyte-accordion-header{
+    .lyteAccordionHeader();
+    display: block;
+    padding: @padding;
+    cursor: pointer;
+    background-color: @background-color;
+    box-sizing: @boxSizing;
+    color: @color;
+    height: @height;
+}
+
+
+
+
+/* LYTE-ACCORDION-BODY TAG STYLES */
+
+lyte-accordion-body{
+    .lyteAccordionBody();
+    display: block;
+    padding: @padding;
+    margin: @margin;
+    box-sizing: @boxSizing;
+    overflow:hidden;
+    height: auto;
+    transition: height ease-out,padding-top ease-out,padding-bottom ease-out;
+}
+
+
+
+
+/* LYTE-ACCORDION-ITEM STYLES */
+
+lyte-accordion-item{
+    display: block;
+}
+
+
+
+
+/* LYTE-ICON arrow Styles */
+
+lyte-icon.lyteAccordionArrow {
+    .lyteAccordionArrow();
+    background: url(images/lyte_ui_sprite.svg) no-repeat -45px -3px;
+    width: 11px;
+    height: 6px;
+    display: inline-block;
+    float: right;
+    margin: @margin;
+    transition: @transition all ease;
+}
+
+.lyteAccordionActive lyte-icon.lyteAccordionArrow{
+    transform: rotate(180deg);
+}
+
+
+
+
+/* LYTE-PLUS arrow Styles */
+
+lyte-icon.lyteAccordionPlus {
+    .lyteAccordionPlus();
+    background: url(images/lyte_ui_sprite.svg) no-repeat -30px -1px;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    float: right;
+    margin: @margin;
+}
+
+.lyteAccordionActive lyte-icon.lyteAccordionPlus{
+    .lyteAccordionPlus();
+    background-position: -30px -165px;
+    height: 3px;
+    margin: @margin;
+}
+
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{accordion}/ui-elements/accordion/accordion.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/accordion.overrides.less";

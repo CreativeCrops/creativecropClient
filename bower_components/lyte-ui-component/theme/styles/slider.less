@@ -1,0 +1,321 @@
+/* Default theme imported */
+
+@import "../themes/default/ui-elements/slider/slider.variables.less";
+
+/* Loading theme in configuration */
+
+@import "../config.less";
+
+@import (optional) "../themes/@{slider}/ui-elements/slider/slider.variables.less";
+
+/* Loading custom themes */
+
+@import (optional) "../overrides/ui-elements/slider/slider.variables.less";
+
+/* slider Styles */
+
+.lyteHorizontal .lyteArrow.lyteSliderHandler:after,.lyteHorizontal .lyteArrow.lyteSliderHandler:before {
+	.lyteSliderHorizontalArrowSliderHandlerPseudo();
+  top: @top;
+  left: @left;
+  border: @border;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteHorizontal .lyteArrow.lyteSliderHandler:after {
+     .lyteSliderHorizontalArrowSliderHandlerAfter();
+  border-color: @borderColor;
+  border-top-color: @borderTopColor;
+  border-width: @borderWidth;
+  margin-left: @marginLeft;
+}
+.lyteHorizontal .lyteArrow.lyteSliderHandler:before {
+	.lyteSliderHorizontalArrowSliderHandlerBefore();
+  border-color: @borderColor;
+  border-top-color: @borderTopColor;
+  border-width: @borderWidth;
+  margin-left: @marginLeft;
+}
+.lyteVertical .lyteArrow.lyteSliderHandler:after,.lyteVertical .lyteArrow.lyteSliderHandler:before {
+	.lyteSliderVerticalArrowSliderHandlerPseudo();
+  left: @left;
+  top: @top;
+  border: @border;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteVertical .lyteArrow.lyteSliderHandler:after {
+	.lyteSliderVerticalArrowSliderHandlerAfter();
+  border-color: @borderColor;
+  border-left-color: @borderLeftColor;
+  border-width: @borderWidth;
+  margin-top: @marginTop;
+}
+.lyteVertical .lyteArrow.lyteSliderHandler:before {
+	.lyteSliderVerticalArrowSliderHandlerBefore();
+  border-color: @borderColor;
+  border-left-color: @borderLeftColor;
+  border-width: @borderWidth;
+  margin-top: @marginTop;
+}
+/*Left side arrow*/
+.lyteVertical .lyteArrowLeft.lyteSliderHandler:after,.lyteVertical .lyteArrowLeft.lyteSliderHandler:before {
+	.lyteSliderVerticalArrowLeftSliderHandlerPseudo();
+  right: @right;
+  top: @top;
+  border: @border;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.lyteVertical .lyteArrowLeft.lyteSliderHandler:after {
+	.lyteSliderArrowLeftSliderHandlerAfter();
+  border-color: @borderColor;
+  border-right-color: @borderRightColor;
+  border-width: @borderWidth;
+  margin-top: @marginTop;
+}
+.lyteVertical .lyteArrowLeft.lyteSliderHandler:before {
+	.lyteSliderArrowLeftSliderHandlerBefore();
+  border-color: @borderColor;
+  border-right-color: @borderRightColor;
+  border-width: @borderWidth;
+  margin-top: @marginTop;
+}
+lyte-slider {
+  display: inline-block;
+}
+lyte-slider .lyteSlide {
+  height: 100%;
+  width: 100%;
+}
+.lyteScaleLine span:not(.lyteScalLable) {
+	.lyteSliderScaleLineSpanNotScallabel();
+  height: 100%;
+  width: @width;
+  background-color: @backgroundColor;
+  display: inline-block;
+  position: absolute;
+  top: @top;
+}
+.lyteHorizontal .lyteArrow.lyteSliderHandler {
+	.lyteSliderGHorizontalArrowSliderHandler();
+  width: @width;
+  height: @height;
+  top: @top;
+  left: @left;
+  position: absolute;
+  background-color: @backgroundColor;
+  cursor: @cursor;
+  border: @border;
+}
+ .lyteHorizontal .lyteSliderFill {
+  top: 0;
+  height: 100%;
+}
+ .lyteVertical.lyteRangeSlider {
+ 	.lyteSliderVerticalRangeSlider();
+  width: @width;
+  height: 100%;
+}
+.lyteVertical.lyteRangeSlider .lyteArrowLeft.lyteScaleOption {
+	.lyteSliderVerticalArrowLeftScaleOption();
+  left: @left;
+}
+.lyteVertical.lyteRangeSlider .lyteArrowLeft.lyteScaleOption .lyteScaleLine span.lyteScalLable {
+	.lyteSliderVerticalArrowLeftScaleLineSpanScaleLabel();
+  position: absolute;
+  top: @top;
+  left: @left;
+  font-size: @fontSize;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleLine span.lyteScalLable {
+	.lyteSliderVerticalScaleLineSpanScaleLabel();
+  position: absolute;
+  top: @top;
+  left: @left;
+  font-size: @fontSize;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleOption {
+	.lyteSliderVerticalRangeSliderScaleOption();
+  position: absolute;
+  top: @top;
+  left: @left;
+  width: @width;
+  height: @height;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleOption.lyteArrow .lyteScaleLine {
+	.lyteSliderVerticalScaleOptionScaleLine();
+  left: @left;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleOption.lyteArrow .lyteScaleLine span.lyteScalLable {
+	.lyteSliderVerticalScaleOptionScaleLineSpanScaleLabel();
+  position: absolute;
+  top: @top;
+  left: @left;
+  font-size: @fontSize;
+}
+.lyteVertical.lyteRangeSlider .lyteScaleOption .lyteScaleLine {
+	.lyteSliderVerticalScaleOptionScaleLine();
+  width: @width;
+  height: @height;
+  position: absolute;
+  margin-top: @marginTop;
+  margin-left: @marginLeft;
+  top: @top;
+  left: @left;
+}
+.lyteVertical .lyteScaleLine span:not(.lyteScalLable) {
+	.lyteSliderVerticalScaleLineSpanNotScaleLabel();
+  height: @height;
+  width: @width;
+  left: @left;
+}
+.lyteVertical .lyteArrowLeft.lyteSliderHandler {
+	.lyteSliderVErticalArrowLeftSliderHandler();
+  top: @top;
+  left: @left !important;
+  width: @width;
+  height: @height;
+  top: @top;
+  position: absolute;
+  background-color: @backgroundColor;
+  cursor: @cursor;
+  border: @border;
+}
+.lyteVertical .lyteArrow.lyteSliderHandler {
+	.lyteSliderVerticalArrowSliderHandler();
+  top: @top;
+  left: @left !important;
+  width: @width;
+  height: @height;
+  top: @top;
+  left: @left;
+  position: absolute;
+  background-color: @backgroundColor;
+  cursor: @cursor;
+  border: @border;
+}
+.lyteVertical .lyteSquare.lyteSliderHandler {
+	.lyteSliderVerticalSquareSliderHandler();
+  width: @width;
+  height: @height;
+  top: @top;
+  left: @left;
+}
+.lyteVertical .lyteCircle.lyteSliderHandler {
+	.lyteSliderVerticalCircleSliderHandler();
+  top: @top;
+  left: @left;
+}
+.lyteVertical .lyteSliderFill {
+	.lyteSliderVerticalSliderFill();
+  height: @height ;
+  min-width: @minWidth ;
+  width: @width;
+  top: @top;
+}
+ .lyteSquare.lyteSliderHandler {
+ 	.lyteSliderSquareSliderHandler();
+  width: @width;
+  height: @height;
+  top: @top;
+  left: @left;
+  position: absolute;
+  background-color: @backgroundColor;
+  cursor: @cursor;
+  border: @border;
+}
+.lyteCircle.lyteSliderHandler {
+	.lyteSliderCircleSliderhandler();
+  width: @width;
+  height: @height;
+  border-radius: @borderRadius;
+  top: @top;
+  left: @left;
+  position: absolute;
+  background-color: @backgroundColor;
+  cursor: @cursor;
+  border: @border;
+}
+.lyteSliderFill {
+	.lyteSliderFill();
+  background-color: @backgroundColor;
+  position: absolute;
+  width: @width;
+  display: block;
+  -moz-box-shadow: @mozBoxShadow;
+  -webkit-box-shadow: @webkitBoxShadow;
+  box-shadow: @boxShadow;
+  -moz-border-radius: @mozBorderRadius;
+  -webkit-border-radius: @webkitBorderRadius;
+  border-radius: @borderRadius;
+}
+ .lyteRangeSlider {
+ 	.lyteSliderRangeSlider();
+  display: block;
+  -moz-box-shadow: @mozBoxShadow;
+  -webkit-box-shadow: @webkitBoxShadow;
+  box-shadow: @boxShadow;
+  -moz-border-radius: @mozBorderRadius;
+  -webkit-border-radius: @webkitBorderRadius;
+  border-radius: @borderRadius;
+  width: @width;
+  height: @height;
+  background-color: @backgroundColor;
+  position: relative;
+  outline: @outline;
+}
+.lyteRangeSlider .lyteScaleLine span.lyteScalLable {
+	.lyteSliderScaleLineSpanScaleLabel();
+  position: absolute;
+  top: @top;
+  left: @left;
+  font-size: @fontSize;
+}
+ .lyteRangeSlider .lyteScaleOption {
+ 	.lyteSliderRangeSliderScaleOption();
+  position: absolute;
+  top: @top;
+  left: @left;
+  width: @width;
+  height: @height;
+}
+.lyteRangeSlider .lyteScaleOption .lyteScaleLine {
+	.lyteSliderRangeSliderScaleOptionScaleLine();
+  width: @width;
+  height: @height;
+  text-align: @textAlign;
+  display: inline-block;
+  position: absolute;
+  margin-left: @marginLeft;
+  left: @left;
+}
+ .lyteSliderHandler {
+ 	.lyteSliderSliderHandler();
+  outline: @outline;
+}
+.lyteSliderDisabled {
+	.lyteSliderDisabled();
+  pointer-events: none;
+  opacity: @opacity;
+}
+
+
+
+/* import theme overrides - styles */
+@import (optional) "../themes/@{slider}/ui-elements/slider/slider.styles.less";
+
+
+
+
+/* import custom css - final tweaks by the user */
+@import (optional) "../overrides/ui-elements/slider.overrides.less";
