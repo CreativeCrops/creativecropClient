@@ -79,64 +79,17 @@ if (!String.prototype.endsWith) {
     }
     return this.substring(this_len - search.length, this_len) === search;
   };
-}Lyte = {
-    version : "2.0.0",
-    $ : {},
-    registeredMixins : {},
-    Mixin : {},
-    debug : false,
-    performance : false,
-    toBeRegistered : []
-};
-
+}Lyte = {};
+Lyte.version = "1.0.6";
+Lyte.registeredMixins = {};
+Lyte.Mixin = {};
+Lyte.debug = false;
+Lyte.performance = false;
+Lyte.toBeRegistered = [];
 var consoleTime = [];
-
-(function assetsDivCreation() {
-    Lyte.$.assetsDiv = document.createElement("div");
-    Lyte.$.assetsDiv.setAttribute("id", "lyteAssetsDiv");
-    document.head.appendChild(Lyte.$.assetsDiv);
-})();
-
-Lyte.registerErrorCodes = function(obj) {
-    Object.assign(Lyte.errorCodes, obj);
-}
-
-Lyte.getErrorMessage = function(code) {
-    var args = Array.from(arguments).slice(1);
-    if(Lyte.errorCodes[code]) {
-        return Lyte.errorCodes[code].replace(/{(\d+)}/g, function(t, i) {
-            return args[i]
-        });
-    } else {
-        return code;
-    }
-}
-
-
-Lyte.error = function() {
-    var errorObj = arguments[0].stack || Error(Lyte.getErrorMessage.apply(Lyte,arguments))
-    if(Lyte.onerror) {
-      Lyte.onerror.call(this,errorObj);
-    }
-    Lyte.triggerEvent("error",errorObj);
-    console.error.call(console,errorObj);
-}
-
-Lyte.warn = function() {
-    var errorObj = arguments[0].stack || Error(Lyte.getErrorMessage.apply(Lyte,arguments));
-    console.warn.call(console,errorObj);
-}
 
 Lyte.Mixin.register = function(name, mixin){
   Lyte.registeredMixins[name] = mixin;
-}
-
-Lyte.Mixin.exists = function(name) {
-  if(!Lyte.registeredMixins[name]) {
-    Lyte.error('Mixin used before being registered.');
-    return false;
-  }
-  return true;
 }
 
 Lyte.log = function(text,color) {
@@ -172,159 +125,42 @@ Lyte.isComponent = function(object) {
   return false;
 }
 
-
-/* --------- lyte router v2 changes starts---- */
-var reqFiles = {};
-
-Lyte.injectResources = function (files, every, completed) {
-  var successFiles = [],
-  errorFiles = []; 
-  every = every || function() {};
-  completed = completed || function() {};
-  return new Promise(function(resolve) {
-    processRequirements(files, resolve);   
-  }).then(function() {
-    completed(successFiles,errorFiles);  
-  });
-
-  function processRequirements(files, resolve) {
-    if(!files) {
-      resolve();
-    } else {
-      if(!Array.isArray(files)) {
-        files = [files];
+Lyte.injectResources = function(files,every,completed) {
+  if(files) {
+    files = Array.isArray(files) ? files : [files];
+    var filesLoaded = -(files.length);
+    files.forEach(function(file) {
+      var tag,
+      fileSplit = file.split('.'),
+      type = fileSplit[fileSplit.length-1],
+      tags = {js:'script',css:'link'};
+      tag = document.createElement(tags[type]);
+      if(fileSplit.length == 1) {
+        console.error('Type of file is not specified in injectResources.');
+        return;
       }
-      if(!files.length) {
-        resolve();
-      }
-      var len = -(files.length);
-      files.forEach(function(file) {
-        if(typeof file == "string"){
-          requestFile(file, Lyte.injectResources.availableTags[file], function() {
-            loaded();
-          });  
-        } else if(Array.isArray(file)) {
-          new Promise(function(r){
-            processRequirements(file, r);
-          }).then(function(){
-            loaded();
-          })
-        } else {
-          new Promise(function(r){
-            processRequirements(file.parent, r);
-          }).then(function(){
-            new Promise(function(r1){
-              processRequirements(file.child, r1)
-            }).then(function(){
-              loaded();
-            })
-          })
-        }
-      })
-    }
-
-    function loaded() {
-      len++;
-      if(len == 0) {
-        resolve();
-      }
-    }
-    
-    function requestFile(file,cached,resolve) {
-      if(reqFiles[file]) {
-        reqFiles[file].push(resolve)
+      if(type == 'css') {
+        tag.setAttribute('href',file);
+        tag.setAttribute('type',"text/css");
+        tag.setAttribute('rel',"stylesheet");
       } else {
-        reqFiles[file] = [resolve];
-        if(cached && cached.event.type != "error") {
-          if(Lyte.removeFromCache.arr.indexOf(file) != -1) {
-            Lyte.removeFromCache.arr.splice(Lyte.removeFromCache.arr.indexOf(file),1);
-          }
-          fileLoaded.call(cached.tag,cached.event,true);
-          resolve();
-        } else {
-          makeRequest(file,
-            function(event) {
-              reqFiles[file].forEach(function(resolve) {
-                resolve();
-              });
-              fileLoaded.call(this,event);
-              every.call(this,event);
-            }
-          );
+        tag.setAttribute('src',file);
+      }
+      tag.onerror = tag.onload = function (event) {
+        filesLoaded++
+        if(every) {
+          every.call(this,event);
         }
-      }
-    }
-
-    function fileLoaded(event,cached) {
-      var file = this.getAttribute('src') || this.getAttribute('href');
-      delete reqFiles[file];
-      if(!cached) {
-        if(Lyte.injectResources.availableTags[file]) {
-          Lyte.injectResources.availableTags[file].tag.remove();
+        if(completed && filesLoaded == 0) {
+          completed();
         }
-        this.onerror = this.onload = undefined;
-        Lyte.injectResources.availableTags[file] = {tag : this, event : {type : event.type}};
-      }
-    }
-  }
-
-  function makeRequest(file,callBack) {
-    var tag,
-    fileSplit = file.split('.'),
-    type = fileSplit[fileSplit.length - 1],
-    tags = { js: 'script', css: 'link' };
-    tag = document.createElement(tags[type]);
-    if (fileSplit.length == 1) {
-      Lyte.error('Type of file is not specified in injectResources.');
-      return;
-    }
-    if (type == 'css') {
-      tag.setAttribute('href', file);
-      tag.setAttribute('type', "text/css");
-      tag.setAttribute('rel', "stylesheet");
-    } else {
-      tag.setAttribute('src', file);
-    }
-    tag.onerror = tag.onload = function (event) {
-      if(event.type == "error") {
-        errorFiles.push(event);  
-      } else {
-        successFiles.push(event);
-      }
-      if(callBack) {
-        callBack.call(this,event);
-      }
-    };
-    document.getElementById("lyteAssetsDiv").appendChild(tag);
-  };
-};
-
-Lyte.injectResources.availableTags = [];
-
-Lyte.removeFromCache = function(arr) {
-  Lyte.removeFromCache.assign(arr);
-  if(Lyte.removeFromCache.arr.length) {
-    Lyte.removeFromCache.arr.forEach(function(file) {
-      if(Lyte.injectResources.availableTags[file]) {
-        Lyte.injectResources.availableTags[file].tag.remove();
-        delete Lyte.injectResources.availableTags[file];  
-      }
-    });
-    Lyte.removeFromCache.arr = [];
+      };
+      document.head.appendChild(tag);
+    });  
   }
 }
 
-Lyte.removeFromCache.arr = [];
-
-Lyte.removeFromCache.assign = function(arr) {
-  arr = arr == "*" ? Object.keys(Lyte.injectResources.availableTags) : (Array.isArray(arr) ? arr : [arr]); 
-  Lyte.removeFromCache.arr = Lyte.removeFromCache.arr.concat(arr);
-  return;
-}
-
-/* --------- lyte router v2 changes ends ---- */
-
-Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
+Lyte.checkProperty = function(property,dataVal,key,fieldVal, record){
   var exts = "extends";
   switch(property){
     case "type" : 
@@ -338,20 +174,13 @@ Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
           return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
         }
       }
-      else if(dataVal !== undefined){
-        if(Array.isArray(dataVal)){
-           if(fieldVal != "array"){
-              return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
-           }
-        }
-        else if(fieldVal != (typeof dataVal)){
+      else if(Array.isArray(dataVal)){
+        if(fieldVal != "array"){
           return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
         }
       }
-      break;
-    case "mandatory":
-      if(dataVal == undefined || dataVal == null || dataVal == ""){
-        return {code : "ERR02", message: Lyte.errorCodes.ERR02 };
+      else if(fieldVal != (typeof dataVal)){
+        return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
       }
       break;
     case "maximum" :
@@ -366,18 +195,18 @@ Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
       break;
     case "maxLength" :
     case "maxItems" :
-      if(dataVal && dataVal.length > fieldVal){
+      if(dataVal.length > fieldVal){
         return {code : "ERR06", message : Lyte.errorCodes.ERR06, expected : fieldVal};
       }
       break;
     case "minLength" :
     case "minItems" :
-      if(dataVal && dataVal.length < fieldVal){
+      if(dataVal.length < fieldVal){
         return {code : "ERR07", message : Lyte.errorCodes.ERR07, expected : fieldVal};
       }
       break;
     case "pattern" :
-      if(dataVal && (typeof dataVal == "string") && !(new RegExp(fieldVal).test(dataVal))){
+      if((typeof dataVal == "string") && !(new RegExp(fieldVal).test(dataVal))){
         return {code : "ERR08", message : Lyte.errorCodes.ERR08, expected : fieldVal};
       }
       break;
@@ -407,7 +236,7 @@ Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
           return {code : "ERR10", message : Lyte.errorCodes.ERR10, expected : fieldVal};
         }
       }
-      else if(dataVal && dataVal != fieldVal){
+      else if(dataVal != fieldVal){
         return {code : "ERR10", message : Lyte.errorCodes.ERR10, expected : fieldVal};
       }
       break;
@@ -449,16 +278,14 @@ Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
 Lyte.types = ["string", "object", "number", "boolean", "array"];
 
 Lyte.attr = function(type, opts){
-  var obj = {};
-  obj.type = type;
   if(opts == undefined){
     opts = {};
   }
   if(this.types.indexOf(type) == -1 && !Lyte.Transform.hasOwnProperty(type)){
     throw new Error("Not a valid field type - "+type);
   }
-  Object.assign(obj,opts);
-  return obj;
+  opts.type = type;
+  return opts;
 }
 
 Lyte.defineRelation = function(name,type,opts){
@@ -500,7 +327,7 @@ Lyte.registerValidator = function(customValidatorName, func){
 }
 
 Lyte.patterns = {
-  email : /^([A-Za-z0-9._%\-'+/]+@[A-Za-z0-9.-]+\.[a-zA-Z]{2,22})$/,
+  email : /([A-Za-z0-9._%\-'+/]+@[A-Za-z0-9.-]+\.[a-zA-Z]{2,22})$|[\s]+/,
   url : /(^(ht|f)tp(s?):\/\/[0-9a-zA-Z][-.\w]*(:[0-9])*(\/?)([a-zA-Z0-9\-.?,:'/\\+=&amp;%$#_[\]@!()*;~]*)?$)/,
   ampm : /^(AM|PM|am|pm)$/,
   hour : /^(0?[0-9]|1[0-9]|2[0-4])$/,
@@ -515,9 +342,8 @@ Lyte.patterns = {
 Lyte.validate = function(object, key, value, component) {
   var definition = component.__data[key];
   var isError = false;
-  var type = definition ? definition.type : undefined;
   for(var defKey in definition) {
-    isError = Lyte.checkProperty(defKey, value, key, definition[defKey], object, type);
+    isError = Lyte.checkProperty(defKey, value, key, definition[defKey], object);
     if(isError !== true) {
       return isError;
     }
@@ -535,7 +361,7 @@ Lyte.errorCodes = {
   ERR08 : "String does not match the specified pattern", ERR09 : "Values in array are not unique", ERR10 : "Value is not equal to the specified constant", ERR11 : "Model of related field is not defined",
   ERR12 : "Model of backward relation is not defined", ERR13 : "Record not found", ERR14 : "Model does not match the related field model", ERR15 : "Error in creating a record as a relation",
   ERR16 : "Record with primary key already exists", ERR17 : "Value cannot be changed because record has been deleted", ERR18 : "Action not defined", ERR19 : "Model not defined",
-  ERR20 : "Key not specified", ERR21 : "'belongsTo' relationship expects a single object/id", ERR22 : "Type not specified for polymorphic relation", ERR23: "Primary Key value not present", ERR24: "Error while relating record", ERR25: "Backward relation not present"
+  ERR20 : "Key not specified", ERR21 : "'belongsTo' relationship expects a single object/id", ERR22 : "Type not specified for polymorphic relation", ERR23: "Primary Key value not present", ERR24: "Error while relating record"
 }
 
 Lyte.registeredGlobalEvents = {};
@@ -566,7 +392,7 @@ Lyte.triggerEvent = function() {
 
  Lyte.addEventListener = function(eventName, func) {
    if(typeof func !== "function") {
-       Lyte.error("Second parameter to LyteComponent.addGlobalEventListener() must be a function");
+       console.error("Second parameter to LyteComponent.addGlobalEventListener() must be a function");
        return;
    }
    var s = this.registeredGlobalEvents[eventName];
@@ -579,21 +405,20 @@ Lyte.triggerEvent = function() {
 
 Lyte.removeEventListener = function(id) {
    if(!id) {
-     Lyte.error("listener unique id not specified");
+     console.error("listener unique id not specified");
      return;
    }
    var globalId  = id.split("-");
    var s = this.registeredGlobalEvents[globalId[0]];
    if(!s || !s.listeners[globalId[1]]) {
-       Lyte.error("No such listener registered");
+       console.error("No such listener registered");
        return;
    }
    s.listeners[globalId[1]] = null;
  }
 
 Lyte.deepCopyObject = function( obj )  {
-  var targetVal = Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
-  var current, copies = [{source : obj, target : targetVal}], keys, propertyIndex, descriptor, nextSource, indexOf, sourceReferences = [obj];
+  var current, copies = [{source : obj, target : Object.create(Object.getPrototypeOf(obj))}], keys, propertyIndex, descriptor, nextSource, indexOf, sourceReferences = [obj];
   var cloneObject = copies[0].target, targetReferences = [cloneObject];
   while(current = copies.shift()){
       keys = Object.getOwnPropertyNames(current.source);
@@ -604,7 +429,7 @@ Lyte.deepCopyObject = function( obj )  {
               continue;
           }
           nextSource = descriptor.value;
-          descriptor.value = Array.isArray(nextSource) ? [] : nextSource instanceof Set ? new Set() : Object.create(Object.getPrototypeOf(nextSource));
+          descriptor.value = Array.isArray(nextSource) ? [] : Object.create(Object.getPrototypeOf(nextSource));
           indexOf = sourceReferences.indexOf(nextSource);
           if(indexOf != -1){
               descriptor.value = targetReferences[indexOf];
@@ -621,43 +446,30 @@ Lyte.deepCopyObject = function( obj )  {
 }
 
 Lyte.resolvePromises = function(promises) {
-  if(typeof promises != "string") {
-    if(Array.isArray(promises)) {
-      return promiseArray(promises);
-    } else if(typeof promises == "object") {
-      return promiseHash(promises);
-    }    
-  } else {
-      return promises;
+  if(Array.isArray(promises)) {
+    return promiseArray(promises);
+  } else if(typeof promises == "object") {
+    return promiseHash(promises);
   }
 
   function promiseHash(promiseObj) {
-    var actPromKeys = [],
-    promises = [],
-    promiseKeys = Object.keys(promiseObj);
+    var actPromKeys = [],promises = [],promiseKeys = Object.keys(promiseObj);
     promiseKeys.forEach(function(key) {
-        var value = promiseObj[key];
-      if(value instanceof Promise) {
         actPromKeys.push(key)
-        promises.push(value);
-      }
+        promises.push(promiseObj[key]);
     });
     if(!promises.length) {
       return promiseObj;
     } else {
        var obj = {},promise = new Promise(function(resolve,reject) {
           Promise.all(promises).then(function(data) {
-            promiseKeys.forEach(function(promiseKey) {
-              if(actPromKeys.indexOf(promiseKey) != -1) {
-                obj[promiseKey] = data[actPromKeys.indexOf(promiseKey)]
-              } else {
-                obj[promiseKey] = promiseObj[promiseKey];
-              }
-            });
+          data.forEach(function(dataVal, index) {
+              obj[actPromKeys[index]] = dataVal;
+            });  
           resolve(obj);
         },function(err) {
           reject(err);
-          Lyte.error(err);
+          console.error(err);
         });
       });   
      return promise;
@@ -665,18 +477,7 @@ Lyte.resolvePromises = function(promises) {
   }
 
   function promiseArray(promiseArray) {
-    var array = [],
-    hasPromise = false;
-    promiseArray.every(function(item,i) {
-        if(item instanceof Promise) { 
-            hasPromise = true;
-            return false;
-        }
-        return true
-    });
-    if(!hasPromise) {
-        return promiseArray;
-    }
+    var array = [];
     var promise = new Promise(function(resolve,reject) {
       Promise.all(promiseArray).then(function(data) {
         promiseArray.forEach(function(key,index){
@@ -685,7 +486,7 @@ Lyte.resolvePromises = function(promises) {
         resolve(array);
       },function(err) {
         reject(err);
-        Lyte.error(err);
+        console.error(err);
       });
     });   
    return promise;
@@ -761,212 +562,1183 @@ if(document.readyState === "complete" || document.readyState === "interactive") 
     document.addEventListener("DOMContentLoaded", function(e){
         domContentLoaded1();
     },true);
+}
+Lyte.Router = {
+  definitions : {}
 };
 (function _router(window) {
-  window.lyteRouter = function Router(routes) {
-    window._router = _router;
-    var newTransInfo,
-    LR = this,
-    definitions = {},
-    dloc = document.location,
-    config = {
-      queryParamOptions : {}
+  window._router = _router;
+  var newTransInfo,
+  LR = Lyte.Router,
+  dloc = document.location,
+  trans,prevTrans,
+  removeFromCache = [],
+  Route,
+  routeHash = {},
+  decidedTrans,
+  redirectIndex,
+  removeIndex,
+  listeners,
+  reqFiles = {},
+  availableTags = {},
+  logger = 'route', 
+  instance,
+  historyObj,
+  callOnError,
+  removeTemplate = [],
+  configurations = {},
+  routeDef = {
+    get : function(arr) {
+      var routeObj = LR.definitions;
+      arr.forEach(function(key)  {
+        routeObj = routeObj[key];
+      });
+      return routeObj && routeObj.$ || undefined;
     },
-    trans,
-    prevTrans,
-    Route,
-    routeHash = {},
-    visibleTrans,
-    logger = 'route',
-    historyObj,
-    initialLoad = true,
-    fromHistoryGo = false,
-    allowHistoryChange = false,
-    routeParser,
-    run = {},
-    invokeRunLoop,
-    basicHooks = ["beforeModel","model","afterModel","redirect","renderTemplate","afterRender"],
-    reqestedType = {getDependencies : "dependencies",getResources : "resources"},
-    stoppableHooks = ["getResources","getDependencies","beforeModel","model","afterModel"],
-    processedDispatch;
-
-    run.getResources = run.getDependencies = function(hook,index) {
-      var currentRoute = this.currentRoutes[index],
-      callback = currentRoute[hook],
-      routeInstance = this.routeInstances[index],
-      require = callHookWithoutPromise.call(this,callback,routeInstance,hook,params(index));
-      currentRoute.__lp[reqestedType[hook]+'Loaded'] = callback ? false : true;
-      if(callback && !this.aborted && !this.paused) {
-        currentRoute.__lp[reqestedType[hook]] = require;
-        if(require && hook == "getDependencies") {
-          console.log('Requesting files in getDependencies will stall execution of route till download completes. Please validate files before requesting.');
+    set : function(dir,value) {
+      var cache = LR.definitions,
+      dirLen = dir.length-1;
+      dir.forEach(function(key,i) {
+        if(dirLen === i) {
+          if(cache[key]) {
+            cache[key].$ = value;
+          } else {
+            cache[key] = {$ : value};
+          }
+        } else if(!cache[key])  {
+          cache[key]={};
         }
-        getRequirements.call(this,{reqType : reqestedType[hook],currentRoute : currentRoute,  index : index});
+        cache = cache[key];
+      });
+    }
+  },
+
+  listener = {
+    history: false,
+
+    init: function (fn, history) {
+      var self = this;
+      this.history = history;
+      if (!listeners) {
+        listeners = [];
       }
-      return callHookWithPromise();
+
+      function onchange(onChangeEvent) {
+       listeners.forEach(function(listener)  {
+         listener(onChangeEvent);
+       });
+      }
+      // if ('onhashchange' in window && (document.documentMode === undefined || document.documentMode > 7)) {
+        // if (this.history === true) {
+            window.onpopstate = onchange;
+        // } else {
+          // window.onhashchange = onchange;
+        // }
+      // }
+      listeners.push(fn);
+      return;
+    },
+    
+     addToHistory : function(obj) {
+      var url;
+      obj.fromHistory = obj.fromHistory == undefined ? false : obj.fromHistory;
+      if (obj.url) {
+        url = instance.history ? _delimit(shiftBaseURL(obj.url, true)) : '#'+_delimit(obj.url);
+      }
+      obj.title = obj.title || document.title;
+      if (url) {
+        window.history[obj.type](obj.data, obj.title, url);
+      } else {
+        window.history[obj.type](obj.data, obj.title);
+      }
+      delete obj.type;
+      return obj;
+    }
+  };
+
+  function Router(routes) {
+    this.routes = routes;
+    this.history = configurations.history == "html5" ? true : false;
+    this.baseURL =  configurations.baseURL;
+    this.deferInit = configurations.deferInit || false;
+    return this;
+  };
+
+  LR.configureDefaults = function(options) {
+    configurations = options || {};
+  }; 
+
+  LR.removeFromCache = function(arr) {
+    arr = arr == "*" ? Object.keys(availableTags) : (Array.isArray(arr) ? arr : [arr]); 
+    removeFromCache = removeFromCache.concat(arr);
+    return;
+  }
+
+  LR.beforeRouteTransition = LR.afterRouteTransition = function() {};
+
+   LR.configureRoutes = function (map) {
+    instance = this.instance = new Router(typeof map == "function" ? parseRouteMapping.call(this, map) : map);
+    window.addEventListener('DOMContentLoaded', function () { /* move this code outside.*/
+      if(!instance.deferInit && LR.init) {
+        LR.init();
+        LR.init = undefined
+      }
+    });
+  };
+
+  LR.init = function() {
+    instance.init();
+    linkToRegistration();
+  }
+
+  function linkToRegistration() {
+    class LinkTo extends HTMLElement {
+      static get observedAttributes() {
+        return ['lt-prop-route', 'lt-prop-dp', 'lt-prop-qp', 'lt-prop', 'lt-prop-class', 'lt-prop-id', 'lt-prop-rel', 'lt-prop-title', 'lt-prop-style', 'lt-prop-target']
+      }
+      attributeChangedCallback(attr, oldValue, newValue) {
+        if(this.hasAttribute("lyte-rendered") && this._linkCreated) {
+          let firstChild = this.children[0];
+          //If attr is ltProp
+          if(attr === "lt-prop") {
+            this.handleLtProp();
+            if(!this.hasAttribute("lt-prop-custom")) {
+              this.setCustomAttributes(firstChild, true);
+            }
+            this.getMatchedObject();
+            if(firstChild.tagName === "A") {
+              this.constructHref(firstChild);
+            }
+          } 
+          //if it is a route transition attribute
+          else if(/^(lt-prop-route|lt-prop-dp|lt-prop-qp)$/.test(attr)) {
+            this.getMatchedObject();
+            if(firstChild.tagName === "A") {
+              this.constructHref(firstChild);
+            }
+          }
+          //for rest of the attributes
+          else if(!this.hasAttribute('lt-prop-custom')) {
+            firstChild.setAttribute(attr.substring(8), newValue);
+          }
+        }
+      }
+      connectedCallback() {
+        this.ltProp = this.ltProp || {};
+        if(this.hasAttribute("lyte-rendered")) {
+        this._linkCreated = true;
+        this.getMatchedObject();
+        return;
+        } 
+        this.handleLtProp();
+        let isCustom = this.hasAttribute("lt-prop-custom") || this.ltProp.custom,
+        linkTag;
+        if(isCustom) {
+          //To set the matched object. 
+          this.getMatchedObject();
+          if(this.children[0].tagName === "A") {
+            //update only href.
+            this.constructHref(this.children[0]);
+          }
+        } else {
+          linkTag = document.createElement("a");
+          let length = this.childNodes.length;
+            for(let i=0; i<length; i++) {
+              linkTag.appendChild(this.childNodes[0]);
+            }
+            //update Href and other attributes to linkTag
+            this.setCustomAttributes(linkTag);
+            // sets Matched Obj in this and constructs href
+            this.getMatchedObject();
+            this.constructHref(linkTag);
+            this.appendChild(linkTag);
+        }
+        this.setAttribute("lyte-rendered", "");
+        this._linkCreated = true;
+      }
+      handleLtProp() {
+        var ltProp = this.getAttribute("lt-prop");
+        if(ltProp) {
+          try{
+            var jsonObj = JSON.parse(ltProp);
+            this.ltProp = jsonObj;
+          } catch(e) {
+            console.warn("Error while parsing ltProp in link-to");
+          }
+        }
+      }
+      setCustomAttributes(linkTag, onlyLtProp) {
+      for(let key in this.ltProp) {
+        if(/^(id|class|style|target)$/.test(key)) {
+            linkTag.setAttribute(key, this.ltProp[key]);
+          }
+      }
+      if(!onlyLtProp) {
+        var attrs = this.attributes;
+        for(let i=0;i<attrs.length;i++) {
+          let attrName = attrs[i].nodeName;
+          if(attrName !== "lt-prop" && /^(lt-prop-id|lt-prop-class|lt-prop-style|lt-prop-target)$/.test(attrName)) {
+            linkTag.setAttribute(attrName.substring(8), attrs[i].nodeValue);
+          }
+        }
+      }
+      }
+      constructHref(linkTag) {
+        let matched;
+        if(matched = normalizeMatchedObj(this.matched)) {
+          let href = constructURLFromRoute(matched);
+          href = instance.history ?  shiftBaseURL(href,true) : "#" + href;
+          linkTag.setAttribute("href", href); 
+        }
+      }
+      getMatchedObject() {
+        let matched = this.matched || {};
+        matched.route = this.getAttribute("lt-prop-route") || this.ltProp.route;
+        let dynamicParams = this.getAttribute("lt-prop-dp") || this.ltProp.dp || [],
+        queryParams = this.getAttribute("lt-prop-qp") || this.ltProp.qp || {};
+        if(!(dynamicParams instanceof Array)) {
+          try{
+            matched.dynamicParams = JSON.parse(dynamicParams) || [];  
+          }catch(e) {
+            console.error("Error while parsing dynamicParams in link-to.");
+            matched.dynamicParams = []  
+          }
+        } else {
+          matched.dynamicParams = [];
+        }
+        if(!(queryParams instanceof Object)) {
+          try{
+            matched.queryParams = JSON.parse(queryParams);
+          } catch(e) {
+            console.error("Error while parsing queryParams in link-to.");
+            matched.queryParams = {};
+          }
+        } else {
+          matched.queryParams = {}
+        }
+        this.matched = matched;
+      }
+    }
+    customElements.define('link-to', LinkTo);
+  }
+
+  document.addEventListener("click", function(event) {
+    if(event.button == 2) {
+      return;
+    }
+    var targetElem = event.target || event.srcElement;
+    while(targetElem) {
+      if(targetElem.nodeName === "LINK-TO") {
+        break;
+      } else {
+        targetElem = targetElem.parentNode;
+      }
+    }
+    if(targetElem) {
+      if(targetElem.children[0].tagName === "A" && (event.ctrlKey == true || event.metaKey == true || event.which == 2 || (targetElem.children[0].hasAttribute("target") && targetElem.children[0].getAttribute("target") !== "_self")) ) {
+        return;  
+      }
+      event.preventDefault();
+      var currentTransition = Lyte.Router.getRouteInstance().transition,
+      transitionInstance;
+      if(currentTransition && LR.checkIfSameRoute(targetElem.matched, currentTransition.info) && targetElem.hasAttribute("lt-prop-refresh-route")) {
+          transitionInstance = LR.getRouteInstance(targetElem.getAttribute("lt-prop-refresh-route")).refresh(); 
+      } else {
+        transitionInstance = LR.transitionTo(targetElem.matched);
+      }
+      var transObj = {};
+      if(targetElem.getAttribute("lt-prop-trans")) {
+        try{
+          transObj = JSON.parse("lt-prop-trans");  
+        }
+        catch(e) {
+        }
+      }
+
+      transitionData = targetElem.getAttribute("lt-prop-td");
+      transitionData = transitionData || transObj.data;
+      if(transitionData) {
+        if(typeof transitionData === "string") {
+          try{
+          transitionData = JSON.parse(transitionData);
+          } catch(e) {
+          }
+        }
+        transObj.data = transitionData;
+      }
+      for(var key in transObj) {
+        transitionInstance[key] = transObj[key];
+      }
+    }
+  },true);
+
+
+  LR.checkIfSameRoute = function(transInfo1, transInfo2) {
+    if(transInfo1.route == transInfo2.route && transInfo1.dynamicParams.length === transInfo1.dynamicParams.length && _compareObj(transInfo1.queryParams,transInfo2.queryParams)) {
+      if(transInfo1.dynamicParams.length) {
+        for(var i = 0; i <= transInfo1.dynamicParams.length; i++) {
+          return transInfo1.dynamicParams[i] == transInfo2.dynamicParams[i];
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  LR.addRoutes = function(map) { 
+    Object.assign(this.instance.routes,parseRouteMapping.call(this,map));
+  };
+    
+  function parseRouteMapping(map) {
+    Lyte.time('parseRouteMapping')
+    var routesObj = {},
+    mapObj = {}, 
+    pathStringArr = [], 
+    routeStringArr = [], 
+    pathString;
+    this.route = function route(routeName,obj,nestedFn) {
+      if(typeof obj == "object") {
+        if(!obj.path) {obj.path = _delimit(routeName)};
+        if(_presence(obj.path,"?")) {
+          var split = obj.path.split('?');
+          obj.defQP = Router.frameQueryParams(split[1]);
+          obj.path = split[0];
+        } else if(obj.queryParams) {
+          obj.defQP = obj.queryParams;
+          delete obj.queryParams;
+        }
+      } else {
+        if(typeof obj == "function") {
+          nestedFn = obj;
+        }
+        obj = {path : _delimit(routeName)};  
+      }
+      if(obj.path == '/') {
+        mapObj = _getObj(pathStringArr,routeHash)[obj.path] = {$ : {}};
+        pathStringArr.push('/');
+      } else {
+        var trimedPath = obj.path;
+        mapObj = _getObj(pathStringArr,routeHash)[obj.path] = {$ : {}};
+        if(dynamicRouteCheck(trimedPath) || wildcardRouteCheck(trimedPath)) {
+          _splitPath(trimedPath).every(function(seg,index,arr) {
+            if(dynamicRouteCheck(seg)) {
+              obj.dynamicKey = mapObj.$.dynamicKey = seg.replace(":","");
+              obj.dynamicIndex = mapObj.$.dynamicIndex = index;
+              return false;
+            } else if(wildcardRouteCheck(seg)) {
+              obj.dynamicKey = mapObj.$.dynamicKey = seg.replace("*","");
+              obj.dynamicIndex = mapObj.$.dynamicIndex = index;
+              obj.wildcard = mapObj.$.wildcard = true;
+              obj.sufix = mapObj.$.sufix = [];
+              for(var indx=index+1;indx<arr.length;indx++){
+                mapObj.$.sufix.push(arr[indx])
+              }
+              return false;
+            }
+            return true;
+          });
+        } else {
+          obj.dynamicKey = mapObj.$.dynamicKey = undefined;
+        }
+        pathStringArr.push(trimedPath);
+      }
+      routeStringArr.push(routeName);
+      mapObj.$.route = Array.from(routeStringArr);
+      var routes = routesObj;
+      routeStringArr.forEach(function(r,index) {
+        if(index +1 != routeStringArr.length) {
+          routes = routes[r]; 
+        }
+      });
+      routes[routeName] = {$ : obj};
+      if(nestedFn) {
+        nestedFn.call(this,{});
+      }
+      routeStringArr.pop();
+      pathStringArr.pop();
+    }
+    map.call(this,{});
+    Lyte.time('parseRouteMapping')
+    return routesObj;
+  };
+
+  LR.replaceWith = function() {
+    var args = normalizeTransitionParams.apply(this,arguments);
+    if(args) {
+      args.replace = true;
+      return routeTransition(args);  
+    }
+    
+  }
+
+  LR.transitionTo = function() {
+    var matched;
+    if(matched = normalizeTransitionParams.apply(this,arguments)) {
+      return routeTransition(matched);  
+    }
+  }
+
+  LR.getURL = function () {
+    var url,matched;
+    if(matched  = normalizeTransitionParams.apply(this,arguments)) {
+      url = constructURLFromRoute(matched);
+    }
+    return instance.history ? shiftBaseURL(url, true) : url;
+  };
+
+  LR.getRoute = function(url) {
+    var matched = traverse(shiftBaseURL(url),true);
+    if(matched) {
+      matched.dynamicParams = matched.dynamicParams.filter(function(e) {
+         return e !== undefined;
+      });
+      matched.route = matched.route.join('.')  
+    }
+    return matched;  
+  }  
+
+  function routeTransition(matched) {
+    if(matched) {
+      decidedTrans = redirectIndex = undefined;
+      var url,
+      title;
+      if(typeof matched == "object") {
+        if(trans) {
+          title = trans.title;
+          var fromRedirect = trans.runLoop && trans.runLoop.current && trans.runLoop.current[0] && trans.runLoop.current[0].hook == "redirect";
+          if(fromRedirect) {
+            url = validateRedirect(matched);    
+          } else {
+            url = constructURLFromRoute(matched);
+          }  
+        } else {
+          url = constructURLFromRoute(matched);
+        }
+      } else {
+        console.warn('Not a valid route transition');
+      }
+      newTransInfo = {type : matched.replace ? "replaceState" : "pushState",url : url, title : title,fromHistory : false};
+      Lyte.log('Transitioning to '+url,logger)
+      if(!fromRedirect) {
+        var processed;
+        if(processed = setParamsInDef(matched)) {
+          dispatch(url,processed);  
+        } else {
+          return;
+        }
+      }
+      return trans.routeTrans;  
+    } else {
+      console.error('Transition tried without arguments.');      
+    }
+  };
+
+  Router.prototype.init = function (r) {
+    var self = this;
+    this.handler = function(onChangeEvent) {
+      var url;
+      if(self.history) {
+        url = LR.getLocation();
+      } else {
+        var newURL = onChangeEvent && onChangeEvent.newURL || dloc.hash;
+        url = checkForEmptyPath(newURL.replace(/.*#/, ''));
+      }
+      historyObj = {fromHistory : true};
+      if(onChangeEvent && history.state) {
+        historyObj.data = history.state;
+      }
+      dispatch(url);
+    };
+    
+    listener.init(this.handler, this.history);
+    if(this.history) {
+      if(LR.getLocation()) {
+        this.handler();
+      }   
+    } else {
+      historyObj = {fromHistory : true};
+      dispatch(LR.getLocation());
+    }
+    return this;
+  };
+
+  LR.getLocation = function() {
+    if(instance.history) {
+      var path = checkForEmptyPath(dloc.pathname+dloc.search);
+      path = shiftBaseURL(path);
+      return _delimit(path);  
+    } else {
+      return _delimit(checkForEmptyPath(dloc.hash.replace(/^(#\/|#|\/)/, '')))
+    }
+  }
+
+  function checkForEmptyPath(path) {
+    if(!path) {
+      listener.addToHistory({ type: "replaceState", title: document.title, url: (path = '/') });
+    }
+    return path;
+  }
+
+  function shiftBaseURL(path,append) {
+    var baseURL = instance.baseURL;
+    if(baseURL && path) {
+      baseURL = _delimit(instance.baseURL);
+      if(path.indexOf(baseURL) == 0 && !append) {
+        return path.replace(baseURL,'');
+      } else if(append && path.indexOf(baseURL) == -1) {
+        return baseURL+path;
+      } 
+    } 
+    return path;
+    
+  };
+
+  function constructURLFromRoute(matched) {
+    if(matched) {
+      if(matched.route && !Array.isArray(matched.route)) {
+        matched.route = matched.route.split('.');
+      }
+      var qp,
+      url = '';  
+      matched.route.forEach(function(route,index) {
+        var queryParams,
+        _route = matched.route.slice(0,index+1),
+        routeObj = _getObj(_route,instance.routes);
+        if(!routeObj) {
+          console.error('There is no url mapped for the route "'+_route.join('.')+'".');
+          return false;
+        }
+        var path = routeObj.$.path;
+        if(queryParams = routeObj.$.defQP) {
+          for(var key in queryParams) {
+            if(matched.queryParams && !matched.queryParams.hasOwnProperty(key)) {
+              matched.queryParams[key] = queryParams[key];
+            } 
+          };
+        }
+        if(routeObj.$.dynamicKey) {
+          var dynamicPathSplit = _splitPath(path);
+          if(!matched.dynamicParams || !matched.dynamicParams[index]) {
+            console.error('Dynamic params for the route '+route+' is not defined.');
+            return false;   
+          } else {
+            dynamicPathSplit[routeObj.$.dynamicIndex] = encodeURI(matched.dynamicParams[index]);
+            url += _delimit(dynamicPathSplit.join('/')); 
+          } 
+        } else {
+          url += _delimit(path);
+        }
+      });
+      url = url[url.length-1] == '/' && url.length != 1  ? url.slice(0,-1) : url;
+      qp = Object.keys(matched.queryParams).filter(function(key){
+          return matched.queryParams[key] != undefined ? key : false;
+        });
+      if(matched.queryParams && qp.length) {
+        url += '?';
+        qp.forEach(function(key,index) {
+          url+= key+'='+encodeURIComponent(matched.queryParams[key])+(index < qp.length-1 ? '&' : '');  
+        });
+      }
+      return validateURL(url);
+    }
+  };
+
+  function dispatch(path,processed) {
+    Lyte.time('RouteTransition')
+    if(trans && (trans.running || (prevTrans && trans != prevTrans))) {
+      trans.abort();
+    }
+    LR.error = false;
+    if(!processed) {
+      processed = traverse(path);  
+    }
+    if(processed && processed.matched.route.length) {
+      Lyte.time('constructRunLoop')
+      invoke(processed);
+      Lyte.time('constructRunLoop')
+      processed.prevTrans = prevTrans;
+      trans.runLoop = constructRunLoop(processed);
+      setTimeout(function() {
+        if(newTransInfo && trans.routeTrans.data) {
+          newTransInfo.data = trans.routeTrans.data;
+        }
+        trans.run();
+      },0);
+    } 
+    return;
+  };
+
+
+
+  function constructRunLoop(processed) {
+    var basicHooks = ["beforeModel","model","afterModel","redirect","renderTemplate","afterRender"],
+    currentRoutes = processed.currentRoutes,
+    matched = processed.matched,
+    prevTrans = processed.decidedTrans || processed.prevTrans,
+    fromRedirect = processed.validateTransition,
+    refreshRouteFrom = processed.refreshRouteFrom,
+    sameTrans = true,
+    similar = true,
+    toRemove = true,
+    templateToRemove,
+    runLoop = [],
+    forceFetch = [],
+    req = [],
+    b4Exit = [],
+    willTransit = [],
+    didTransit = [],
+    leavingRoutes = [],
+    matchedLen = matched.route.length,
+    prevCurrentRoutes,prevCurrentRoute;
+
+    if(refreshRouteFrom) {
+      refreshRouteFrom = refreshRouteFrom.split('.');
+      refreshRouteFrom.pop();
+    }
+    
+    function pushBasicHooks(route,index) {
+      if(!fromRedirect) {
+        var routeCheck = prevTrans && prevTrans.currentRoutes && prevTrans.currentRoutes[index] && prevTrans.currentRoutes[index].routeName == route.routeName && (!refreshRouteFrom || refreshRouteFrom[index] == route.routeName);
+        if(routeCheck && redirectIndex != undefined && index >= redirectIndex) {
+          runLoop.push({hook : "redirect", index : index})
+          if(index == redirectIndex) {
+            ["renderTemplate","afterRender"].forEach(function(hook) {
+              var obj = {};
+              obj.hook = hook;
+              obj.index = index;
+              runLoop.push(obj);
+            })
+          }
+        } else {
+          req.push({hook : "getResources",index : index})
+          req.push({hook : "getDependencies",index : index});
+          basicHooks.forEach(function(hook) {
+            var obj = {};
+            obj.hook = hook;
+            obj.index = index;
+            if(route.forceFetch && !_presence(["redirect","renderTemplate","afterRender"],hook)) {
+              forceFetch.push(obj);
+              if(hook == "afterModel") {
+                route._fetchStatus = "pending";
+              }
+            } else {
+              runLoop.push(obj);
+            }
+          });
+        }
+      }
+    }
+    
+    currentRoutes.forEach(function(currentRoute,index) {
+      if(prevTrans) {
+        prevCurrentRoutes = prevTrans.currentRoutes;
+        prevCurrentRoute = prevCurrentRoutes[index];
+        if(prevCurrentRoute && similar && prevCurrentRoute.routeName == currentRoute.routeName && prevTrans.routeInstances[index]._rendered && (!refreshRouteFrom || refreshRouteFrom[index] == currentRoute.routeName)) {
+          function routeDiff() {
+            pushBasicHooks(currentRoute,index);
+            similar = false;
+          }
+
+          function pushRedirect() {
+            if(!fromRedirect) {
+              trans.routeInstances[index]._rendered = true;
+              runLoop.push({hook : "redirect",index : index});  
+            }
+          }
+
+          if((currentRoute._queryParams || currentRoute._dynamicParams) && !processed.ignore) {
+            if(currentRoute._queryParams) {
+              currentRoute.queryParams.forEach(function(key) {
+                if((matched.queryParams || prevTrans.matched.queryParams) && matched.queryParams[key] != prevTrans.matched.queryParams[key] && similar) {
+                  routeDiff()
+                } 
+              });
+            }
+            if(currentRoute._dynamicParams) {
+              if(matched.dynamicParams[index] != prevTrans.matched.dynamicParams[index] && similar) {
+                routeDiff()
+              } 
+            };
+            if(similar) {
+              pushRedirect()
+            }
+          } else {
+            pushRedirect()
+          }
+        } else {
+          similar = false;
+          pushBasicHooks(currentRoute,index);
+          if(prevCurrentRoute) {
+            if(!sameTrans || prevCurrentRoute.routeName != currentRoute.routeName) {
+              sameTrans = false;
+              leavingRoutes.push(prevCurrentRoute);
+              if(toRemove && prevTrans.routeInstances[index]._rendered) {
+                templateToRemove = index;
+                toRemove = false;
+                if(fromRedirect) {
+                  return index;
+                }
+              } else if(fromRedirect) {
+                return index;
+              }
+            }
+          }
+        }
+        if(matchedLen == index+1) {
+          if(prevTrans.matched.route.length > matchedLen) {
+            if(toRemove && prevTrans.routeInstances[index+1]._rendered) {
+              templateToRemove = templateToRemove == undefined ? index+1 : templateToRemove;
+            }
+            leavingRoutes = leavingRoutes.concat(prevCurrentRoutes.slice(index+1));
+          }
+        }
+      } else {
+        pushBasicHooks(currentRoute,index)
+      }
+      var revIndex = currentRoutes.length-index-1;
+      didTransit.push({hook : "didTransition",index : revIndex});
+    });
+    if(fromRedirect) {
+      return templateToRemove;
+    }
+    if(prevTrans) {
+      if(processed.decidedTrans) {
+        leavingRoutes = instance.prevTransition.currentRoutes.slice(instance.prevTransition.leavingRoutesIndex+1);
+      }
+      var len = instance.prevTransition.currentRoutes.length;
+      instance.prevTransition.currentRoutes.forEach(function(r,i) {
+        willTransit.push({hook : "willTransition",index : len-i-1, route : r});
+      });
+      leavingRoutes.forEach(function(r,i){
+        var revIndex = len-i-1;
+        b4Exit.push({hook : "beforeExit",index : revIndex});
+      }); 
+    }
+      
+    runLoop = {previous : willTransit.concat(b4Exit), current : req.concat(runLoop).concat(didTransit),forceFetch : forceFetch};
+    runLoop.current.removeTemplate = prevTrans && prevTrans.runLoop && prevTrans.runLoop.current && prevTrans.runLoop.current.removeTemplate;
+    if(templateToRemove != undefined) {
+      runLoop.current.removeTemplate = runLoop.current.removeTemplate || [];
+      runLoop.current.removeTemplate.push({index : templateToRemove, routeInstances : prevTrans.routeInstances});  
+    }
+    return runLoop;
+  }
+
+  function invoke(processed) {
+    instance.transition = trans =  new Transition(processed);
+    trans.routeTrans = limitTransition(trans);
+    trans.routeInstances = Router.initRoute(processed.matched);
+    if(historyObj) {
+      trans.routeTrans.data = historyObj.data;
+      LR.beforeRouteTransition(prevTrans && prevTrans.routeTrans || undefined,trans.routeTrans,historyObj);
+      trans.running = true;
+      historyObj.data = trans.routeTrans.data;
+      historyObj.type = "replaceState";
+      listener.addToHistory(historyObj);
+      historyObj = undefined;  
+    } else if(trans.routeTrans.data) {
+      listener.addToHistory({type : "replaceState", data : trans.routeTrans.data});
+    }
+  };
+
+  function _getObj(arr,obj) {
+    arr.every(function(key)  {
+      if(obj && obj[key]) {
+        obj = obj[key];
+        return true;
+      }
+      return obj = false;
+    });
+    return obj;
+  }
+
+  function Transition(processed) {
+    this.matched = processed.matched;
+    this.target = processed.matched.target;
+    this.info = {
+      route : processed.matched.target,
+      queryParams : processed.matched.queryParams,
+      dynamicParams : processed.matched.dynamicParams.filter(_arrayClean)
+    };
+    this.currentRoutes = processed.currentRoutes;
+    this.aborted = this.paused = false;
+    this.abort = function() {
+      if(!this.aborted) {
+        if(this.runningPromise) {
+          this.runningPromise.reject('aborted');  
+        }
+        if(this.constructor.name == "transition") {
+          delete this.runLoop.current.removeTemplate;
+        }
+        this.aborted = true;
+
+        transitionCompleted(this.currentPromise && this.currentPromise.hook == "willTransition")
+      }
+    }.bind(this);
+    this.pause = function() {
+      this.paused = trans.currentPromise;
+      this.resume = this.routeTrans.resume = function(t) {
+        t = t || this;
+        if(t.runningPromise) {
+          t.runningPromise.reject('aborted');
+        }
+        delete t.routeTrans.resume; 
+        delete t.resume;
+        var state = trans.paused.state;
+        if(t.runLoop[state][0].hook ==  trans.paused.hook && t.runLoop[state][0].index == trans.paused.index) {
+          t.runLoop[state].splice(0,1);  
+        }
+        t.paused = false;
+        t.run();
+      }.bind(this);
+      return this.routeTrans;
+    }.bind(this);
+  }
+
+  function getRequirements(object) {
+    var req = object.req,
+    cached,
+    route = object.inst,
+    hook = trans.currentPromise.hook,
+    index = object.index,
+    errorType = getRequirementsErrorType(req),
+    currentRoute = object.currentRoute;
+    return new Promise(function(resolve) {
+      processRequirements(currentRoute[req], resolve);   
+    }).then(function() {
+      currentRoute[req+'Loaded'] = true;
+      if(!currentRoute[errorType] || !currentRoute[errorType].length) {
+        if(trans.pending && trans.pending[req] != undefined && trans.pending[req] == index) {
+          trans.run();
+        }
+      } else {
+        if(!trans.aborted) {
+          if(!trans.paused) {
+            trans.pause();  
+          }
+          callOnError(hook,index,currentRoute[errorType]);  
+        }
+      }         
+    });
+
+    function processRequirements(files, resolve) {
+      if(!files) {
+        resolve();
+      } else {
+        if(!Array.isArray(files)) {
+          files = [files];
+        }
+        if(!files.length) {
+          resolve();
+        }
+        var len = -(files.length);
+        files.forEach(function(file) {
+          if(typeof file == "string"){
+            requestFile(file, availableTags[file], function() {
+              loaded();
+            });  
+          } else if(Array.isArray(file)) {
+            new Promise(function(r){
+              processRequirements(file, r);
+            }).then(function(){
+              loaded();
+            })
+          } else {
+            new Promise(function(r){
+              processRequirements(file.parent, r);
+            }).then(function(){
+              new Promise(function(r1){
+                processRequirements(file.child, r1)
+              }).then(function(){
+                loaded();
+              })
+            })
+          }
+        })
+      }
+
+      function loaded() {
+        len++;
+        if(len == 0){
+          resolve();
+        }
+      }
+      
+      function requestFile(file,cached,resolve) {
+        if(reqFiles[file]) {
+          reqFiles[file].$.push({ type: req, index: index ,resolve : resolve});
+        } else {
+          reqFiles[file] = {$ : [{type : req, index : index}]};
+          if(cached && cached.event.type != "error") {
+            if(removeFromCache.indexOf(file) != -1) {
+              removeFromCache.splice(removeFromCache.indexOf(file),1);
+            }
+            fileLoaded.call(cached.tag,cached.event,true);
+            resolve();
+          } else {
+            Lyte.injectResources([file],fileLoaded, resolve);
+          }
+        }
+      }
+
+      function fileLoaded(event,cached) {
+        var file = this.getAttribute('src') || this.getAttribute('href');
+        if(!cached) {
+            if(availableTags[file]) {
+              availableTags[file].tag.remove();
+            }
+            this.onerror = this.onload = undefined;
+            availableTags[file] = {tag : this, event : {type : event.type}};
+        }
+        requirements.set(file,event,cached);  
+      }
+    }
+  }
+
+  var requirements = {
+    get : function(def,type) {
+      return def[type+'Loaded'] != false;
+    },
+    set : function(file,event) {
+      if(reqFiles[file]) {
+        var respDetails = reqFiles[file].$;
+        respDetails.forEach(function(resp) {
+          var def = trans.currentRoutes[resp.index];
+          if(resp.resolve) {
+            resp.resolve();
+          }
+          if(event.type == "error") {
+            var type = getRequirementsErrorType(resp.type);
+            def[type] ? def[type].push(event) : (def[type] = [event]);
+          }
+        });
+        delete reqFiles[file];
+      }   
+    }
+  }
+
+  var getRequirementsErrorType = function(type) {
+    return type == "_dependencies" ? "_errorDependencies" : "_errorResources";
+  } 
+
+  function templateDelete(arr) {
+    arr.forEach(function(obj) {
+      for (var inst, i = obj.routeInstances.length - 1; i >= obj.index; i--) {
+        inst = obj.routeInstances[i];
+        if (inst.outlet) {
+          if (inst.component) {
+            inst.component._route = undefined;
+          }
+          Lyte.triggerEvent("beforeTemplateDestroy", inst.outletName, inst);
+          inst.outlet.innerHTML = "";
+        }
+      }
+    });
+  }
+
+  Transition.prototype.run = function() {
+    var run = {},
+    action,
+    boundParams = params.bind(this);
+      
+    function params(index,model) { 
+      return {queryParams : this.currentRoutes[index]._queryParams, 
+              dynamicParam : this.currentRoutes[index]._dynamicParams}
     };
 
-    run.beforeModel = run.model = function(hook,index) {
-      return callHookWithPromise.call(this,this.currentRoutes[index][hook],this.routeInstances[index],params(index));
+    run.getResources = run.getDependencies = function(hook,index) {
+      var req = {getDependencies : "_dependencies",getResources : "_resources"},
+      currentRoute = this.currentRoutes[index],
+      callback = currentRoute[hook],
+      routeInstance = this.routeInstances[index],
+      require = callAction(callback,routeInstance,boundParams(index));
+      currentRoute[req[hook]+'Loaded'] = callback ? false : true;
+      if(callback && !this.aborted && !this.paused) {
+        currentRoute[req[hook]] = require;
+        getRequirements({inst : routeInstance, currentRoute : currentRoute, req : req[hook], index : index})
+      }  
+      
+      return callHook();
+    };
+
+    run.beforeModel = run.model = run.afterModel =  function(hook,index) {
+      return callHook(this.currentRoutes[index][hook],this.routeInstances[index],boundParams(index));
     };
 
     run.afterModel =  function(hook,index) {
       var routeInstance = this.routeInstances[index];
-      return callHookWithPromise.call(this,this.currentRoutes[index][hook],routeInstance,routeInstance.currentModel,params(index));
+      return callHook(this.currentRoutes[index][hook],routeInstance,routeInstance.currentModel,boundParams(index));
     };
 
-    run.onError = function(index,errObj) {
-      consoleError(420,errObj.hook,this.routeInstances[index].routeName);
-      for(; index >= 0; index--) {
-          if(callAction.call(this,"onError",index,[errObj.error,this.routeTrans,params(index),errObj.hook]) == false) {
-            break;
-          }  
-        }
-      if(this.paused) {
-        this.abort({state : errObj.state, internalAbort : true});
-      }
-    };
-
-    run.willTransition = function(hook,index) {
-      if(callAction.call(prevTrans,hook,index,[trans.routeTrans]) == false) {
-        removeHook(trans.runLoop.previous,hook);
-      }
-      return callHookWithPromise();
-    };
-
-    run.beforeRouteTransition = function() {
-      if(newTransInfo && !this.aborted) {
-        newTransInfo.state = getHistoryState({replace : newTransInfo.replace,data : trans.routeTrans.data,matched : trans.matched});
-        LR.beforeRouteTransition(prevTrans && prevTrans.routeTrans || undefined, trans.routeTrans, getHistoryObj(newTransInfo));
-        trans.routeTrans.state = 102;
-        if(newTransInfo && trans.routeTrans.data) {
-          newTransInfo.state.data = trans.routeTrans.data
-        }
-        addToHistory(newTransInfo);
-        newTransInfo = undefined;
-        trans.runningPromise.reject('aborted');
-        processedDispatch.previous = false;
-        trans.runLoop = constructRunLoop(processedDispatch);
-        trans.run();
-      }
-      return callHookWithPromise();
-    };
-
-    run.onBeforeLoad = function() {
-      trans.beforeLoadCalled = true;
-      return new Promise(function(resolve,reject) {
-        for(var len,i=1;i <= trans.matched.route.length;i++) {
-          len = trans.matched.route.length-i;
-          if((callAction.call(trans,"onBeforeLoad",len,[params(len)]) == false) || (i == trans.matched.route.length)) {
-            resolve();
-            break;
+    callOnError = run.onError = function(hook,index,error) {
+      var routeInstance = trans.routeInstances[index],
+      resp;
+      console.error('Error on '+hook+' of route '+routeInstance.routeName);  
+      for(var action,i = trans.currentPromise.index;0 <= i;i--) {
+        if(trans.currentRoutes[i].actions && (action = trans.currentRoutes[i].actions.onError)) {
+          if(action.call(trans.routeInstances[i],error,trans.routeTrans,boundParams(index),hook) == false) {
+            i = -1;
           }
-        }
-      });
-    };
+        } 
+      }
+      if(trans.paused) {
+        trans.abort();
+      }
+    }
+
+    function callAction(callback,instance) {
+      if(callback) {
+        var hook = trans.currentPromise.hook,
+        stopTrans = _presence(["getResources","getDependencies"],hook);
+        try {
+          return callback.apply(instance,Array.from(arguments).slice(2));
+        } catch(err) {
+          processError(stopTrans,err,instance);
+          return;
+        }  
+      }
+    }
+
+    function processError(stopTrans,err,instance) {
+      if(trans.currentPromise) {
+        var hook = trans.currentPromise.hook,
+        index = trans.currentPromise.index,
+        state = trans.currentPromise.state;
+        trans.pause();
+        console.error(err);
+        if(!stopTrans) {
+          console.error('Error on '+hook+' of route '+instance.routeName);
+          if(_presence(["willTransition","didTransition","beforeExit"],hook)) {
+            trans.resume()
+          } else {
+            trans.abort();
+          }
+        } else {
+          callOnError(hook,index,err);
+        }  
+      }
+    }
+
+    function callHook(callback,instance) {
+      if(callback) { 
+        var args = arguments,
+        resp,
+        hook = trans.currentPromise.hook, 
+        stopTrans = _presence(["beforeModel","model","afterModel"],hook);
+        return Promise.resolve(new Promise(function(resolve,reject) {
+          try {
+            resp = Promise.resolve(callback.apply(instance,Array.from(args).slice(2)));
+          } catch(err) {
+            processError(stopTrans,err,instance);
+            return;
+          }
+          resp.then(function(data) {
+            resolve(data);
+          },function(err) {
+            console.error(err);
+            if(hook == "model") {
+              instance.currentModel = err;
+            } 
+            processError(stopTrans,err,instance);
+          });  
+        }));
+      } else {
+        return Promise.resolve();
+      }
+    }
 
     run.redirect =  function(hook,index) {
       var routeInstance = this.routeInstances[index];
-      return callHookWithPromise.call(this,this.currentRoutes[index][hook],routeInstance,routeInstance.currentModel,params(index));
+      return callHook(this.currentRoutes[index][hook],routeInstance,routeInstance.currentModel,boundParams(index));
     };
 
     run.afterRender = function(hook,index) {
-      this.routeInstances[index].__lp.rendered =  true;
-      return new Promise(function(resolve, reject) {
-        var ar = setTimeout(function() {
-          var routeInstance = this.routeInstances[index];
-          callHookWithPromise.call(this,this.currentRoutes[index][hook],routeInstance,routeInstance.currentModel,params(index),routeInstance.component).then(function(data) {
-            resolve(data);
-          }, function(data) {
-            reject(data);
-          });
-        }.bind(this,hook,index),0);
-        this.timeouteFns.push(ar);          
-      }.bind(this));
+      var routeInstance = this.routeInstances[index];
+      routeInstance._rendered = true;
+      return callHook(this.currentRoutes[index][hook],routeInstance,routeInstance.currentModel,boundParams(index),routeInstance.component);
+    };
+    
+    run.willTransition = function(hook,index) {
+      var prevCurrentRoute = prevTrans.currentRoutes[index];
+      if(prevCurrentRoute.actions && (action = prevCurrentRoute.actions[hook]) && (callAction(action,prevTrans.routeInstances[index],trans.routeTrans) == false)) {
+        removeHooks("previous",hook);
+      }
+      return callHook()
     };
     
     run.didTransition = function(hook,index) {
-      return new Promise(function(resolve, reject) {
-        var dt = setTimeout(function() {
-          run.removeTemplate.call(this,this.runLoop.templateToRemove);
-          if(callAction.call(this,hook,index,[params(index),trans.routeTrans]) == false) {
-            removeHook(trans.runLoop.current,hook);
-          }
-          resolve();
-          if(index == 0) {
-            transitionCompleted({state : 200});
-          }
-        }.bind(this,hook,index),0);
-        this.timeouteFns.push(dt);          
-      }.bind(this));
+      var toCall;
+      if(this.currentRoutes[index].actions && (action = this.currentRoutes[index].actions[hook]) && (callAction(action,this.routeInstances[index],boundParams(index)) == false)) {
+        toCall = true;
+        removeHooks("current",hook);
+      }
+      if(toCall || !index) {
+        run.removeTemplate(trans.runLoop.current.removeTemplate);
+        transitionCompleted();
+      }
+      return callHook();
     };
 
     run.beforeExit = function(hook,index) {
       var prevTransRouteInstance = prevTrans.routeInstances[index],
       callback = prevTrans.currentRoutes[index][hook];
-      return callHookWithPromise.call(this,callback,prevTransRouteInstance,prevTransRouteInstance.currentModel,params(index,prevTrans));
+      return callHook(callback,prevTransRouteInstance,prevTransRouteInstance.currentModel,params.call(prevTrans,index));
     };
 
     run.renderTemplate = function(hook,index) {
       var currentRoute = this.currentRoutes[index],
       routeInstance = this.routeInstances[index];
-      if(this.runLoop.templateToRemove && this.currentRoutes.length == index+1) {
-        run.removeTemplate.call(this,this.runLoop.templateToRemove)
+      if(trans.runLoop.current.removeTemplate && this.currentRoutes.length == index+1) {
+        run.removeTemplate(trans.runLoop.current.removeTemplate)
       }
       if(this.currentRoutes[index][hook]) {
-        var renderTemplate = callHookWithoutPromise.call(this,currentRoute[hook],routeInstance,hook,routeInstance.currentModel,params(index));
-        if(!this.aborted) {
-          run.removeTemplate.call(this,this.runLoop.templateToRemove);
-          if(visibleTrans != this) {
-            visibleTrans = this;
-          }
-          if(renderTemplate && renderTemplate.outlet) {
-            routeInstance.outletName = renderTemplate.outlet;
-            var data = routeInstance.currentModel,
-            outlet;
-            if(outlet = getOutlet(renderTemplate.outlet,routeInstance.parent)) {
-              if(renderTemplate.component) {
-                var component;
-                if(routeInstance.component && (routeInstance.component.tagName.toLocaleLowerCase() == renderTemplate.component) && routeInstance.outlet == outlet && outlet.contains(routeInstance.component)) {
-                  component = routeInstance.component;
-                  component._route = routeInstance;
-                  routeInstance.outlet = outlet;
-                  routeInstance.component = component;
-                  setDataInComponent.call(this,component,data);
-                } else {
-                  Lyte.triggerEvent("beforeTemplateDestroy", renderTemplate.outlet , routeInstance);
-                  outlet.innerHTML = '';
-                  component = document.createElement(renderTemplate.component);
-                  component._route = routeInstance;
-                  routeInstance.outlet = outlet;
-                  routeInstance.component = component;
-                  setDataInComponent(component,data);
-                  outlet.appendChild(component);
-                }
-              } else if(renderTemplate.html) {
-                routeInstance.component = undefined;
+        var renderTemplate = callAction(currentRoute[hook],routeInstance,routeInstance.currentModel,params.apply(this,[index]));
+        if(renderTemplate && trans.runLoop.current.removeTemplate) {
+          run.removeTemplate(trans.runLoop.current.removeTemplate)
+        }
+        if(renderTemplate && renderTemplate.outlet) {
+          routeInstance.outletName = renderTemplate.outlet;
+          var data = routeInstance.currentModel,outlet,parentOutlet;
+          if(outlet = getOutlet(renderTemplate.outlet,routeInstance.parent)) {
+            if(renderTemplate.component) {
+              var component;
+              if(routeInstance.component && routeInstance.outlet == outlet && outlet.contains(routeInstance.component)) {
+                component = routeInstance.component;
+                component._route = routeInstance;
                 routeInstance.outlet = outlet;
-                Lyte.triggerEvent("beforeTemplateDestroy", renderTemplate.outlet ,routeInstance);
-                outlet.innerHTML = renderTemplate.html;
-                var scripts = outlet.getElementsByTagName('script');
-                if(scripts.length) {
-                  scriptExecution(Array.from(scripts),outlet);
-                }
+                routeInstance.component = component;
+                setDataInComponent(component,data)
+              } else {
+                Lyte.triggerEvent("beforeTemplateDestroy", renderTemplate.outlet , routeInstance);
+                outlet.innerHTML = '';
+                component = document.createElement(renderTemplate.component);
+                component._route = routeInstance;
+                routeInstance.outlet = outlet;
+                routeInstance.component = component;
+                setDataInComponent(component,data)
+                outlet.appendChild(component);
+              }
+            } else if(renderTemplate.html) {
+              routeInstance.component = undefined;
+              routeInstance.outlet = outlet;
+              Lyte.triggerEvent("beforeTemplateDestroy", renderTemplate.outlet ,routeInstance);
+              outlet.innerHTML = renderTemplate.html;
+              var scripts = outlet.getElementsByTagName('script');
+              if(scripts.length) {
+                scriptExecution(Array.from(scripts),outlet);
               }
             }
-          } else {
-            console.warn("renderTemplate hook should return either component or HTML. Rendering of HTML directly into the DOM within the renderTemplate hook is deprecated.");
           }
-        }  
+        }
       }
-      return callHookWithPromise();
+      return callHook();
 
       function setDataInComponent(component,data) {
         if(data) {
            if(typeof data == "object" && !Array.isArray(data)) {
             component.setData(data);
           } else {
-            processError.call(this,true,Error(getError(203)).stack,routeInstance);
+            processError(true,new Error('Data provided for component is not valid.').stack,routeInstance)
           }   
         }
       }
@@ -974,12 +1746,10 @@ if(document.readyState === "complete" || document.readyState === "interactive") 
       function getOutlet(outlet,parent) {
         var _outlet;
         if(parent) {
-          _outlet =  parent.outletName ? document.querySelector(parent.outletName).querySelector(outlet) : undefined;
-          if(!_outlet) {
-            return getOutlet(outlet,parent.parent);
-          }
+            _outlet =  parent.outletName ? document.querySelector(parent.outletName).querySelector(outlet) : undefined;
+            if(!_outlet) { return getOutlet(outlet,parent.parent) }
         } else if(!(_outlet = document.querySelector(outlet))) {
-          consoleError(428,outlet);
+          console.error('There is no outlet named ' +outlet+'.');
         }
         return _outlet;
       }
@@ -992,1959 +1762,715 @@ if(document.readyState === "complete" || document.readyState === "interactive") 
             s.setAttribute(currentScript.attributes[j].name, currentScript.attributes[j].value);
           }
           s.innerHTML = currentScript.innerHTML;
-          parent.appendChild(s);
-          parent.removeChild(currentScript);
+          parent.appendChild(s)
+          parent.removeChild(currentScript)
         }
       }
     };
     
     run.removeTemplate = function(arr) {
-      if(!this.routeCleared) {
-        this.routeCleared = true;
-        if (prevTrans && arr) {
-          templateDelete(arr);
-        }
-        delete this.runLoop.templateToRemove;
-        Lyte.removeFromCache();
+      if (prevTrans && arr) {
+        templateDelete(arr);
       }
-    };
-
-    function params(index,t) {
-      t = t || trans;
-      return {queryParams : t.routeInstances[index].__lp.queryParams, 
-              dynamicParam : t.routeInstances[index].__lp.dynamicParam};
-    }
-      
-    function addToHistory(obj) {
-      var type = obj.replace ? "replaceState" : "pushState",
-      url = obj.url ? (config.history ? _delimit(shiftBaseURL(obj.url, true)) : '#'+_delimit(obj.url)) : undefined;
-      obj.title = obj.title || document.title;
-      /* support for windows, undefined is appended to url */
-      if(url) {
-        window.history[type](obj.state, obj.title, url);
-      } else {
-        window.history[type](obj.state, obj.title);
-      }
-      return obj;
-    }
-
-    function getHistoryState(obj) {
-      /* 
-        state data which needs to be pushed to history. 
-          - Matched object is added to process url directly with history back and forward.
-          - Index is used to detect browser back or forward.
-      */
-      return {
-        meta : {
-          matched : obj.matched,
-          index : (obj.replace && history.state && history.state.meta) ? history.state.meta.index : (initialLoad ? history.length-1 : history.length)
-        },
-        data : obj.data
-      };
-    }
-
-    function getHistoryObj(obj) {
-      /* parses history state to history object. */
-      if(!LR.history) {
-        historyRegistration();
-      }
-      LR.history.fromHistory = obj.fromHistory ? ((LR.history.index = obj.state.meta.index) < history.length-1 ? 'back' : 'forward') : false;
-      allowHistoryChange = true;
-      LR.history.state = history.state ? history.state.data : {};
-      LR.history.initial = initialLoad;
-      return LR.history;
-    }
-
-    this.configureDefaults = function(options) {
-      options = options || {};
-      config.history = options.history == "html5" ? true : false;
-      config.baseURL =  options.baseURL;
-      config.deferInit = options.deferInit || false;
-      config.queryParamOptions = {
-        sticky : options.queryParamOptions && options.queryParamOptions.hasOwnProperty('sticky') ?  options.queryParamOptions.sticky : true
-      };
-      this.__lp = {
-        version : "2.0.0",
-        config : config,
-        getDefinition : function(arr,def) {
-          if(arr == "*") {
-            return definitions;
-          } else {
-            def = def || definitions;
-            def = _getObj(arr,def);
-            return def && def.__lp || undefined;  
+      delete trans.runLoop.current.removeTemplate;
+      if(removeFromCache.length) {
+        removeFromCache.forEach(function(file) {
+          if(availableTags[file]) {
+            availableTags[file].tag.remove();
+            delete availableTags[file];  
           }
-        }
-      };
-    }; 
-
-    this.configureRoutes = function (map) {
-      if(!this.__lp) {
-        this.configureDefaults();
-      }
-      config.routes = typeof map == "function" ? parseRouteMapping.call(this, map) : map;
-      if(document.readyState === "complete" || document.readyState === "interactive") { 
-        init();
-      } else {
-        window.addEventListener('DOMContentLoaded', function() {
-          init();
         });
+        removeFromCache = [];
       }
-      function init () { /* move this code outside.*/
-        if(!config.deferInit && LR.init) {
-          LR.init();
-          delete LR.init;
-        }  
-      }
+      return callHook();
     };
 
-    this.init = function(r) {
-      window.onpopstate = function(onChangeEvent) {
-        if(fromHistoryGo) {
-          fromHistoryGo = false;
-          return;
-        }
-        var url;
-        if(config.history) {
-          url = getLocation();
-          if(trans && trans.url == url) {
-            return;
-          }
-        } else {
-          var newURL = onChangeEvent && onChangeEvent.newURL || dloc.hash;
-          url = checkForEmptyPath(newURL.replace(/.*#/, ''));
-        }
-        historyObj = {fromHistory : true};
-        if(onChangeEvent && history.state) {
-          historyObj.data = history.state;
-        }
-        dispatch(url);
-      };
-      
-      if(config.history) {
-        if(getLocation()) {
-          window.onpopstate();
-        }   
-      } else {
-        historyObj = {fromHistory : true};
-        dispatch(getLocation());
-      }
-      linkToRegistration();
-      return this;
-    };
-    
-    this.beforeRouteTransition = this.afterRouteTransition = function() {};
+    processRunLoop.call(this);
+    document.title = this.title = this.routeInstances[this.routeInstances.length-1].title || document.title;
 
-    function setRouteDef(dir,value) {
-      var cache = definitions,
-      dirLen = dir.length-1;
-      dir.forEach(function(key,i) {
-        if(dirLen === i) {
-          if(cache[key]) {
-            cache[key].__lp = value;
-          } else {
-            cache[key] = {__lp : value};
-          }
-        } else if(!cache[key])  {
-          cache[key]={};
-        }
-        cache = cache[key];
-      });
-    }   
-
-    function linkToRegistration() {
-      class LinkTo extends HTMLElement {
-        static get observedAttributes() {
-          return ['lt-prop-route', 'lt-prop-dp', 'lt-prop-fragment', 'lt-prop-qp', 'lt-prop', 'lt-prop-class', 'lt-prop-id', 'lt-prop-rel', 'lt-prop-title', 'lt-prop-style', 'lt-prop-target'];
-        }
-        attributeChangedCallback(attr, oldValue, newValue) {
-          if(this.hasAttribute("lyte-rendered") && this._linkCreated) {
-            let firstChild = this.children[0];
-            //If attr is ltProp
-            if(attr === "lt-prop") {
-              this.handleLtProp();
-              if(!this.hasAttribute("lt-prop-custom")) {
-                this.setCustomAttributes(firstChild, true);
-              }
-              if(!this.pendingCallback) {
-                this.pendingCallback = true;
-                setTimeout(function() {
-                  this.pendingCallback = false;
-                  this.getMatchedObject();
-                }.bind(this),0);  
-              }
-              if(firstChild.tagName === "A") {
-                this.constructHref(firstChild);
-              }
-            } 
-            //if it is a route transition attribute
-            else if(/^(lt-prop-route|lt-prop-fragment|lt-prop-dp|lt-prop-qp)$/.test(attr)) {
-              this.getMatchedObject();
-              if(firstChild.tagName === "A") {
-                this.constructHref(firstChild, attr, oldValue, newValue);
-              }
-            }
-            //for rest of the attributes
-            else if(!this.hasAttribute('lt-prop-custom')) {
-              firstChild.setAttribute(attr.substring(8), newValue);
-            }
-          }
-        }
-        connectedCallback() {
-          this.ltProp = this.ltProp || {};
-          if(this.hasAttribute("lyte-rendered")) {
-          this._linkCreated = true;
-          this.getMatchedObject();
-          return;
-          } 
-          this.handleLtProp();
-          let isCustom = this.hasAttribute("lt-prop-custom") || this.ltProp.custom,
-          linkTag;
-          if(isCustom) {
-            //To set the matched object. 
-            this.getMatchedObject();
-            if(this.children[0].tagName === "A") {
-              //update only href.
-              this.constructHref(this.children[0]);
-            }
-          } else {
-            linkTag = document.createElement("a");
-            let length = this.childNodes.length;
-              for(let i=0; i<length; i++) {
-                linkTag.appendChild(this.childNodes[0]);
-              }
-              //update Href and other attributes to linkTag
-              this.setCustomAttributes(linkTag);
-              // sets Matched Obj in this and constructs href
-              this.getMatchedObject();
-              this.constructHref(linkTag);
-              this.appendChild(linkTag);
-          }
-          this.setAttribute("lyte-rendered", "");
-          if(LyteComponent) {
-            this._linkToEventId = LyteComponent.addLyteEventListener(this, "click", function(event) {
-              linkToEventListener(event, this);
-            }, this);
-          } else {
-            this.addEventListener("click", linkToEventListener);
-          }
-          //linkToEventListener(this);
-          this._linkCreated = true;
-        }
-        modifyLinkToTagsInRoute(remove) {
-          let def = definitions;
-          let routes = remove && remove != true ? remove : this.matched.route;
-          if(!routes) {
-            consoleError(498,"route","link-to");
-            return;
-          } 
-          routes =  dotSerperator(routes);
-          routes.forEach(function(r) {
-            def =  _getObj(r,def);
-            if(!def || !def.__lp) {
-              Error(getError(422,this.matched.target));
-              return false;
-            }
-            var definition = def.__lp.__lp;
-            if(remove) {
-              definition.linkTags.splice(definition.linkTags.indexOf(this),1);
-            } else {
-              definition.linkTags.push(this);  
-            }
-          }.bind(this));
-        }
-        disconnectedCallback() {
-          if(this._linkToEventId && !LyteComponent.ignoreDisconnect) {
-            this.modifyLinkToTagsInRoute(true);
-            LyteComponent.removeLyteEventListener(this, this._linkToEventId);
-          }
-        }
-        handleLtProp() {
-          var ltProp = this.getAttribute("lt-prop");
-          if(ltProp) {
-            try{
-              var jsonObj = JSON.parse(ltProp);
-              this.ltProp = jsonObj;
-            } catch(e) {
-              console.warn("Error while parsing ltProp in link-to");
-            }
-          }
-        }
-        setCustomAttributes(linkTag, onlyLtProp) {
-        for(let key in this.ltProp) {
-          if(/^(id|class|style|target)$/.test(key)) {
-              linkTag.setAttribute(key, this.ltProp[key]);
-            }
-        }
-        if(!onlyLtProp) {
-          var attrs = this.attributes;
-          for(let i=0;i<attrs.length;i++) {
-            let attrName = attrs[i].nodeName;
-            if(attrName !== "lt-prop" && /^(lt-prop-id|lt-prop-class|lt-prop-style|lt-prop-target)$/.test(attrName)) {
-              linkTag.setAttribute(attrName.substring(8), attrs[i].nodeValue);
-            }
-          }
-        }
-        }
-        constructHref(linkTag, attr, oldValue , newValue) {
-          let href;
-          if(href = LR.getURL(this.matched)) {
-            linkTag.setAttribute("href", href); 
-            if(attr) {
-              if(attr == "lt-prop-route") {
-                this.modifyLinkToTagsInRoute(oldValue);
-                this.modifyLinkToTagsInRoute();
-              } else {
-                this.modifyLinkToTagsInRoute(this.matched.route);
-                this.modifyLinkToTagsInRoute();
-              }
-            } else {
-              this.modifyLinkToTagsInRoute();
-            }
-          }
-        }
-      }
-      LinkTo.prototype.getMatchedObject = function(reset) {
-        let matched = reset ? {} : (this.matched ? this.matched : {});
-        matched.route = this.getAttribute("lt-prop-route") || this.ltProp.route;
-        matched.fragment = this.getAttribute("lt-prop-fragment");
-        let dynamicParams = this.getAttribute("lt-prop-dp") || this.ltProp.dp || [],
-        queryParams = this.getAttribute("lt-prop-qp") || this.ltProp.qp || {};
-        if(!(dynamicParams instanceof Array)) {
-          try {
-            matched.dynamicParams = JSON.parse(dynamicParams) || [];  
-          } catch(e) {
-            consoleError(498,"dynamicParams","link-to");
-            matched.dynamicParams = [];
-            return;
-          }
-        } else {
-          matched.dynamicParams = [];
-        }
-        if(!(queryParams instanceof Object)) {
-          try{
-            matched.queryParams = JSON.parse(queryParams);
-          } catch(e) {
-            consoleError(498,"queryParams","link-to");
-            matched.queryParams = {};
-          }
-        } else {
-          matched.queryParams = {};
-        }
-        return this.matched = matched;
-      };
-      customElements.define('link-to', LinkTo);
-    }
-
-    function linkToEventListener(event, linkTo) {
-      if(event.button == 2 || event.defaultPrevented) {
-        return;
-      }
-      var targetElem = linkTo || event.currentTarget;
-      if(targetElem.children[0].tagName === "A" && (event.ctrlKey == true || event.metaKey == true || event.which == 2 || (targetElem.children[0].hasAttribute("target") && targetElem.children[0].getAttribute("target") !== "_self")) ) {
-        return;  
-      }
-      event.preventDefault();
-      var currentTransition = LR.getRouteInstance().transition,
-      transitionInstance;
-      if(currentTransition && LR.checkIfSameRoute(targetElem.matched, currentTransition.info) && targetElem.hasAttribute("lt-prop-refresh-route")) {
-          transitionInstance = LR.getRouteInstance(targetElem.getAttribute("lt-prop-refresh-route")).refresh(); 
-      } else {
-        transitionInstance = LR.transitionTo(targetElem.matched);
-      }
-      var transObj = {};
-      if(targetElem.getAttribute("lt-prop-trans")) {
-        try{
-          transObj = JSON.parse(targetElem.getAttribute("lt-prop-trans"));  
-        }
-        catch(e) {
-          consoleError(498, "lt-prop-trans", "link-to");
-        }
-      }
-
-      let transitionData = targetElem.getAttribute("lt-prop-td");
-      transitionData = transitionData || transObj.data;
-      if(transitionData) {
-        if(typeof transitionData === "string") {
-          try{
-          transitionData = JSON.parse(transitionData);
-          } catch(e) {
-            consoleError(498, "lt-prop-td", "link-to");
-          }
-        }
-        transObj.data = transitionData;
-      }
-      for(var key in transObj) {
-        transitionInstance[key] = transObj[key];
-      }
-    }
-
-    this.checkIfSameRoute = function(transInfo1, transInfo2) {
-      if(transInfo1.route == transInfo2.route && transInfo1.dynamicParams.length === transInfo1.dynamicParams.length && _compareObj(transInfo1.queryParams,transInfo2.queryParams)) {
-        if(transInfo1.dynamicParams.length) {
-          for(var i = 0; i <= transInfo1.dynamicParams.length; i++) {
-            return transInfo1.dynamicParams[i] == transInfo2.dynamicParams[i];
-          }
-        }
-        return true;
-      }
-      return false;
-    };
-
-    this.addRoutes = function(map) { 
-      console.warn("addRoutes function will be deprecated from next version");
-      Object.assign(config.routes,parseRouteMapping.call(routeParser,map));
-    };
-
-    function dotSerperator(str) {
-      return str.split('.').filter(function(s) {return s != "";});
-    }
-    
-    function _arrayClean(e) {
-       return e != undefined;
-    }
-
-    function parseRouteMapping(map) {
-      Lyte.time('parseRouteMapping');
-      var routesObj = {},
-      mapObj = {}, 
-      pathStringArr = [], 
-      routeStringArr = [];
-      routeParser = {
-        route : function(routeName,obj,nestedFn) {
-          if(typeof obj == "object") {
-            if(!obj.path) {obj.path = _delimit(routeName);}
-            if(_presence(obj.path,"?")) {
-              var split = obj.path.split('?');
-              obj.defQP = Router.frameQueryParams(split[1]);
-              obj.path = split[0];
-            } else if(obj.queryParams) {
-              obj.defQP = obj.queryParams;
-              delete obj.queryParams;
-            }
-          } else {
-            if(typeof obj == "function") {
-              nestedFn = obj;
-            }
-            obj = {path : _delimit(routeName)};  
-          }
-          if(obj.path == '/') {
-            mapObj = _getObj(pathStringArr,routeHash)[obj.path] = {__lp : {}};
-            pathStringArr.push('/');
-          } else {
-            var trimedPath = obj.path;
-            mapObj = _getObj(pathStringArr,routeHash)[obj.path] = {__lp : {}};
-            if(dynamicRouteCheck(trimedPath) || wildcardRouteCheck(trimedPath)) {
-              _splitPath(trimedPath).every(function(seg,index,arr) {
-                if(dynamicRouteCheck(seg)) {
-                  obj.dynamicKey = mapObj.__lp.dynamicKey = seg.replace(":","");
-                  obj.dynamicIndex = mapObj.__lp.dynamicIndex = index;
-                  return false;
-                } else if(wildcardRouteCheck(seg)) {
-                  obj.dynamicKey = mapObj.__lp.dynamicKey = seg.replace("*","");
-                  obj.dynamicIndex = mapObj.__lp.dynamicIndex = index;
-                  obj.wildcard = mapObj.__lp.wildcard = true;
-                  obj.sufix = mapObj.__lp.sufix = [];
-                  for(var indx=index+1;indx<arr.length;indx++){
-                    mapObj.__lp.sufix.push(arr[indx]);
-                  }
-                  return false;
-                }
-                return true;
-              });
-            } else {
-              obj.dynamicKey = mapObj.__lp.dynamicKey = undefined;
-            }
-            pathStringArr.push(trimedPath);
-          }
-          routeStringArr.push(routeName);
-          mapObj.__lp.route = Array.from(routeStringArr);
-          var routes = routesObj;
-          routeStringArr.forEach(function(r,index) {
-            if(index +1 != routeStringArr.length) {
-              routes = routes[r]; 
-            }
-          });
-          routes[routeName] = {__lp : obj};
-          if(nestedFn) {
-            nestedFn.call(this,{});
-          }
-          routeStringArr.pop();
-          pathStringArr.pop();
-        }
-      };
-      map.call(routeParser,{});
-      Lyte.time('parseRouteMapping');
-      return routesObj;
-    }
-
-    this.replaceWith = function() {
-      var args = normalizeTransitionParams.apply(this,arguments);
-      if(args) {
-        args.replace = true;
-        return routeTransition(args);   
-      }
-    };
-
-    this.transitionTo = function() {
-      var matched;
-      if(matched = normalizeTransitionParams.apply(this,arguments)) {
-        return routeTransition(matched);  
-      }
-    };
-
-    this.getURL = function () {
-      var url,matched;
-      if(matched  = normalizeTransitionParams.apply(this,arguments)) {
-        url = constructURLFromRoute(matched);
-      }
-      return config.history ? shiftBaseURL(url, true) : '#'+url;
-    };
-
-    this.getRoute = function(url) {
-      var matched = traverse(shiftBaseURL(url),true);
-      if(matched) {
-        matched.dynamicParams = matched.dynamicParams.filter(_arrayClean);
-        matched.route = matched.route.join('.');
-      }
-      return matched;  
-    };
-
-    function routeTransition(matched) {
-      if(matched) {
-        if(typeof matched == "object") {
-          var url;
-          newTransInfo = {replace : matched.replace, title : trans ? trans.title : document.title,fromHistory : false};
-          url = dispatchTransition(matched);
-          Lyte.log('Transitioning to '+matched.route.join('.')+' '+url,logger);
-        } else {
-          consoleError(498,JSON.stringify(matched));
-        }
-        return trans.routeTrans;  
-      } else {
-        consoleError(499);
-      }
-    }
-
-     function getLocation() {
-      if(config.history) {
-        var path = checkForEmptyPath(dloc.pathname + dloc.search + (dloc.hash || ""));
-        path = shiftBaseURL(path);
-        return _delimit(path);  
-      } else {
-        return _delimit(checkForEmptyPath(dloc.hash.replace(/^(#\/|#|\/)/, '')));
-      }
-    }
-
-    function checkForEmptyPath(path) {
-      if(!path) {
-        addToHistory({
-          replace : true,
-          state : getHistoryState({
-            replace : true,
-            data : history.state && history.state.data || undefined
-          }),
-          url: (path = '/') 
-        });
-      }
-      return path;
-    }
-
-    function shiftBaseURL(path,append) {
-      var baseURL = config.baseURL;
-      if(baseURL && path) {
-        baseURL = _delimit(config.baseURL);
-        if(path.indexOf(baseURL) == 0 && !append) {
-          return path.replace(baseURL,'');
-        } else if(append && path.indexOf(baseURL) == -1) {
-          return baseURL+path;
-        } 
-      } 
-      return path;
-    }
-
-    function constructURLFromRoute(matched) {
-      if(matched) {
-        if(matched.route && !Array.isArray(matched.route)) {
-          matched.route = dotSerperator(matched.route);
-        }
-        var sameRoute = trans ? true : false,
-        refreshModel = false,
-        qp,
-        def = definitions,
-        routeObj = config.routes,
-        url = '';  
-        matched.route.forEach(function(route,index) {
-          if(sameRoute && trans && trans.matched.route[index] != route) {
-            sameRoute = false;
-          }
-          var _route = matched.route.slice(0,index+1);
-          routeObj = _getObj(route,routeObj);
-          def = _getObj(route,def);
-          if(!routeObj && !routeObj.__lp) {
-            consoleError(422,_route.join('.'));
-            return false;
-          }
-          var path = routeObj.__lp.path;
-          if(!def || !def.__lp) {
-            if(defaultQP = routeObj.__lp.defQP) {
-              for(var key in defaultQP) {
-                if(matched.queryParams && !matched.queryParams.hasOwnProperty(key)) {
-                  matched.queryParams[key] = defaultQP[key];
-                } 
-              }
-            }
-          } else if(def.__lp.queryParams) {
-            var defaultQP = routeObj.__lp.defQP,
-      queryParamsDef = def.__lp.__lp.queryParamsDef;
-            for(var key in queryParamsDef) {
-              if(!matched.queryParams.hasOwnProperty(key)) {
-                if(sameRoute && queryParamsDef[key].sticky) {
-                  matched.queryParams[key] = def.__lp.__lp.queryParams[key];
-                } else if(defaultQP && defaultQP.hasOwnProperty(key)) {
-                  matched.queryParams[key] = defaultQP[key];
-                }
-              }
-              if(!refreshModel && queryParamsDef[key].refreshModel) {
-                matched.refreshModel = true;
-              }
-            }
-          }
-          if(routeObj.__lp.dynamicKey) {
-            var dynamicPathSplit = _splitPath(path);
-            if(!matched.dynamicParams || matched.dynamicParams[index] == undefined) {
-              consoleError(499,route);
-              return false;   
-            } else {
-              dynamicPathSplit[routeObj.__lp.dynamicIndex] = encodeURI(matched.dynamicParams[index]);
-              url += _delimit(dynamicPathSplit.join('/')); 
-            } 
-          } else {
-            url += _delimit(path);
-          }
-        }.bind(this));
-        url = url[url.length-1] == '/' && url.length != 1  ? url.slice(0,-1) : url;
-        qp = Object.keys(matched.queryParams).filter(function(key){
-            return matched.queryParams[key] == undefined ? false : key;
-          });
-        if(matched.queryParams && qp.length) {
-          url += '?';
-          qp.forEach(function(key,index) {
-            url+= key+'='+encodeURIComponent(matched.queryParams[key])+(index < qp.length-1 ? '&' : '');  
-          });
-        }
-        if(config.history && matched.fragment) {
-          url = url+"#"+matched.fragment;
-        }
-        return validateURL(url);
-      }
-    }
-
-    function historyRegistration() {
-      LR.history = new History();
-      function History() {
-        return this;
-      }
-
-      Object.defineProperty(History.prototype, 'state', {
-        get : function() {
-          return history.state.data;
-        },
-        set : function(data) {
-          if(allowHistoryChange) {
-            allowHistoryChange = false;
-          } else {
-            console.warn('setting on data will not be pushed to history. If needed, use `Lyte.Router.history.replaceState`.');
-          }
-          return data;
-        }
-      });
-
-      History.prototype.replaceState = function() {
-        stateChange.apply(Array.from(arguments).push(true));
-      };
-
-      History.prototype.pushState = function() {
-        stateChange.apply(Array.from(arguments));
-      };
-
-      function stateChange(data,title,url,replace) {
-        addToHistory({
-          state : {
-            meta : replace ? history.state.meta : history.state.meta+1,
-            data : data
-          },
-          title: title, 
-          url: url
-        });
-      }
-    }  
-
-    function dispatch(path,processed) {
-      Lyte.time('RouteTransition');
-      if(trans && (trans.routeTrans.state && trans.routeTrans.state == 102  || (prevTrans && trans != prevTrans))) {
-        clearTimeout(invokeRunLoop);
-        trans.abort({state : 409, internalAbort : true});
-      }
-      processed = processed || (!initialLoad && history.state && history.state.meta && history.state.meta.matched ? setParamsInDef(history.state.meta.matched) : traverse(path));
-      if(processed && processed.matched.route.length) {
-        processed.prevTrans = processed.prevTrans || prevTrans;
-        invoke(path,processed);
-        invokeRunLoop = setTimeout(function() {
-          Lyte.time('constructRunLoop');
-          processed.previous = true;
-          trans.runLoop = constructRunLoop(processedDispatch = processed);
-          if(newTransInfo && trans.routeTrans.data) {
-            newTransInfo.data = trans.routeTrans.data;
-          }
+    function processRunLoop() {
+      this.pending = {};
+      new Promise(function(resolve,reject) {
+        this.runningPromise = {resolve : resolve, reject : reject};
+        nestedPromises.call(this,this.runLoop,'previous',resolve);
+      }.bind(this)).then(function() {
+        if(newTransInfo) {
+          LR.beforeRouteTransition((decidedTrans && decidedTrans.routeTrans || prevTrans && prevTrans.routeTrans || undefined),trans.routeTrans,newTransInfo);
           trans.running = true;
-          trans.run();
-          Lyte.time('constructRunLoop');  
-        },0);
-      } 
+          newTransInfo.data = trans.routeTrans.data;
+          listener.addToHistory(newTransInfo);
+          newTransInfo = undefined;
+        } else if(trans.routeTrans.data) {
+          listener.addToHistory({data : trans.routeTrans.data,type : "replaceState"});
+        }
+        nestedPromises.call(this,this.runLoop,'current');
+      }.bind(this),function(error) {
+        if(error != 'aborted') {
+          console.error(error)
+          console.log('Promise is rejected');  
+        }
+      });
+    }
+
+    function removeHooks(type,hook) {
+      var index;
+      for(var i = 0;i < trans.runLoop[type].length;i++) {
+        var obj = trans.runLoop[type][i];
+        if(obj.hook == hook) {
+          trans.runLoop[type].splice(i,1);
+          i--;
+        }
+      }
+    }
+
+    function nestedForcedPromises(forcedLoop,resolve) {
+      if(forcedLoop && forcedLoop.length) {
+        var promise = forcedLoop[0],
+        currentRoute = this.currentRoutes[promise.index],
+        routeInstance = this.routeInstances[promise.index];
+        promise.state = "forced";
+        trans.currentPromise = promise;
+        if(promise.hook == "beforeModel" && !requirements.get(routeInstance,'_dependencies')) {
+          this.pending._dependencies = promise.index;
+          return;
+        }
+        logCallbacks(promise);
+        run[promise.hook].call(this,promise.hook,promise.index).then(function(data) {
+          switch(promise.hook) {
+            case "model":
+              this.routeInstances[promise.index].currentModel = data;
+              break;
+            case "afterModel" : 
+              currentRoute._fetchStatus = "completed";
+              if(this.pending.forceFetch != undefined && this.pending.forceFetch == promise.index) {
+                trans.run();
+                // delete this.pending.forceFetch;
+                // nestedPromises.call(this,this.runLoop,'current');
+              }
+              break;
+          }
+          forcedLoop.splice(0,1);
+          nestedForcedPromises.call(this,forcedLoop);
+        }.bind(this)); 
+      }
+    }
+
+    function logCallbacks(promise) {
+      var hook = promise.hook,
+      index = promise.index;
+      var route = promise.state == "previous" ? prevTrans.currentRoutes[index] : trans.currentRoutes[index];
+      Lyte.log(hook +' of route '+route.routeName,logger,'MediumOrchid');  
+    }
+    
+    function nestedPromises(loop,state,resolve) {
+      var runLoop = loop[state];
+      if(runLoop && runLoop.length) {
+        var promise = runLoop[0],
+        currentRoute = this.currentRoutes[promise.index],
+        routeInstance = this.routeInstances[promise.index];
+        if(!this.aborted && !this.paused) {
+          if (promise.hook == "beforeModel" && !requirements.get(currentRoute,"_dependencies")) {
+            this.pending._dependencies = promise.index;
+            return;
+          } else if(promise.hook == "renderTemplate" && !requirements.get(currentRoute,"_resources")) {
+            this.pending._resources = promise.index;
+            return;
+          } else if(promise.hook == "redirect" && currentRoute.forceFetch && currentRoute._fetchStatus == "pending") {
+            if(!this.forceFetchRunning) {
+              nestedForcedPromises.call(this,this.runLoop.forceFetch);
+              this.forceFetchRunning = true;
+            }
+            this.pending.forceFetch = promise.index;
+            return;
+          } else {
+            promise.state = state;
+            trans.currentPromise = promise;
+            logCallbacks(promise);
+            Lyte.time(promise.hook+promise.index)
+            run[promise.hook].call(this,promise.hook,promise.index).then(function(data) {
+              Lyte.time(promise.hook+promise.index)
+              if(promise.hook == "model") {
+                this.routeInstances[promise.index].currentModel = data;
+              } 
+              runLoop.splice(0,1);
+              nestedPromises.call(this,loop,state,resolve);
+            }.bind(this));
+          }
+        } 
+      } else if(resolve) {
+        resolve();
+      }
+    }
+  }
+
+  Router.frameQueryParams = function(url) {
+    if(url && _presence(url,"=")) {
+      var qp = {},params = _presence(url,"?") ? url.split("?")[1] : url;
+      params = _presence(params,"&") ? params.split(/&/g) : [params];
+      params.forEach(function(param) {
+        var split = param.split('=');
+        qp[split[0]] = split[1] ? decodeURIComponent(split[1]) : split[1];
+      });
+      return qp;
+    } 
+    return;    
+  }
+
+  Router.frameDynamicParams = function(url,matched) {
+    if(url) {
+      var routesObj = instance.routes,
+      dynamicParam,
+      framedDP = [],
+      urlSplit = _splitPath(url.split('?')[0]);
+      matched.route.forEach(function(r,i,arr) {
+        routesObj = _getObj([r],routesObj);
+        if(routesObj.$.wildcard) {
+          if(routesObj.$.sufix.length) {
+            var dp = urlSplit.slice(0,urlSplit.indexOf(routesObj.$.sufix[0]));
+            framedDP.push(decodeURI(dp.join('/')));
+            _pop(dp.concat(routesObj.$.sufix));
+          } else {
+            framedDP.push(decodeURI(urlSplit.join('/')));   
+          }
+          return; 
+        } else if(routesObj.$.dynamicKey) {
+          dynamicParam = urlSplit[routesObj.$.dynamicIndex];
+          _pop(_splitPath(routesObj.$.path));
+          framedDP.push(decodeURI(dynamicParam));
+        } else {
+          _pop(_splitPath(routesObj.$.path))
+          framedDP.push(undefined);
+        }
+      });
+      return framedDP;
+      function _pop(path) {
+        path.forEach(function() {
+          urlSplit.shift();
+        });  
+      }
+    }
+  }
+
+  function _presence(str,char) {
+    return str.indexOf(char) != -1 ? true : false;
+  }
+
+  function transitionCompleted(reverseTrans) {
+    if(trans.running) {
+      Lyte.time('RouteTransition');
+      reqFiles = {};
+      trans.running = false;
+      LR.afterRouteTransition(trans.routeTrans);
+      window.$lr = LR.getRouteInstance();
+      Lyte.log('Transition completed.',logger)
+    }
+    if(reverseTrans) {
+      instance.prevTransition = instance.transition = trans = prevTrans;
+    } else {
+      instance.prevTransition = instance.transition = prevTrans =  trans;  
+    }
+  }
+
+  function _arrayClean(r) {
+    return r != undefined;
+  }
+
+  function _arrayUniquePush(arr,value) {
+    if(!_presence(arr,value)) {
+      arr.push(value);
+      return true;
+    }
+    return false;
+  }
+
+  function _objContains(obj,key) {
+    var exist = false;
+    for(var k in obj) {
+      if(k == key) {
+        exist = true;
+        break;
+      }
+    }
+    return exist;
+  }
+
+  function _delimit(seg) {
+    return seg[0] == "/"? seg : "/"+seg;
+  }
+
+  function _splitPath(path) {
+    return path.match(/[^/?]+/g) || [];
+  }
+
+  function validateURL(url) {
+    // url = url.replace(/\/$/, '')
+    url = url.replace(/\/\//g,'/')
+    url = url.replace(/\/\?/g,'?')
+    return url;
+  }
+
+  function traverse(path,get) {
+    if(!path) {
+      console.error('path is not valid');
       return;
     }
-
-    function getTransitionDiffernce(prevTrans, matched, currentRoutes) {
-      var like = true,
-      similar = true,
-      rendered = [],
-      common = [],
-      unRendered = [],
-      templateToRemove,
-      currentRoute;   
-
-      function compareRoute(index) {
-        var same = true;
-        if(!currentRoute.queryParams && !currentRoute.__lp.dynamicParam) {
-          return true;
-        }
-        if(currentRoute.__lp.dynamicParam && prevMatched.dynamicParams[index] != matched.dynamicParams[index]) {
-          return false;
-        } else if(currentRoute.queryParams) {
-          currentRoute.queryParams.every(function(key) {
-            if(same && currentRoute.__lp.queryParamsDef[key].refreshModel && (matched.queryParams || prevMatched.queryParams) && matched.queryParams[key] != prevMatched.queryParams[key]) {
-              return same = false;
-            } else {
-              return true;
-            } 
-          });
-        }
-        return same;
-      }
-
-      if(prevTrans) {
-        var prevMatched = prevTrans.matched;
-        matched.route.forEach(function(route,index) {
-          if(similar && route == prevMatched.route[index]) {
-            currentRoute = currentRoutes ? currentRoutes[index] : LR.__lp.getDefinition(route.slice(0,index));
-            if(like && compareRoute(index)) {
-              if(prevTrans.routeInstances[index].__lp.rendered) {
-                rendered.push(route);  
-              } else {
-                like = false;
-                unRendered.push(route);  
-              }
-              common.push(route);
-            } else {
-              like = false;
-              unRendered.push(route);
-            }
-          } else {
-            similar = false;
-            if(templateToRemove == undefined && prevTrans.routeInstances[index] && prevTrans.routeInstances[index].__lp.rendered) {
-              templateToRemove = index;
-            }
-            unRendered.push(route);
-          }
-        });
-        if(prevMatched.route.length > matched.route.length) {
-          var index = matched.route.length;
-          if(templateToRemove == undefined && prevTrans.routeInstances[index].__lp.rendered) {
-            templateToRemove = index;
-          }
-        }
+    var url = path,selectedPaths = [],
+    pathSplit = path.split('?'), 
+    path = decodeURI(pathSplit[0]),
+    params = pathSplit[1],
+    pathSplitArr = _splitPath(path);
+    if(path == '/') {
+      if(_getObj(['/'],routeHash)) {
+        selectedPaths.push([path]);  
       } else {
-        unRendered = unRendered.concat(matched.route);
+        console.error("url '"+path +"' is not defined in router");
+        return;
       }
-      return {
-        rendered : rendered,
-        unRendered : unRendered,
-        common : common,
-        templateToRemove : templateToRemove
-      };
-    }
+    } else {
+      var pathLevel = 0,
+      pathArrLevel = [0],
+      exactMatch,
+      matchedPath = [];
+      matchedPath.dynamicParams = [];
+      findPossibleMatch(routeHash);
 
-    function constructRunLoop(processed) {
-      var transComparison = processed.transComparison || getTransitionDiffernce(prevTrans, processed.matched,processed.currentRoutes),
-      runLoop = [],
-      forceFetch = {
-        beforeModel : [],
-        model : [],
-        afterModel : []
-      },
-      req = [],
-      b4Exit = [],
-      willTransit = [],
-      didTransit = [];
-
-      if (processed.previous) {
-        var b4RouteTrans = [{hook : 'beforeRouteTransition'}];
-        if(prevTrans) {
-          for(var i = prevTrans.matched.route.length-1; i>=0; i--) {
-            if(prevTrans.matched.route[i] && prevTrans.matched.route[i] != trans.matched.route[i]) {
-              b4Exit.push({hook : "beforeExit", index : i});
+      function checkArrayMatch(arr1,arr2,l,pathObj,matchedPath) {
+        if(!(pathObj.$.wildcard || pathObj.$.dynamicKey)) {
+          var prevObj;
+          if(prevObj = _getObj(matchedPath,routeHash).$) {
+            if(prevObj.wildcard) {
+              var pathArr = arr2.slice(l);
+              if(!(l += pathArr.indexOf(arr1[0]))) {
+                return false;
+              }  
             }
-            willTransit.push({hook : "willTransition", index : i});
           }
-          return {previous : willTransit.concat(b4Exit.concat(b4RouteTrans)) ,current : [],forceFetch : []};   
         }
-        return {previous : b4RouteTrans,current : [],forceFetch : []};
-      }
-      if(transComparison.rendered && transComparison.rendered.length) {
-        transComparison.rendered.forEach(function(hook,index) {
-          trans.routeInstances[index].__lp.rendered = true;
-          runLoop.push({hook : "redirect",index : index});
-          didTransit.push({hook : "didTransition",index : trans.matched.route.length-index-1});
-        });
-      }
-      if(transComparison.unRendered && transComparison.unRendered.length) {
-        transComparison.unRendered.forEach(function(hook,index) {
-          index = transComparison.rendered.length+index;
-          if(transComparison.executed && transComparison.executed.index == index) {
-            if(transComparison.executed.hook == "getResources") {
-              req.push({hook : "getDependencies",index : index});  
+        for(var i = 0;i < arr1.length; i++,l++) {
+          if(arr1[i] != arr2[l] && !dynamicRouteCheck(arr1[i])) {
+            if(wildcardRouteCheck(arr1[i])) {
+              if(pathObj.$.sufix.length) {
+                l = arr2.indexOf(pathObj.$.sufix[0])-1; 
+              }
+            } else if(arr1[l] == '/') {
+              l--;
+            } else {
+              return false;  
             }
-          } else {
-            req.push({hook : "getResources",index : index});
-            req.push({hook : "getDependencies",index : index});
           }
-          var routeInstance = trans.routeInstances[index];
-          if(typeof routeInstance.forceFetch == "function" ? callHookWithoutPromise.call(this,routeInstance.forceFetch,routeInstance,"forceFetch",params(index)) : routeInstance.forceFetch) {
-            ["beforeModel","model","afterModel"].forEach(function(h) {
-              forceFetch[h].push({hook : h,index : index});
-            });
-            processed.currentRoutes[index]._fetchStatus = "pending";
-            ["redirect","renderTemplate","afterRender"].forEach(function(h) {
-              runLoop.push({hook : h,index : index});  
-            });
-          } else {
-            var resume = false;
-            basicHooks.forEach(function(h) {
-              if(transComparison.executed && transComparison.executed.index == index) {
-                if(transComparison.executed.hook == h || resume) {
-                  if(h == "redirect") {
-                    runLoop.push({hook : h,index : index});
-                  } 
-                  if(!resume) {
-                    resume = true;
+        }
+        return l;
+      }
+
+      function findPossibleMatch(mapObj) {
+        for(var mapPath in mapObj) {
+          if(!exactMatch) {
+            var pathObj = mapObj[mapPath],
+            innerLevel;
+            if(mapPath != "$") {
+              var mapPathSplit = _splitPath(mapPath);
+              if(mapPathSplit) {
+                if((innerLevel = checkArrayMatch(mapPathSplit,pathSplitArr,pathLevel,pathObj,matchedPath)) !== false) {
+                  pathArrLevel.push(innerLevel);
+                  pathLevel = pathArrLevel[pathArrLevel.length-1];
+                  if(pathSplitArr.length == pathLevel) {
+                    var path = Array.from(matchedPath.concat(mapPath));
+                    if(pathObj["/"]) {
+                      path = path.concat('/');
+                    }
+                    selectedPaths.push(path);
+                    if(pathObj.$.wildcard) {
+                      pathArrLevel.pop()
+                      pathLevel = pathArrLevel[pathArrLevel.length-1];
+                    } else {
+                      exactMatch = path;
+                      return;  
+                    }
                   } else {
-                    runLoop.push({hook : h,index : index});
+                    var innerRoutes = Object.keys(pathObj);
+                    matchedPath.push(mapPath);
+                    if(pathSplitArr[pathLevel]) {
+                      if(pathObj.$.wildcard && !pathObj.$.sufix.length && innerRoutes.length == 1) {
+                        var wildcard = Array.from(matchedPath);
+                        if(pathObj["/"]) {
+                          wildcard = wildcard.concat('/');
+                        }
+                        selectedPaths.push(wildcard);
+                      } else if(innerRoutes.length > 1) {
+                        findPossibleMatch(pathObj);    
+                      }
+                    } 
+                    matchedPath.pop();
+                    pathArrLevel.pop()
+                    pathLevel = pathArrLevel[pathArrLevel.length-1];
                   }
                 }
-              } else {
-                runLoop.push({hook : h,index : index});    
               }
-            });  
+            }
           }
-          didTransit.push({hook : "didTransition",index : trans.matched.route.length-index-1});
+        }
+      }
+    }
+    if(exactMatch) {
+      return pathProcessor(get,exactMatch,path,params);
+    } else if(selectedPaths.length == 1) {
+      return pathProcessor(get,selectedPaths[0],path,params);
+    } else if(selectedPaths.length) {
+      var staticSegmentsInMatch = [],
+      wildcardRoute,
+      maxStaticSeg;
+      for(var i = 0;i < selectedPaths.length;i++) {
+        if(selectedPaths[i].length == 1) {
+          wildcardRoute = selectedPaths[i];  
+        }
+        staticSegmentsInMatch.push(refine(selectedPaths[i]));
+      }
+      if(maxStaticSeg = Math.max(...staticSegmentsInMatch)) {
+        return pathProcessor(get,selectedPaths[staticSegmentsInMatch.indexOf(maxStaticSeg)],path,params);
+      } else if(wildcardRoute) {
+        return pathProcessor(get,wildcardRoute,path,params);
+      } else {
+        console.error("url '"+path +"' is not defined in router");  
+      }
+
+      function refine(arr1) {
+        arr1 = Array.from(arr1);
+        var staticPath = 0;
+        if(arr1[0] == "/") {
+          staticPath++;
+          arr1.shift();
+        }
+        var counter = -1;
+        arr1.forEach(function(seg,i) {
+          _splitPath(seg).forEach(function(innerSeg,j) {
+            counter++;
+            if(innerSeg == pathSplitArr[counter]) {
+              staticPath++;
+            }
+          });  
+        });
+        return staticPath;
+      }
+    } else {
+      console.error("url '"+path +"' is not defined in router");
+    }
+
+    function pathProcessor(get,selectedPaths,path,params) {
+      var newURL,
+      newMatched,
+      matched = {};
+      matched.route = _getObj(selectedPaths,routeHash).$.route;
+      matched.queryParams = params ? Router.frameQueryParams(params) : {},
+      matched.dynamicParams = Router.frameDynamicParams(path,matched);
+      if(get) {return matched}
+      var transInfo = setParamsInDef(matched);
+      if(LR.error) {return false}
+      newMatched = Lyte.deepCopyObject(transInfo.matched);
+      newURL = constructURLFromRoute(newMatched);
+      if(!_compareObj(newMatched.queryParams,matched.queryParams)) {
+        historyObj = listener.addToHistory({type : "replaceState",data : window.history.state,title : document.title,url : newURL,fromHistory : true});
+      }
+      return transInfo;
+    };
+  };
+
+  function setParamsInDef(matched) {
+    var routeDef = LR.definitions,
+    routesObj = instance.routes,
+    currentRoutes = [];
+    matched.target = "";
+    matched._routes = [];
+    matched.route.every(function(r,i) {
+      matched.target = matched.target ? matched.target+'.'+r : r;
+      routesObj = _getObj([r],routesObj);
+      routeDef = _getObj([r],routeDef);
+      if(!routeDef || !routeDef.$) {
+        console.error('There is no route object for the route "'+matched.target+'"');
+        LR.error = true;
+        return false;
+      }
+      r = matched.target.split('.');
+      matched._routes.push(r);
+      var obj = routeDef.$;
+      if(obj.queryParams) {
+        obj._queryParams = {};
+        obj.queryParams.forEach(function(key) {
+            obj._queryParams[key] = matched.queryParams[key] != undefined ? matched.queryParams[key] : (routesObj.defQP && routesObj.defQP[key] ? routesObj.defQP[key] : undefined);
         });
       }
-      
-      runLoop = {
-        previous : [],
-        current : req.concat(runLoop).concat(didTransit),
-        forceFetch : forceFetch
-      };
-      runLoop.templateToRemove = (prevTrans && prevTrans.runLoop.templateToRemove) ? prevTrans.runLoop.templateToRemove : [];
-      if(transComparison.templateToRemove != undefined) {
-        runLoop.templateToRemove.push({index : transComparison.templateToRemove, routeInstances : prevTrans.routeInstances});
-      }
-      return runLoop;
-    }
+      obj._dynamicParams = matched.dynamicParams[i];
+      return currentRoutes.push(obj);
+    });
+    if(LR.error) {return false;}
+    return {currentRoutes : currentRoutes, matched : matched};
+  };
 
-    function invoke(path,processed) {
-      LR.__lp.trans = trans = new Transition(processed);
-      trans.url = path;
-      trans.runLoop = {previous : [],current : [],forceFetch : []};
-      trans.routeTrans = limitTransition(trans);
-      trans.routeInstances = Router.initRoute(processed);
-      if(historyObj) {
-        newTransInfo = historyObj;
-        trans.routeTrans.data = history.state ? history.state.data : {};
-        historyObj.replace = true;
-        historyObj = undefined;
-      } else if(trans.routeTrans.data) {
-        LR.history.replaceState(trans.routeTrans.data);
+  LR.registerRoute = function(dir,fns,options) {
+    if(options && options.mixins) {
+      if(!Array.isArray(options.mixins)) {
+        options.mixins = [options.mixins]
       }
-    }
-
-    function _getObj(arr,obj) {
-      if(!obj) {
-        consoleError(getError(498));
-        return;
-      } else if(!arr) {
-        return obj;
-      } else if(!Array.isArray(arr) && typeof arr == 'string') {
-        arr = dotSerperator(arr);
-      }
-      arr.every(function(key)  {
-        if(obj && obj[key]) {
-          obj = obj[key];
-          return true;
-        }
-        return obj = false;
-      });
-      return obj;
-    }
-
-    function abortRunningPromises(trans) {
-     if(trans.runningPromise) {
-        trans.runningPromise.reject('aborted');  
-      }
-      if(trans.forcedRunningPromise) {
-        trans.forcedRunningPromise.reject('aborted');   
-      }
-    }
-
-    function Transition(processed) {
-      this.matched = processed.matched;
-      this.target = processed.matched.target;
-      this.timeouteFns = [];
-      this.info = {
-        route : processed.matched.target,
-        queryParams : processed.matched.queryParams,
-        dynamicParams : processed.matched.dynamicParams.filter(_arrayClean)
-      };
-      if(processed.matched.fragment) {
-        this.info.fragment = processed.matched.fragment;
-      }
-      this.currentRoutes = processed.currentRoutes;
-      this.aborted = this.paused = false;
-      this.abort = function(obj) {
-        if(!this.aborted) {
-          abortRunningPromises(this);
-          this.timeouteFns.forEach(function(callback) {
-            clearTimeout(callback);
-          });
-          this.aborted = true;
-          if(!obj) {
-            obj = {state : 308};
-          } 
-          Lyte.log('Transition aborted.',logger);
-          if(!obj.internalAbort) {
-            delete this.runLoop.templateToRemove;
-            if(prevTrans.url != getLocation() && this.routeTrans.state == 201) {
-              fromHistoryGo = true;
-              if(history.state && history.state.meta && history.state.meta.index != undefined && history.state.meta.index < history.length) {
-                history.go(1);
-              } else {
-                history.go(-1);
-              }
-            }  
-          }
-          transitionCompleted(obj);
-        }
-      }.bind(this);
-      this.pause = function() {
-        if(!this.paused) {
-          Lyte.log('Transition paused.',logger);
-          abortRunningPromises(this);
-          this.routeTrans.state = 307;
-          this.paused = trans.currentPromise || true;
-          this.resume = this.routeTrans.resume = function(t) {
-            t = t || this;
-            delete t.routeTrans.resume;
-            delete t.resume;
-            Lyte.log('Transition resumed.',logger);
-            if(t.paused) {
-              if(t.paused != true) {
-                var state = t.paused.state;
-                if(t.runLoop[state][0] && t.runLoop[state][0].hook == t.paused.hook && t.runLoop[state][0].index == t.paused.index) {
-                  removeHook(t.runLoop[state],t.paused.hook,t.paused.index);
-                }
-              }
-              t.paused = false;
-              t.routeTrans.state = 102;
-              t.run();
-            }
-          }.bind(this);
-          return this.routeTrans;
-        }
-      }.bind(this);
-    }
-
-    function getRequirements(object) {
-      var reqType = object.reqType,
-      currentRoute = object.currentRoute,
-      index = object.index,
-      hook = trans.currentPromise.hook,
-      errorType = reqType == "dependencies" ? "errorDependencies" : "errorResources",
-      self = this;
-      Lyte.injectResources(currentRoute.__lp[reqType],function() {
-        //callback after every file request
-      },function(successFiles,errorFiles) {
-        currentRoute.__lp[reqType+'Loaded'] = true;
-        if(!errorFiles.length) {
-          if(trans.pending && trans.pending[reqType] != undefined && trans.pending[reqType] == index) {
-            trans.run();
-          }
-        } else {
-          if(!self.aborted) {
-            if(!self.paused) {
-              self.pause();  
-            }
-            run.onError.call(self,index,{state : 424, error : (currentRoute.__lp[errorType] = errorFiles), hook : hook});  
-          }
-        }         
-      });
-    }
-
-    var requirements = {
-      get : function(def,type) {
-        return def.__lp[type+'Loaded'] != false;
-      }
-    };
-
-    function templateDelete(arr) {
-      arr.forEach(function(obj) {
-        for (var inst, i = obj.routeInstances.length - 1; i >= obj.index; i--) {
-          inst = obj.routeInstances[i];
-          delete inst.__lp.rendered;  
-          if (inst.outlet) {
-            if (inst.component) {
-              inst.component._route = undefined;
-            }
-            Lyte.triggerEvent("beforeTemplateDestroy", inst.outletName, inst);
-            inst.outlet.innerHTML = "";
-          }
+      options.mixins.forEach(function(mixin) {
+        var regMixin = Lyte.registeredMixins[mixin];
+        if(regMixin) {
+          for(var key in regMixin) {
+            fns[key] = regMixin[key];
+          }           
         }
       });
     }
+    fns._objPath = dir.replace(/\//g,'.');
+    var dir = dir.split('.'),len = dir.length -1;
+    fns.routeName = dir[len];
+    routeDef.set(dir,fns);
+  }
 
-    function errorStoppableHook(hook) {
-      return _presence(stoppableHooks,hook);
-    }
-
-    function callHookWithPromise(callback,instance) {
-      if(callback) { 
-        var args = arguments,
-        resp,
-        hook = trans.currentPromise.hook, 
-        stopTrans = errorStoppableHook(hook),
-        self = this;
-        return Promise.resolve(new Promise(function(resolve,reject) {
-          try {
-            var result = callback.apply(instance,Array.from(args).slice(2));
-            if(stopTrans && result) {
-              result = Lyte.resolvePromises(result);
-            }
-            resp = Promise.resolve(result);
-          } catch(err) {
-            processError.call(self,stopTrans,err,instance);
-            return;
+  function limitTransition(int) {
+    var routeTrans = new transition(int);
+    function transition(int) {
+      var predefined = ['runLoop','paused','currentRoutes','routeInstances','aborted','currentPromise','run','pending'];
+      for(var prop in int) {
+        if(predefined.indexOf(prop) == -1) {
+          if(prop == 'info') {
+            this.info = deepCopyObject(int[prop]);
+          } else {
+            this[prop] = int[prop];  
           }
-          resp.then(function(data) {
-            resolve(data);
-          },function(err) {
-            consoleError(err);
-            if(hook == "model") {
-              instance.currentModel = err;
-            } 
-            processError.call(self,stopTrans,err,instance);
-          });  
-        }));
+        }
+      }
+    }
+    return routeTrans;
+  }
+
+  function dynamicRouteCheck(route) {
+    return _presence(route,":") ? true : false;
+  }
+
+  function wildcardRouteCheck(route) {
+    return _presence(route,"*") ? true : false;
+  }
+  
+  function _compareObj(obj1,obj2) {
+    var obj1keys = Object.keys(obj1),
+    obj2keys = Object.keys(obj2);
+    if(obj1keys.length != obj2keys.length) {
+      return false;
+    } else {
+      for(var key in obj1) {
+        if(obj1[key] != obj2[key]) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  LR.getRouteInstance = function(routeName) {
+    if(this.instance && trans && trans.routeInstances) {
+      if(routeName == "*") {
+        return trans.routeInstances;
       } else {
-        return Promise.resolve();
-      }
-    }
-
-    function callHookWithoutPromise(callback,instance,hook) {
-      if(callback) {
-        var stopTrans = errorStoppableHook(hook);
-        try {
-          return callback.apply(instance,Array.from(arguments).slice(3));
-        } catch(err) {
-          processError.call(this,stopTrans,err,instance);
-          return;
-        }  
-      }
-    }
-
-    function callAction(hook,index,args) {
-      var action;
-      if(this.routeInstances[index].actions && (action = this.routeInstances[index].actions[hook])) {
-        try {
-          if(action.apply(this.routeInstances[index],args) == false) {
+        routeName = routeName || trans.target;
+        var match;
+        trans.routeInstances.every(function(instance,index) {
+          instance = trans.routeInstances[trans.routeInstances.length-1-index]
+          if(instance._objPath == routeName) {
+            match = instance;
             return false;
           }
-        } catch(e) {
-          consoleError(e);
-          return false;
-        } 
-      }
-    }
-
-    function processError(stopTrans,err,instance) {
-      if(trans.currentPromise) {
-        var hook = trans.currentPromise.hook,
-        index = trans.currentPromise.index;
-        trans.pause();
-        consoleError(err);
-        if(!stopTrans) {
-          consoleError(420,hook,instance.routeName);
-          if(_presence(["willTransition","didTransition","beforeExit"],hook)) {
-            trans.resume();
-          } else {
-            trans.abort({state : 4, internalAbort : true});
-          }
-        } else {
-          run.onError.call(this,index,{state : 420, error : err, hook : hook});
-        }  
-      }
-    }
-
-    Transition.prototype.run = function() {
-      processRunLoop.call(this);
-      document.title = this.title = this.routeInstances[this.routeInstances.length-1].title || document.title;
-
-      function runLoopPromise(fn,fnName,loop,success,failure) {
-        success = success || function() {};
-        failure = failure || function(error) {
-          if(error != 'aborted') {
-            consoleError(error);
-          }
-        };
-        new Promise(function(resolve,reject) {
-          if(fnName == "nestedForcedPromises" ) {
-            this.forcedRunningPromise = {resolve : resolve, reject : reject};
-            fn.call(this,this.runLoop.forceFetch,resolve);
-          } else {
-            this.runningPromise = {resolve : resolve, reject : reject};
-            fn.call(this,this.runLoop,loop,resolve);  
-          }
-        }.bind(this)).then(success,failure);
-      }
-
-      function processRunLoop() {
-        this.pending = {};
-        runLoopPromise.call(this,nestedPromises,"nestedPromises",'previous',function() {
-          if(!trans.beforeLoadCalled) {
-            run.onBeforeLoad();
-          }
-          runLoopPromise.call(this,nestedPromises,"nestedPromises",'current');
-        }.bind(this));
-      }
-
-      function nestedForcedPromises(forcedLoop,resolve,promise) {
-        if(forcedLoop && forcedLoop.beforeModel.length || forcedLoop.model.length || forcedLoop.afterModel.length) {
-          promise = promise || forcedLoop.beforeModel[0];
-          var self = this,
-          currentRoute = this.currentRoutes[promise.index],
-          routeInstance = this.routeInstances[promise.index];
-          promise.state = "forced";
-          trans.currentPromise = promise;
-          if(promise.hook == "beforeModel" && !requirements.get(routeInstance,'dependencies')) {
-            this.pending.dependencies = promise.index;
-            return;
-          }
-          logCallbacks(promise);
-          run[promise.hook].call(this,promise.hook,promise.index).then(function(data) {
-            switch(promise.hook) {
-              case "model":
-                this.routeInstances[promise.index].currentModel = data;
-                break;
-              case "afterModel" : 
-                currentRoute._fetchStatus = "completed";
-                if(this.pending.forceFetch != undefined && this.pending.forceFetch == promise.index) {
-                  this.run();
-                }
-                break;
-            }
-            if(this.forcedRunningPromise.resolve == resolve && promise.hook != "afterModel") {
-              getObjWithIndex(forcedLoop[promise.hook],promise.index,true);
-              nestedForcedPromises.call(self,forcedLoop,resolve,getObjWithIndex(forcedLoop[promise.hook == "beforeModel" ? "model" : "afterModel"],promise.index));
-            }
-          }.bind(this));
-          if(forcedLoop.beforeModel.length > 1) {
-            getObjWithIndex(forcedLoop[promise.hook],promise.index,true);
-            nestedForcedPromises.call(this,forcedLoop,resolve);  
-          }
-        }
-
-        function getObjWithIndex(arr,index,isDelete) {
-          for(var i=0;i<arr.length;i++) {
-            var prom = arr[i];
-            if(prom.index == index) {
-              if(isDelete) {
-                arr.splice(i,1);
-                return;
-              }
-              return prom;
-            }
-          }
-        }
-      }
-
-      function logCallbacks(promise) {
-        var hook = promise.hook,
-        index = promise.index;
-        if(promise.hook == "beforeRouteTransition") {
-          Lyte.log(hook,logger,'MediumOrchid');
-          return;  
-        }
-        var route = promise.state == "previous" ? prevTrans.currentRoutes[index] : trans.currentRoutes[index];
-        Lyte.log(hook +' of route '+route.routeName,logger,'MediumOrchid');  
-      }
-      
-      function nestedPromises(loop,state,resolve) {
-        var runLoop = loop[state];
-        if(runLoop && runLoop.length) {
-          var promise = runLoop[0],
-          currentRoute = this.currentRoutes[promise.index];
-          if(!this.aborted && !this.paused) {
-            if(promise.hook == "beforeModel" && !requirements.get(currentRoute,"dependencies")) {
-              this.pending.dependencies = promise.index;
-              return;
-            } else if(promise.hook == "renderTemplate" && !requirements.get(currentRoute,"resources")) {
-              this.pending.resources = promise.index;
-              return;
-            } else if(promise.hook == "redirect" && currentRoute.forceFetch && currentRoute._fetchStatus == "pending") {
-              if(!this.forceFetchRunning) {
-                runLoopPromise.call(this,nestedForcedPromises,"nestedForcedPromises");
-                this.forceFetchRunning = true;
-              }
-              this.pending.forceFetch = promise.index;
-              return;
-            } else {
-              promise.state = state;
-              trans.currentPromise = promise;
-              logCallbacks(promise);
-              Lyte.time(promise.hook+promise.index);
-              run[promise.hook].call(this,promise.hook,promise.index).then(function(data) {
-                Lyte.time(promise.hook+promise.index);
-                if(promise.hook == "model") {
-                    this.routeInstances[promise.index].currentModel = data;
-                }
-                if(this.runningPromise.resolve == resolve) {
-                  removeHook(loop[state],promise.hook,promise.index);
-                  nestedPromises.call(this,loop,state,resolve);  
-                }
-              }.bind(this));
-            }
-          } 
-        } else if(resolve) {
-          resolve();
-        }
-      }
-    };
-
-    function removeHook(loop,hook,index) {
-      for(var i = 0;i < loop.length; i++) {
-        var obj = loop[i];
-        if(obj.hook == hook) {
-          if(index != undefined) {
-            if(index == obj.index) {
-              loop.splice(i,1);
-              break;
-            }
-          } else {
-            loop.splice(i,1);
-            i--;
-          }
-        }
-      }
-    }
-
-    Router.frameQueryParams = function(url) {
-      if(url && _presence(url,"=")) {
-        var qp = {},
-        params = _presence(url,"?") ? url.split("?")[1] : url;
-        params = _presence(params,"&") ? params.split(/&/g) : [params];
-        params.forEach(function(param) {
-          var split = param.split('=');
-          qp[split[0]] = split[1] ? decodeURIComponent(split[1]) : split[1];
+          return true;
         });
-        return qp;
-      } 
-      return;    
-    };
+        return match;
+      }
+    }
+  }
 
-    Router.frameDynamicParams = function(url,matched) {
-      if(url) { 
-        var routesObj = config.routes,
-        dynamicParam,
-        framedDP = [],
-        urlSplit = _splitPath(url.split('?')[0]);
-        matched.route.forEach(function(r,i,arr) {
-          routesObj = _getObj([r],routesObj);
-          if(routesObj.__lp.wildcard) {
-            if(routesObj.__lp.sufix.length) {
-              var dp = urlSplit.slice(0,urlSplit.indexOf(routesObj.__lp.sufix[0]));
-              framedDP.push(decodeURI(dp.join('/')));
-              _pop(dp.concat(routesObj.__lp.sufix));
-            } else {
-              framedDP.push(decodeURI(urlSplit.join('/')));   
-            }
-            return; 
-          } else if(routesObj.__lp.dynamicKey) {
-            dynamicParam = urlSplit[routesObj.__lp.dynamicIndex];
-            _pop(_splitPath(routesObj.__lp.path));
-            framedDP.push(decodeURI(dynamicParam));
+  function normalizeTransitionParams(obj) {
+    // To normalize argument for transition, returns matched obj from obj or native tranisitionTo argument.
+    if(typeof obj == "object") {
+      if(obj.route) {
+        return normalizeMatchedObj(obj);
+      }
+    } else {
+      var params = {};
+      params.queryParams = {};
+      params.dynamicParams = [];
+      Array.from(arguments).forEach(function(arg,index) {
+        if(Array.isArray(arg)) {
+          console.error(JSON.stringify(arg)+' is not a valid argument.')
+        } else {
+          if(index == 0) {
+            params.route = arg;
+          } else if(typeof arg == "object") {
+            params.queryParams = arg;
           } else {
-            _pop(_splitPath(routesObj.__lp.path));
-            framedDP.push(undefined);
-          }
-        });
-    return framedDP;
-        
-         function _pop(path) {
-          path.forEach(function() {
-            urlSplit.shift();
-          });  
-        }
-      }
-    };
-
-    function _presence(str,char) {
-      return str.indexOf(char) != -1 ? true : false;
-    }
-
-    function transitionCompleted(obj) {
-      if(trans.running) {
-        trans.running = false;
-        if (trans.routeTrans.state && trans.routeTrans.state != 201) {
-          LR.afterRouteTransition(trans.routeTrans);
-          trans.routeTrans.state = obj.state;
-        }
-        if(initialLoad || trans.routeTrans.state == 200) {
-          LR.__lp.prevTrans = prevTrans =  trans;
-          Lyte.time('RouteTransition');
-          Lyte.log('Transition completed.',logger);
-          if(config.history && trans.info.fragment) {
-            var elem;
-            if((elem = document.getElementById(trans.routeTrans.info.fragment)) && elem.scrollIntoView) {
-              elem.scrollIntoView();
-            }
-          }
-        } else if(obj.internalAbort || visibleTrans == trans) {
-          LR.__lp.prevTrans = prevTrans = trans;
-        } else {
-          LR.__lp.trans = trans = prevTrans;  
-        }
-        if(initialLoad) {
-          initialLoad = false;
-        }
-      }
-    }
-
-    function _delimit(seg) {
-      return seg[0] == "/"? seg : "/"+seg;
-    }
-
-    function _splitPath(path) {
-      return path.match(/[^/?]+/g) || [];
-    }
-
-    function validateURL(url) {
-      url = url.replace(/\/\//g,'/');
-      url = url.replace(/\/\?/g,'?');
-      return url;
-    }
-
-    function getError(code,arr) {
-      arr = Array.isArray(arr) ? arr : Array.from(arguments).slice(1);
-      var errors = {
-      400 : "url '"+arr[0]+"' is not defined in router.",
-      422 : "There is no route definition for the route "+arr[0]+".",
-      498 : "Invalid argument "+arr[0]+(arr[1] ? " provided in link-to." : "."),
-      499 : arr[0] ? "Dynamic params for the route "+arr[0]+" is not provided." : "Transition tried without arguments.",
-      420 : "Error on "+arr[0]+" of route "+arr[1]+".",
-      428 : "There is no outlet named "+arr[0]+".",
-      203 : "Data provided for component is not valid."
-    };
-      return 'LRE '+code+': '+errors[code];
-    }
-
-    function consoleError() {
-      Lyte.error(arguments[0].stack || arguments.length == 1 ? arguments[0] : getError.apply(this,arguments));
-    }
-
-    function traverse(path,get) {
-      if(!path) {
-        consoleError(400,'');
-        return;
-      }
-      var selectedPaths = [],
-      fragment;
-      if(config.history) {
-        var fragSplit = path.split('#');
-        if(fragSplit[1]) {
-          fragment = fragSplit[1];  
-          path = fragSplit[0];
-        }
-      }
-      var pathSplit = path.split('?');
-      path = decodeURI(pathSplit[0]);
-      path = decodeURI(pathSplit[0]);
-      var params = pathSplit[1],
-      pathSplitArr = _splitPath(path);
-      if(path == '/') {
-        if(_getObj(['/'],routeHash)) {
-          selectedPaths.push([path]);  
-        } else {
-          consoleError(400,path);
-          return;
-        }
-      } else {
-        var pathLevel = 0,
-        pathArrLevel = [0],
-        exactMatch,
-        matchedPath = [];
-        matchedPath.dynamicParams = [];
-        findPossibleMatch(routeHash);
-
-        function checkArrayMatch(arr1,arr2,l,pathObj,matchedPath) {
-          if(!(pathObj.__lp.wildcard || pathObj.__lp.dynamicKey)) {
-            var prevObj;
-            if(prevObj = _getObj(matchedPath,routeHash).__lp) {
-              if(prevObj.wildcard) {
-                var pathArr = arr2.slice(l);
-                if(!(l += pathArr.indexOf(arr1[0]))) {
-                  return false;
-                }  
-              }
-            }
-          }
-          for(var i = 0;i < arr1.length; i++,l++) {
-            if(arr1[i] != arr2[l] && !dynamicRouteCheck(arr1[i])) {
-              if(wildcardRouteCheck(arr1[i])) {
-                if(pathObj.__lp.sufix.length) {
-                  l = arr2.indexOf(pathObj.__lp.sufix[0])-1; 
-                }
-              } else if(arr1[l] == '/') {
-                l--;
-              } else {
-                return false;  
-              }
-            }
-          }
-          return l;
-        }
-
-        function findPossibleMatch(mapObj) {
-          for(var mapPath in mapObj) {
-            if(!exactMatch) {
-              var pathObj = mapObj[mapPath],
-              innerLevel;
-              if(mapPath != "__lp") {
-                var mapPathSplit = _splitPath(mapPath);
-                if(mapPathSplit) {
-                  if((innerLevel = checkArrayMatch(mapPathSplit,pathSplitArr,pathLevel,pathObj,matchedPath)) !== false) {
-                    pathArrLevel.push(innerLevel);
-                    pathLevel = pathArrLevel[pathArrLevel.length-1];
-                    if(pathSplitArr.length == pathLevel) {
-                      var path = Array.from(matchedPath.concat(mapPath));
-                      if(pathObj["/"]) {
-                        path = path.concat('/');
-                      }
-                      selectedPaths.push(path);
-                      if(pathObj.__lp.wildcard || pathObj.__lp.dynamicKey) {
-                        pathArrLevel.pop()
-                        pathLevel = pathArrLevel[pathArrLevel.length-1];
-                      } else {
-                        exactMatch = path;
-                        return;  
-                      }
-                    } else {
-                      var innerRoutes = Object.keys(pathObj);
-                      matchedPath.push(mapPath);
-                      if(pathSplitArr[pathLevel]) {
-                        if(pathObj.__lp.wildcard && !pathObj.__lp.sufix.length && innerRoutes.length == 1) {
-                          var wildcard = Array.from(matchedPath);
-                          if(pathObj["/"]) {
-                            wildcard = wildcard.concat('/');
-                          }
-                          selectedPaths.push(wildcard);
-                        } else if(innerRoutes.length > 1) {
-                          findPossibleMatch(pathObj);    
-                        }
-                      } 
-                      matchedPath.pop();
-                      pathArrLevel.pop();
-                      pathLevel = pathArrLevel[pathArrLevel.length-1];
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      if(exactMatch) {
-        return pathProcessor(get,exactMatch,path,params);
-      } else if(selectedPaths.length == 1) {
-        return pathProcessor(get,selectedPaths[0],path,params);
-      } else if(selectedPaths.length) {
-        var staticSegmentsInMatch = [],
-        wildcardRoute,
-        maxStaticSeg;
-        for(var i = 0;i < selectedPaths.length;i++) {
-          if(selectedPaths[i].length == 1) {
-            wildcardRoute = selectedPaths[i];  
-          }
-          staticSegmentsInMatch.push(refine(selectedPaths[i]));
-        }
-        if(maxStaticSeg = Math.max(...staticSegmentsInMatch)) {
-          return pathProcessor(get,selectedPaths[staticSegmentsInMatch.indexOf(maxStaticSeg)],path,params);
-        } else if(wildcardRoute) {
-          return pathProcessor(get,wildcardRoute,path,params);
-        } else {
-          consoleError(400,path);
-        }
-
-        function refine(arr1) {
-          arr1 = Array.from(arr1);
-          var staticPath = 0;
-          if(arr1[0] == "/") {
-            staticPath++;
-            arr1.shift();
-          }
-          var counter = -1;
-          arr1.forEach(function(seg,i) {
-            _splitPath(seg).forEach(function(innerSeg,j) {
-              counter++;
-              if(innerSeg == pathSplitArr[counter]) {
-                staticPath++;
-              }
-            });  
-          });
-          return staticPath;
-        }
-      } else {
-        consoleError(400,path);
-      }
-
-      function pathProcessor(get,selectedPaths,path,params) {
-        var newURL,
-        newMatched,
-        matched = {
-          route : _getObj(selectedPaths,routeHash).__lp.route,
-          queryParams : params ? Router.frameQueryParams(params) : {}
-        };
-        if(config.history) {
-          matched.fragment = fragment
-        }
-        matched.dynamicParams = Router.frameDynamicParams(path,matched);
-        if(get) {return matched;}
-        var transInfo = setParamsInDef(matched);
-        if(transInfo != false) {
-          newMatched = Lyte.deepCopyObject(transInfo.matched);
-          newURL = constructURLFromRoute(newMatched);
-          if(!_compareObj(newMatched.queryParams,matched.queryParams)) {
-            historyObj = addToHistory({replace : true,data : window.history.state,url : newURL,fromHistory : true});
+            params.dynamicParams.push(arg);
           }  
         }
-        return transInfo;
-      }
+      });
+      return normalizeMatchedObj(params);  
     }
+  }
 
-    function setParamsInDef(matched) {
-      var def = definitions,
-      routesObj = config.routes,
-      currentRoutes = [];
+  function normalizeMatchedObj(obj) {
+    // To construct dynamic params array.
+    if(obj.route) {
+      var matched = {}
+      matched.route = obj.route.split('.');
+      matched.queryParams = obj.queryParams || {};
+      matched.dynamicParams = [];
       matched.target = "";
       matched._routes = [];
+      var dynamicParams = obj.dynamicParams ? Array.from(obj.dynamicParams) : [];
       try {
-        matched.route.every(function(r,i) { 
-          matched.target = matched.target ? matched.target+'.'+r : r;
-          routesObj = _getObj([r],routesObj);
-          def = _getObj([r],def);
-          if(!def || !def.__lp) {
-            throw Error(getError(422,matched.target));
-          }
-          r = dotSerperator(matched.target);
-          var obj = def.__lp;
+        matched.route.forEach(function(route,index) {
+          matched.target = matched.target ? matched.target+'.'+route : route;
+          var r = matched.target.split('.');
+          var routesObj = _getObj(matched.route.slice(0,index+1),instance.routes);
           matched._routes.push(r);
-          if(obj.queryParams) {
-            obj.__lp.queryParams = {};
-            obj.queryParams.forEach(function(key) {
-              obj.__lp.queryParams[key] = matched.queryParams[key];
-            });
+          if(routesObj) {
+            matched.dynamicParams.push(routesObj.$.dynamicKey ? dynamicParams.shift() : undefined);
+          } else {
+            throw 'There is no url mapped for the route "'+matched.target+'".'
           }
-          obj.__lp.dynamicParam = matched.dynamicParams[i];
-          var linkTags = def.__lp.__lp.linkTags;
-          if(linkTags.length) {
-            linkTags.forEach(function(tag) {
-              if(tag.firstChild.tagName === "A") {
-                tag.firstChild.setAttribute("href", LR.getURL(tag.getMatchedObject(true))); 
-              }
-            });
-          }
-          return currentRoutes.push(obj);
-        });  
+        });
       } catch(e) {
-        consoleError(e);
-        return false;
+        console.error(e);
+        return false  
       }
-      return {currentRoutes : currentRoutes, matched : matched};
+      return matched;  
     }
+  }
 
-    this.registerRoute = function(dir,fns,options) {
-      if(options && options.mixins) {
-        if(!Array.isArray(options.mixins)) {
-          options.mixins = [options.mixins];
-        }
-        options.mixins.forEach(function(mixin) {
-          if(Lyte.Mixin.exists(mixin)) {
-            var regMixin = Lyte.registeredMixins[mixin];
-            if(regMixin) {
-              for(var key in regMixin) {
-                if(key == "actions") {
-                  for(var action in regMixin.actions) {
-                    fns.actions[action] = regMixin.actions[action];
-                  }
-                } else {
-                  fns[key] = regMixin[key];  
-                }
-              }           
-            }  
-          }
-        });
-      }
-      fns.__lp = {
-        objPath : dir.replace(/\//g,'.'),
-        linkTags : []
-      };
-      if(fns.queryParams) {
-        fns.__lp.queryParamsDef = {};
-        fns.queryParams.forEach(function(qp,i) {
-          if(typeof qp == "string") {
-            fns.__lp.queryParamsDef[qp] = {
-              sticky : config.queryParamOptions.sticky,
-              refreshModel : true
-            };
+  Router.initRoute = function(matched) {
+    var routeObj,
+    len = matched.route.length,
+    routeInstances = [],
+    predefined = ["getResources","getDependencies","beforeModel","model","afterModel","redirect","renderTemplate","afterRender","beforeExit"];
+
+    Route = function(fns,index,prevInstance)  {
+      if(prevInstance) {
+        for(var key in prevInstance) {
+          if(_presence(["_queryParams","_dynamicParams","_rendered"],key)) {
+            this[key] = fns[key];
           } else {
-            for(var key in qp) {
-              fns.__lp.queryParamsDef[key] = {
-                sticky : qp[key].hasOwnProperty('sticky') ? qp[key].sticky : config.queryParamOptions.sticky,
-                refreshModel : qp[key].hasOwnProperty('refreshModel') ? qp[key].refreshModel : true
-              };
-            }
-            fns.queryParams[i] = key;
-          }
-        });  
-      }
-      dir = dotSerperator(dir);
-      var len = dir.length -1;
-      fns.routeName = dir[len];
-      setRouteDef(dir,fns);
-    };
-
-    var transPredefined = ['runLoop','paused','currentRoutes','routeInstances','aborted','currentPromise','run','pending','matched','timeouteFns'];
-
-    function limitTransition(int) {
-      var routeTrans = new transition(int);
-      routeTrans.state = 201;
-      function transition(int) {
-        
-        for(var prop in int) {
-          if(transPredefined.indexOf(prop) == -1) {
-            if(prop == 'info') {
-              this.info = deepCopyObject(int[prop]);
-            } else {
-              this[prop] = int[prop];
-            }
+            this[key] = prevInstance[key];
           }
         }
-      }
-      return routeTrans;
-    }
-
-    function dynamicRouteCheck(route) {
-      return _presence(route,":") ? true : false;
-    }
-
-    function wildcardRouteCheck(route) {
-      return _presence(route,"*") ? true : false;
-    }
-    
-    function _compareObj(obj1,obj2) {
-      var obj1keys = Object.keys(obj1),
-      obj2keys = Object.keys(obj2);
-      if(obj1keys.length != obj2keys.length) {
-        return false;
+        if(this.component) {
+          this.component._route = this;
+        }
       } else {
-        for(var key in obj1) {
-          if(obj1[key] != obj2[key]) {
-            return false;
+        for(var key in fns) {
+          if(!_presence(predefined,key)) {
+            this[key] = fns[key];
+          } 
+        };
+      }
+      this.parent = routeInstances[index-1];
+      this.transition = trans.routeTrans;
+      this.replaceWith = LR.replaceWith;
+      this.transitionTo = LR.transitionTo;
+      this.refresh = function() {
+        trans.abort();
+        var processed = {currentRoutes : trans.currentRoutes,matched : trans.matched, refreshRouteFrom : this._objPath};
+        newTransInfo = {type : "replaceState",data : trans.data,title : document.title,fromHistory : false};
+        dispatch(undefined,processed);
+        return trans.routeTrans;
+      }
+      this.setTitle = function(title) {
+        document.title = this.title = title;
+      }
+      this.getQueryParams = function() {
+        return this._queryParams;
+      }
+      this.getDynamicParam = function() {
+        return this._dynamicParams;
+      }
+      this.getRouteInstance = function(routeName) {
+        return LR.getRouteInstance(routeName);
+      }
+      this.setQueryParams = function(key,value,refresh)  {
+        var obj = {},
+        matched = {};
+        if(typeof key == "object") {
+          for(var i in key) {
+            obj[i] = key[i];
           }
+          refresh = value;
+        } else {
+          obj[key] = value;
         }
+        matched.route = Array.from(trans.matched.route);
+        matched.dynamicParams = Array.from(trans.matched.dynamicParams);
+        matched.queryParams = Object.assign({},trans.matched.queryParams,obj);
+        if(!_compareObj(trans.matched.queryParams,matched.queryParams)) {
+          var url = constructURLFromRoute(matched),
+          processed = setParamsInDef(matched);
+          processed.ignore = refresh == false;
+          newTransInfo = { type: "pushState", data: trans.data, url: url, title: document.title, fromHistory: false };
+          dispatch(url, processed);
+        }
+        return trans.routeTrans;
+      }
+      if(this.init) {this.init()}
+      if(typeof LyteComponent !== "undefined") {this.throwEvent = LyteComponent.throwEvent}
+    }
+
+    var refMatch = decidedTrans || prevTrans,
+    similarRoute = true;
+
+    for(var i=0;i<len;i++) {
+      routeObj = routeDef.get(trans.matched._routes[i]);
+      if(!routeObj) {return false;}
+      if(refMatch && similarRoute && refMatch.matched && refMatch.matched.route[i] == matched.route[i]) {
+        routeInstances.push(new Route(routeObj,i,refMatch.routeInstances[i]))
+      } else {
+        routeInstances[i] = new Route(routeObj,i);
+        similarRoute = false;
+      }
+    }
+    return routeInstances;
+  }
+
+  function commonRouteCheck(matched,prev) {
+    var j = prev.route.length;
+    matched.route.every(function(r,i) {
+      if(r == prev.route[i]) {
         return true;
-      }
-    }
-
-    this.getRouteInstance = function(routeName) {
-      if(LR && trans && trans.routeInstances) {
-        if(routeName == "*") {
-          return trans.routeInstances;
-        } else {
-          routeName = routeName || trans.target;
-          var match;
-          trans.routeInstances.every(function(inst,index) {
-            inst = trans.routeInstances[trans.routeInstances  .length-1-index];
-            if(inst.__lp.objPath == routeName) {
-              match = inst;
-              return false;
-            }
-            return true;
-          });
-          return match;
-        }
-      }
-    };
-
-    function normalizeTransitionParams(obj) {
-      // To normalize argument for transition, returns matched obj from obj or native tranisitionTo argument.
-      if(typeof obj == "object") {
-        if(obj.route) {
-          return normalizeMatchedObj(obj);
-        }
       } else {
-        var params = {
-          queryParams : {},
-          dynamicParams : []
-        };
-        Array.from(arguments).forEach(function(arg,index) {
-          if(Array.isArray(arg)) {
-            consoleError(498,JSON.stringify(arg));
-            return;
-          } else {
-            if(index == 0) {
-              params.route = arg;
-            } else if(typeof arg == "object") {
-              params.queryParams = arg;
-            } else {
-              params.dynamicParams.push(arg);
-            }  
-          }
-        });
-        return normalizeMatchedObj(params);  
+        j = i-1;
+        return false;
       }
-    }
+    });
+    return j;
+  }
 
-    function normalizeMatchedObj(obj) {
-      // To construct dynamic params array.
-      if(obj.route) {
-        var matched = {
-          route : dotSerperator(obj.route),
-          queryParams : obj.queryParams || {},
-          dynamicParams : [],
-          fragment : obj.fragment,
-          target : "",
-          _routes : []
-        };
-        var dynamicParams = obj.dynamicParams ? Array.from(obj.dynamicParams) : [];
-        try {
-          matched.route.forEach(function(route,index) {
-            matched.target = matched.target ? matched.target+'.'+route : route;
-            var r = dotSerperator(matched.target);
-            matched._routes.push(r);
-            var routesObj = _getObj(matched.route.slice(0,index+1),config.routes);
-            if(routesObj) {
-              matched.dynamicParams.push(routesObj.__lp.dynamicKey ? dynamicParams.shift() : undefined);
-            } else {
-              throw Error(getError(400,matched.target));
-            }
-          });
-        } catch(e) {
-          consoleError(e);
-          return false;
-        }
-        return matched;  
-      }
-    }
-
-    var routePredefined = ["getResources","getDependencies","beforeModel","model","afterModel","redirect","renderTemplate","afterRender","beforeExit"];
-
-    Router.initRoute = function(processed) {
-      var routeObj,
-      matched = processed.matched,
-      len = matched.route.length,
-      routeInstances = []
-
-      Route = function(fns,index,prevInstance)  {
-        if(prevInstance) {
-          for(var key in prevInstance) {
-            if(key == "__lp") {
-              this.__lp = {};
-              for(var key in fns.__lp) {
-                if(key != "rendered") {
-                  this.__lp[key] = fns.__lp[key];
-                }
-              }
-            } else {
-              this[key] = prevInstance[key];
-            }
-          }
-          if(this.component) {
-            this.component._route = this;
-          }
-        } else {
-          for(var key in fns) {
-            if(!_presence(routePredefined,key)) {
-              this[key] = fns[key];
-            } 
-          }
-        }
-        this.parent = routeInstances[index-1];
-        this.transition = trans.routeTrans;
-        this.replaceWith = LR.replaceWith;
-        this.transitionTo = LR.transitionTo;
-        this.removeFromCache = function(arr) {
-          Lyte.removeFromCache.assign(arr);
-          return;
-        };
-        this.refresh = function(obj) {
-          var processed = {currentRoutes : trans.currentRoutes,matched : trans.matched},
-          refreshFrom = dotSerperator(this.__lp.objPath).length-1,
-          route = Array.from(matched.route);
-          processed.transComparison = {
-            unRendered : route.splice(refreshFrom),
-            rendered : route
-          };
-          if(obj && obj.refreshTemplate) {
-            for(var i = refreshFrom;i < matched.route.length; i++) {
-              delete trans.routeInstances[i].component;
-            }
-          }
-          newTransInfo = {replace : true,data : trans.data,fromHistory : false};
-          dispatch(undefined,processed);
-          return trans.routeTrans;
-        };
-        this.setTitle = function(title) {
-          document.title = this.title = title;
-        };
-        this.getQueryParams = function() {
-          return this.__lp.queryParams || {};
-        };
-        this.getDynamicParam = function() {
-          return this.__lp.dynamicParam;
-        };
-        this.getRouteInstance = function(routeName) {
-          return LR.getRouteInstance(routeName);
-        };
-        this.setDynamicParam = function(value) {
-          if(this.__lp.dynamicParam && this.__lp.dynamicParam != value) {
-            var dynamicParams = Array.from(trans.matched.dynamicParams);
-            dynamicParams.splice(this.__lp.objPath.split(".").length-1, 1, value);
-            var matched = {
-              route: Array.from(trans.matched.route),
-              dynamicParams: dynamicParams,
-              queryParams: Object.assign({}, trans.matched.queryParams)
-            };
-            var url = constructURLFromRoute(matched),
-                processed = setParamsInDef(matched);
-            newTransInfo = {
-              data: trans.data,
-              url: url,
-              fromHistory: false
-            };
-            dispatch(url, processed);
-            return trans.routeTrans;
-          }
-        };
-        this.setQueryParams = function(key,value,refresh)  {
-          var obj = {};
-          if(typeof key == "object") {
-            for(var i in key) {
-              obj[i] = key[i];
-            }
-            refresh = value;
-          } else {
-            obj[key] = value;
-          }
-          var matched = {
-            route : Array.from(trans.matched.route),
-            dynamicParams : Array.from(trans.matched.dynamicParams),
-            queryParams : Object.assign({},trans.matched.queryParams,obj)
-          };
-          if(!_compareObj(trans.matched.queryParams,matched.queryParams)) {
-            var url = constructURLFromRoute(matched),
-            processed = setParamsInDef(matched);
-            if(refresh == false || !matched.refreshModel) {
-              processed.transComparison = {
-                rendered : matched.route,
-                unRendered : []
-              };  
-            }
-            newTransInfo = {
-              data : trans.data,
-              url : url,
-              fromHistory: false 
-            };
-            dispatch(url, processed);
-          }
-          return trans.routeTrans;
-        };
-        if(this.init) {this.init();}
-        if(typeof LyteComponent !== "undefined") {this.throwEvent = LyteComponent.throwEvent;}
-      };
-
-      var refMatch = processed.prevTrans,
-      similarRoute = true;
-
-      for(var i=0;i<len;i++) {
-        routeObj = LR.__lp.getDefinition(trans.matched._routes[i]);
-        if(!routeObj) {return false;}
-        if(refMatch && similarRoute && refMatch.matched && refMatch.matched.route[i] == matched.route[i]) {
-          routeInstances.push(new Route(routeObj,i,refMatch.routeInstances[i]));
-        } else {
-          routeInstances[i] = new Route(routeObj,i);
-          similarRoute = false;
+  function decideTransition(processed) {
+    if(prevTrans) {
+      processed.validateTransition = true;
+      processed.prevTrans = trans;
+      removeIndex = constructRunLoop(processed);
+      delete processed.validateTransition;
+      if(removeIndex == undefined || removeIndex >= redirectIndex) {
+        var currentTransCommonRoute = commonRouteCheck(processed.matched,trans.matched),
+        prevTransCommonRoute = commonRouteCheck(processed.matched,prevTrans.matched);
+        if(currentTransCommonRoute < prevTransCommonRoute) {
+          redirectIndex = undefined;
+          trans.leavingRoutesIndex = currentTransCommonRoute;
+          processed.decidedTrans = prevTrans;
         }
       }
-      return routeInstances;
-    };
-
-    function dispatchTransition(newMatch) {
-      var url = newTransInfo.url = constructURLFromRoute(newMatch),
-      processed = setParamsInDef(newMatch);
-      dispatch(url,decideTransition(processed));
-      return url;
     }
+  }
 
-    var allHooks = ["getResources","getDependencies","beforeModel","model","afterModel","redirect","renderTemplate","afterRender"];
-
-    function decideTransition(processed) {
-      if(prevTrans && trans.running) {
-        var transComparison = getTransitionDiffernce(trans,processed.matched,processed.currentRoutes);
-        if(trans.currentPromise) {
-          var hook = trans.currentPromise.hook;
-          if(trans.routeTrans.state == 102 && trans.currentPromise.state == "current" && hook != "didTransition") {
-            trans.abort({state : 308, internalAbort : true});
-            var transitioningRoute = allHooks.indexOf(trans.currentPromise.hook) <= 5 ? trans.currentPromise.index : trans.currentPromise.index+1;
-            if((transComparison.common.length-1) <= transitioningRoute) {
-              var visibleTransComparison = getTransitionDiffernce(visibleTrans,processed.matched,processed.currentRoutes);
-              if(transComparison.common.length < visibleTransComparison.common.length) {
-                if(trans.runLoop.templateToRemove.length) {
-                  trans.runLoop.templateToRemove.pop();
-                }
-                processed.prevTrans = visibleTrans;
-                transComparison = visibleTransComparison;
-              } else if(trans.currentPromise.index <= transComparison.common.length -1) {
-                transComparison.executed = trans.currentPromise;  
-              }
-            }
-          }
-        }
-        processed.transComparison = transComparison;  
-      } else {
-        trans.abort({state : 308, internalAbort : true});
-      }
-      return processed;
-    }
-    return this;
-  }; 
-  window.$LR = Lyte.Router = new lyteRouter();
+  function validateRedirect(newMatch) {
+    var promise = trans.runLoop.current[0],
+    url = constructURLFromRoute(newMatch),
+    processed = setParamsInDef(newMatch);
+    redirectIndex = promise.index;
+    decideTransition(processed);
+    dispatch(url,processed);
+    return url;
+  }
 })(window);

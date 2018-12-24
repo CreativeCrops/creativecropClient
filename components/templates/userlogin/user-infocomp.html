@@ -10,7 +10,7 @@
                 <img src="components/images/img/logo-man.svg" style="width: 40px;"><br> <label >Creative Crops's</label>
             </div>
             <div class="col s12">
-                <h5 class="left-align">welcome to CreativeCrops Account</h5>
+                <h5 class="left-align">welcome <span style="text-transform: capitalize">{{user.firstname}} {{user.lastname}}</span> to CreativeCrops Account</h5>
             </div>
 
             <div class="col s12">
@@ -24,7 +24,7 @@
 
             <div class="col s12">
                 <div class="col s4 input-field">
-                    <select class="">
+                    <select class="" id="mon">
                         <option value="1">January</option>
                         <option value="2">February</option>
                         <option value="3">March</option>
@@ -58,10 +58,10 @@
             </div>
             <div class="col s12">
                 <div class="col s12 input-field">
-                    <select>
-                        <option value="2">Female</option>
-                        <option value="1">Male</option>
-                        <option value="3">Rather not say</option>
+                    <select id="gender">
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Rather not say">Rather not say</option>
                     </select>
                     <label>Gender</label>
                 </div>

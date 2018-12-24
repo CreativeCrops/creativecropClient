@@ -79,64 +79,17 @@ if (!String.prototype.endsWith) {
     }
     return this.substring(this_len - search.length, this_len) === search;
   };
-}Lyte = {
-    version : "2.0.0",
-    $ : {},
-    registeredMixins : {},
-    Mixin : {},
-    debug : false,
-    performance : false,
-    toBeRegistered : []
-};
-
+}Lyte = {};
+Lyte.version = "1.0.6";
+Lyte.registeredMixins = {};
+Lyte.Mixin = {};
+Lyte.debug = false;
+Lyte.performance = false;
+Lyte.toBeRegistered = [];
 var consoleTime = [];
-
-(function assetsDivCreation() {
-    Lyte.$.assetsDiv = document.createElement("div");
-    Lyte.$.assetsDiv.setAttribute("id", "lyteAssetsDiv");
-    document.head.appendChild(Lyte.$.assetsDiv);
-})();
-
-Lyte.registerErrorCodes = function(obj) {
-    Object.assign(Lyte.errorCodes, obj);
-}
-
-Lyte.getErrorMessage = function(code) {
-    var args = Array.from(arguments).slice(1);
-    if(Lyte.errorCodes[code]) {
-        return Lyte.errorCodes[code].replace(/{(\d+)}/g, function(t, i) {
-            return args[i]
-        });
-    } else {
-        return code;
-    }
-}
-
-
-Lyte.error = function() {
-    var errorObj = arguments[0].stack || Error(Lyte.getErrorMessage.apply(Lyte,arguments))
-    if(Lyte.onerror) {
-      Lyte.onerror.call(this,errorObj);
-    }
-    Lyte.triggerEvent("error",errorObj);
-    console.error.call(console,errorObj);
-}
-
-Lyte.warn = function() {
-    var errorObj = arguments[0].stack || Error(Lyte.getErrorMessage.apply(Lyte,arguments));
-    console.warn.call(console,errorObj);
-}
 
 Lyte.Mixin.register = function(name, mixin){
   Lyte.registeredMixins[name] = mixin;
-}
-
-Lyte.Mixin.exists = function(name) {
-  if(!Lyte.registeredMixins[name]) {
-    Lyte.error('Mixin used before being registered.');
-    return false;
-  }
-  return true;
 }
 
 Lyte.log = function(text,color) {
@@ -172,159 +125,42 @@ Lyte.isComponent = function(object) {
   return false;
 }
 
-
-/* --------- lyte router v2 changes starts---- */
-var reqFiles = {};
-
-Lyte.injectResources = function (files, every, completed) {
-  var successFiles = [],
-  errorFiles = []; 
-  every = every || function() {};
-  completed = completed || function() {};
-  return new Promise(function(resolve) {
-    processRequirements(files, resolve);   
-  }).then(function() {
-    completed(successFiles,errorFiles);  
-  });
-
-  function processRequirements(files, resolve) {
-    if(!files) {
-      resolve();
-    } else {
-      if(!Array.isArray(files)) {
-        files = [files];
+Lyte.injectResources = function(files,every,completed) {
+  if(files) {
+    files = Array.isArray(files) ? files : [files];
+    var filesLoaded = -(files.length);
+    files.forEach(function(file) {
+      var tag,
+      fileSplit = file.split('.'),
+      type = fileSplit[fileSplit.length-1],
+      tags = {js:'script',css:'link'};
+      tag = document.createElement(tags[type]);
+      if(fileSplit.length == 1) {
+        console.error('Type of file is not specified in injectResources.');
+        return;
       }
-      if(!files.length) {
-        resolve();
-      }
-      var len = -(files.length);
-      files.forEach(function(file) {
-        if(typeof file == "string"){
-          requestFile(file, Lyte.injectResources.availableTags[file], function() {
-            loaded();
-          });  
-        } else if(Array.isArray(file)) {
-          new Promise(function(r){
-            processRequirements(file, r);
-          }).then(function(){
-            loaded();
-          })
-        } else {
-          new Promise(function(r){
-            processRequirements(file.parent, r);
-          }).then(function(){
-            new Promise(function(r1){
-              processRequirements(file.child, r1)
-            }).then(function(){
-              loaded();
-            })
-          })
-        }
-      })
-    }
-
-    function loaded() {
-      len++;
-      if(len == 0) {
-        resolve();
-      }
-    }
-    
-    function requestFile(file,cached,resolve) {
-      if(reqFiles[file]) {
-        reqFiles[file].push(resolve)
+      if(type == 'css') {
+        tag.setAttribute('href',file);
+        tag.setAttribute('type',"text/css");
+        tag.setAttribute('rel',"stylesheet");
       } else {
-        reqFiles[file] = [resolve];
-        if(cached && cached.event.type != "error") {
-          if(Lyte.removeFromCache.arr.indexOf(file) != -1) {
-            Lyte.removeFromCache.arr.splice(Lyte.removeFromCache.arr.indexOf(file),1);
-          }
-          fileLoaded.call(cached.tag,cached.event,true);
-          resolve();
-        } else {
-          makeRequest(file,
-            function(event) {
-              reqFiles[file].forEach(function(resolve) {
-                resolve();
-              });
-              fileLoaded.call(this,event);
-              every.call(this,event);
-            }
-          );
+        tag.setAttribute('src',file);
+      }
+      tag.onerror = tag.onload = function (event) {
+        filesLoaded++
+        if(every) {
+          every.call(this,event);
         }
-      }
-    }
-
-    function fileLoaded(event,cached) {
-      var file = this.getAttribute('src') || this.getAttribute('href');
-      delete reqFiles[file];
-      if(!cached) {
-        if(Lyte.injectResources.availableTags[file]) {
-          Lyte.injectResources.availableTags[file].tag.remove();
+        if(completed && filesLoaded == 0) {
+          completed();
         }
-        this.onerror = this.onload = undefined;
-        Lyte.injectResources.availableTags[file] = {tag : this, event : {type : event.type}};
-      }
-    }
-  }
-
-  function makeRequest(file,callBack) {
-    var tag,
-    fileSplit = file.split('.'),
-    type = fileSplit[fileSplit.length - 1],
-    tags = { js: 'script', css: 'link' };
-    tag = document.createElement(tags[type]);
-    if (fileSplit.length == 1) {
-      Lyte.error('Type of file is not specified in injectResources.');
-      return;
-    }
-    if (type == 'css') {
-      tag.setAttribute('href', file);
-      tag.setAttribute('type', "text/css");
-      tag.setAttribute('rel', "stylesheet");
-    } else {
-      tag.setAttribute('src', file);
-    }
-    tag.onerror = tag.onload = function (event) {
-      if(event.type == "error") {
-        errorFiles.push(event);  
-      } else {
-        successFiles.push(event);
-      }
-      if(callBack) {
-        callBack.call(this,event);
-      }
-    };
-    document.getElementById("lyteAssetsDiv").appendChild(tag);
-  };
-};
-
-Lyte.injectResources.availableTags = [];
-
-Lyte.removeFromCache = function(arr) {
-  Lyte.removeFromCache.assign(arr);
-  if(Lyte.removeFromCache.arr.length) {
-    Lyte.removeFromCache.arr.forEach(function(file) {
-      if(Lyte.injectResources.availableTags[file]) {
-        Lyte.injectResources.availableTags[file].tag.remove();
-        delete Lyte.injectResources.availableTags[file];  
-      }
-    });
-    Lyte.removeFromCache.arr = [];
+      };
+      document.head.appendChild(tag);
+    });  
   }
 }
 
-Lyte.removeFromCache.arr = [];
-
-Lyte.removeFromCache.assign = function(arr) {
-  arr = arr == "*" ? Object.keys(Lyte.injectResources.availableTags) : (Array.isArray(arr) ? arr : [arr]); 
-  Lyte.removeFromCache.arr = Lyte.removeFromCache.arr.concat(arr);
-  return;
-}
-
-/* --------- lyte router v2 changes ends ---- */
-
-Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
+Lyte.checkProperty = function(property,dataVal,key,fieldVal, record){
   var exts = "extends";
   switch(property){
     case "type" : 
@@ -338,20 +174,13 @@ Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
           return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
         }
       }
-      else if(dataVal !== undefined){
-        if(Array.isArray(dataVal)){
-           if(fieldVal != "array"){
-              return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
-           }
-        }
-        else if(fieldVal != (typeof dataVal)){
+      else if(Array.isArray(dataVal)){
+        if(fieldVal != "array"){
           return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
         }
       }
-      break;
-    case "mandatory":
-      if(dataVal == undefined || dataVal == null || dataVal == ""){
-        return {code : "ERR02", message: Lyte.errorCodes.ERR02 };
+      else if(fieldVal != (typeof dataVal)){
+        return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
       }
       break;
     case "maximum" :
@@ -366,18 +195,18 @@ Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
       break;
     case "maxLength" :
     case "maxItems" :
-      if(dataVal && dataVal.length > fieldVal){
+      if(dataVal.length > fieldVal){
         return {code : "ERR06", message : Lyte.errorCodes.ERR06, expected : fieldVal};
       }
       break;
     case "minLength" :
     case "minItems" :
-      if(dataVal && dataVal.length < fieldVal){
+      if(dataVal.length < fieldVal){
         return {code : "ERR07", message : Lyte.errorCodes.ERR07, expected : fieldVal};
       }
       break;
     case "pattern" :
-      if(dataVal && (typeof dataVal == "string") && !(new RegExp(fieldVal).test(dataVal))){
+      if((typeof dataVal == "string") && !(new RegExp(fieldVal).test(dataVal))){
         return {code : "ERR08", message : Lyte.errorCodes.ERR08, expected : fieldVal};
       }
       break;
@@ -407,7 +236,7 @@ Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
           return {code : "ERR10", message : Lyte.errorCodes.ERR10, expected : fieldVal};
         }
       }
-      else if(dataVal && dataVal != fieldVal){
+      else if(dataVal != fieldVal){
         return {code : "ERR10", message : Lyte.errorCodes.ERR10, expected : fieldVal};
       }
       break;
@@ -449,16 +278,14 @@ Lyte.checkProperty = function(property, dataVal, key, fieldVal, record, type){
 Lyte.types = ["string", "object", "number", "boolean", "array"];
 
 Lyte.attr = function(type, opts){
-  var obj = {};
-  obj.type = type;
   if(opts == undefined){
     opts = {};
   }
   if(this.types.indexOf(type) == -1 && !Lyte.Transform.hasOwnProperty(type)){
     throw new Error("Not a valid field type - "+type);
   }
-  Object.assign(obj,opts);
-  return obj;
+  opts.type = type;
+  return opts;
 }
 
 Lyte.defineRelation = function(name,type,opts){
@@ -500,7 +327,7 @@ Lyte.registerValidator = function(customValidatorName, func){
 }
 
 Lyte.patterns = {
-  email : /^([A-Za-z0-9._%\-'+/]+@[A-Za-z0-9.-]+\.[a-zA-Z]{2,22})$/,
+  email : /([A-Za-z0-9._%\-'+/]+@[A-Za-z0-9.-]+\.[a-zA-Z]{2,22})$|[\s]+/,
   url : /(^(ht|f)tp(s?):\/\/[0-9a-zA-Z][-.\w]*(:[0-9])*(\/?)([a-zA-Z0-9\-.?,:'/\\+=&amp;%$#_[\]@!()*;~]*)?$)/,
   ampm : /^(AM|PM|am|pm)$/,
   hour : /^(0?[0-9]|1[0-9]|2[0-4])$/,
@@ -515,9 +342,8 @@ Lyte.patterns = {
 Lyte.validate = function(object, key, value, component) {
   var definition = component.__data[key];
   var isError = false;
-  var type = definition ? definition.type : undefined;
   for(var defKey in definition) {
-    isError = Lyte.checkProperty(defKey, value, key, definition[defKey], object, type);
+    isError = Lyte.checkProperty(defKey, value, key, definition[defKey], object);
     if(isError !== true) {
       return isError;
     }
@@ -535,7 +361,7 @@ Lyte.errorCodes = {
   ERR08 : "String does not match the specified pattern", ERR09 : "Values in array are not unique", ERR10 : "Value is not equal to the specified constant", ERR11 : "Model of related field is not defined",
   ERR12 : "Model of backward relation is not defined", ERR13 : "Record not found", ERR14 : "Model does not match the related field model", ERR15 : "Error in creating a record as a relation",
   ERR16 : "Record with primary key already exists", ERR17 : "Value cannot be changed because record has been deleted", ERR18 : "Action not defined", ERR19 : "Model not defined",
-  ERR20 : "Key not specified", ERR21 : "'belongsTo' relationship expects a single object/id", ERR22 : "Type not specified for polymorphic relation", ERR23: "Primary Key value not present", ERR24: "Error while relating record", ERR25: "Backward relation not present"
+  ERR20 : "Key not specified", ERR21 : "'belongsTo' relationship expects a single object/id", ERR22 : "Type not specified for polymorphic relation", ERR23: "Primary Key value not present", ERR24: "Error while relating record"
 }
 
 Lyte.registeredGlobalEvents = {};
@@ -566,7 +392,7 @@ Lyte.triggerEvent = function() {
 
  Lyte.addEventListener = function(eventName, func) {
    if(typeof func !== "function") {
-       Lyte.error("Second parameter to LyteComponent.addGlobalEventListener() must be a function");
+       console.error("Second parameter to LyteComponent.addGlobalEventListener() must be a function");
        return;
    }
    var s = this.registeredGlobalEvents[eventName];
@@ -579,21 +405,20 @@ Lyte.triggerEvent = function() {
 
 Lyte.removeEventListener = function(id) {
    if(!id) {
-     Lyte.error("listener unique id not specified");
+     console.error("listener unique id not specified");
      return;
    }
    var globalId  = id.split("-");
    var s = this.registeredGlobalEvents[globalId[0]];
    if(!s || !s.listeners[globalId[1]]) {
-       Lyte.error("No such listener registered");
+       console.error("No such listener registered");
        return;
    }
    s.listeners[globalId[1]] = null;
  }
 
 Lyte.deepCopyObject = function( obj )  {
-  var targetVal = Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
-  var current, copies = [{source : obj, target : targetVal}], keys, propertyIndex, descriptor, nextSource, indexOf, sourceReferences = [obj];
+  var current, copies = [{source : obj, target : Object.create(Object.getPrototypeOf(obj))}], keys, propertyIndex, descriptor, nextSource, indexOf, sourceReferences = [obj];
   var cloneObject = copies[0].target, targetReferences = [cloneObject];
   while(current = copies.shift()){
       keys = Object.getOwnPropertyNames(current.source);
@@ -604,7 +429,7 @@ Lyte.deepCopyObject = function( obj )  {
               continue;
           }
           nextSource = descriptor.value;
-          descriptor.value = Array.isArray(nextSource) ? [] : nextSource instanceof Set ? new Set() : Object.create(Object.getPrototypeOf(nextSource));
+          descriptor.value = Array.isArray(nextSource) ? [] : Object.create(Object.getPrototypeOf(nextSource));
           indexOf = sourceReferences.indexOf(nextSource);
           if(indexOf != -1){
               descriptor.value = targetReferences[indexOf];
@@ -621,43 +446,30 @@ Lyte.deepCopyObject = function( obj )  {
 }
 
 Lyte.resolvePromises = function(promises) {
-  if(typeof promises != "string") {
-    if(Array.isArray(promises)) {
-      return promiseArray(promises);
-    } else if(typeof promises == "object") {
-      return promiseHash(promises);
-    }    
-  } else {
-      return promises;
+  if(Array.isArray(promises)) {
+    return promiseArray(promises);
+  } else if(typeof promises == "object") {
+    return promiseHash(promises);
   }
 
   function promiseHash(promiseObj) {
-    var actPromKeys = [],
-    promises = [],
-    promiseKeys = Object.keys(promiseObj);
+    var actPromKeys = [],promises = [],promiseKeys = Object.keys(promiseObj);
     promiseKeys.forEach(function(key) {
-        var value = promiseObj[key];
-      if(value instanceof Promise) {
         actPromKeys.push(key)
-        promises.push(value);
-      }
+        promises.push(promiseObj[key]);
     });
     if(!promises.length) {
       return promiseObj;
     } else {
        var obj = {},promise = new Promise(function(resolve,reject) {
           Promise.all(promises).then(function(data) {
-            promiseKeys.forEach(function(promiseKey) {
-              if(actPromKeys.indexOf(promiseKey) != -1) {
-                obj[promiseKey] = data[actPromKeys.indexOf(promiseKey)]
-              } else {
-                obj[promiseKey] = promiseObj[promiseKey];
-              }
-            });
+          data.forEach(function(dataVal, index) {
+              obj[actPromKeys[index]] = dataVal;
+            });  
           resolve(obj);
         },function(err) {
           reject(err);
-          Lyte.error(err);
+          console.error(err);
         });
       });   
      return promise;
@@ -665,18 +477,7 @@ Lyte.resolvePromises = function(promises) {
   }
 
   function promiseArray(promiseArray) {
-    var array = [],
-    hasPromise = false;
-    promiseArray.every(function(item,i) {
-        if(item instanceof Promise) { 
-            hasPromise = true;
-            return false;
-        }
-        return true
-    });
-    if(!hasPromise) {
-        return promiseArray;
-    }
+    var array = [];
     var promise = new Promise(function(resolve,reject) {
       Promise.all(promiseArray).then(function(data) {
         promiseArray.forEach(function(key,index){
@@ -685,7 +486,7 @@ Lyte.resolvePromises = function(promises) {
         resolve(array);
       },function(err) {
         reject(err);
-        Lyte.error(err);
+        console.error(err);
       });
     });   
    return promise;
@@ -761,19 +562,10 @@ if(document.readyState === "complete" || document.readyState === "interactive") 
     document.addEventListener("DOMContentLoaded", function(e){
         domContentLoaded1();
     },true);
-};
-Lyte.registerErrorCodes({
-    "LC001" : "Error while parsing custom prop handler attribute {0}. Check if the value provided is a valid JSON",
-    "LC002" : "{0} Component is not compiled. Please compile using Lyte CLI",
-    "LC003" : "Helper named {0} is not defined",
-    "LC004" : "Action named {0} doesn't exists",
-    "LC005" : "Lyte.objectUtils doesn't support {0} function", 
-    "LC006" : "Lyte.arrayUtils doesn't support {0} function", 
-    "LC007" : "Component name not specified in Lyte.Component.render", 
-    "LC008" : "Specified outlet {0} doesn't exists - Lyte.Component.render", 
-    "LC009" : "Method named {0} doesn't exists"
-});
-
+}
+if(!window.Lyte) {
+    console.error("Lyte is not defined");
+}
 window.isIE11Lyte = false;
 window.isEdgeLyte = false;
 window.replaceWithNeeded = false;
@@ -785,14 +577,7 @@ if(navigator.userAgent.match(/rv:11/)) {
     }
 }
 if(navigator.userAgent.match('Edge')) {
-    var s = document.createElement("div");
-    s.innerHTML= "<template><div>c</div></template>";
-    if(s.querySelector("template").childNodes.length) {
-        window.isIE11Lyte = true;
-    } else {
-        window.isEdgeLyte = true;    
-    }
-    s.remove()
+    window.isEdgeLyte = true;
 }
 
 if(window.isIE11Lyte || window.isEdgeLyte) {
@@ -887,10 +672,6 @@ Lyte.Component.unregisterComponent = function(componentName) {
             comp.prototype.get = noop;
             comp.prototype.set = noop;
             delete Lyte.Component.registeredComponents[componentName];
-            var template = document.querySelector("template[tag-name="+componentName+ "]")
-            if(template) {
-                template.remove();
-            }
         }
     } else {
         console.warn("Component "+ componentName + " not yet registered");
@@ -911,7 +692,8 @@ function onDomContentForLyte() {
           LyteComponent.dummyLyteComponentsDiv = undefined;
         }
     }
-    let bodyEvents = ["focus","focusin","focusout","resize","scroll","click","dblclick","mousedown","mouseup","mousemove","mouseover","mouseout","change","select","submit","keydown","keypress","keyup","contextmenu"];    
+    document.head.appendChild(LyteComponent.styleDiv);
+    let bodyEvents = ["focus","focusin","focusout","resize","scroll","click","dblclick","mousedown","mouseup","mousemove","mouseover","mouseout","mouseenter","mouseleave","change","select","submit","keydown","keypress","keyup","contextmenu"];    
     for(let i=0; i<bodyEvents.length; i++){    
         var evnt = bodyEvents[i];    
         document.body.addEventListener(evnt,globalEventHandler, true);    
@@ -951,7 +733,7 @@ document.addEventListener("change", function(event) {
 			callee = callee.parentNode;
 		}
 		if(callee && callee.tagName === "LYTE-YIELD"){
-			target._callee = callee._registerYield._callee;
+			target._callee = callee._callee._callee;
 		} else {
 			target._callee = callee;
 		}
@@ -973,19 +755,9 @@ var globalEventHandler = function(ev){
 		toRemove = true;
 		window.event = ev;
 	}
-    let eventStopped = false;
 	while((target.getAttribute && !target.getAttribute(evnt)) && target.tagName != "BODY"){
-		if(LyteComponent.hasLyteEvents(target, evnt)) {
-            eventStopped = LyteComponent.handleLyteEvents(target, ev);
-            if(eventStopped) {
-                break;
-            }
-        }
-        target = target.parentNode;
+		target = target.parentNode;
 	}
-    if(eventStopped) {
-        return;
-    }
  	var callee = target;
 	if(!target._callee){
 		while(callee && !LyteComponent.isCustomElement(callee) && callee.tagName !== "LYTE-YIELD") {
@@ -996,7 +768,7 @@ var globalEventHandler = function(ev){
 			callee = callee.parentNode;
 		}
 		if(callee && callee.tagName === "LYTE-YIELD"){
-			target._callee = callee._registerYield._callee;
+			target._callee = callee._callee._callee;
 		} else {
 			target._callee = callee === target ? undefined : callee;
 		}
@@ -1009,7 +781,7 @@ var globalEventHandler = function(ev){
         let cloneActObj = Lyte.deepCopyObject(actObj);
 		cloneActObj.args.shift();
 		LyteComponent.throwAction.call(target,target,evnt,cloneActObj, undefined, undefined, target, ev);
-	} else if(target.getAttribute && target.getAttribute(evnt)){
+	} else if(target.getAttribute(evnt)){
 		let actions = target._callee.constructor._actions;
 		let func = target.getAttribute(evnt).split(" => ")[1];
 		let actObj = target._boundEvents[evnt];
@@ -1019,7 +791,7 @@ var globalEventHandler = function(ev){
 	}
 	if(target.tagName === "LABEL"){
 		var input = target.querySelector("input");
-		if(input && input.getAttribute(evnt)){
+		if(input.getAttribute(evnt)){
 			let actions = target._callee.constructor._actions;
 			let func = input.getAttribute(evnt).split(" => ")[1];
 			//	let actObj = target._callee.constructor.getHelper(func);
@@ -1056,9 +828,8 @@ class LyteYield extends HTMLElement{
 			if(this._dynamicProperty[key].isActualNode) {
 				this._dynamicProperty[key].isActualNode._helperNodes[del](this);
 			}else {
-                let helperNodes = node._callee.getProperty(key)._helperNodes;
-				if(helperNodes) {
-					helperNodes[del](this);
+				if(node._callee.getProperty(key)._helperNodes) {
+					node._callee.getProperty(key)._helperNodes[del](this);
 				}
 			}
 		}
@@ -1148,7 +919,7 @@ class customElementPrototype extends elementPrototype{
             callee = callee.parentNode;
         }
         if(callee && callee.tagName === "LYTE-YIELD") {
-        return callee._registerYield._callee;
+        return callee._callee._callee;
         }
         return ((this ===  callee) ? undefined : callee);
     }
@@ -1173,8 +944,11 @@ class customElementPrototype extends elementPrototype{
         if(this._initProperties) {
             let initProperties = this._initProperties;
             for(let key in initProperties) {
-                if(this.component.__data[key] && this.component.__data[key].type !== LyteComponent.getDataType(initProperties[key]) && (initProperties[key] !== undefined  || this.component.__data[key].type === "boolean")) {
-                    this.component.data[key] = LyteComponent.typeCast(initProperties[key], this.component.__data[key].type);
+                if(this.component.__data[key] && typeof initProperties[key] === "string" && this.component.__data[key].type !== "string") {
+                    var obj = {"newValue" : initProperties[key], "dataType" : this.component.__data[key].type, "attr" : key, "tagName" : this.tagName};
+                    if(LyteComponent.getProperData(obj)) {
+                        this.component.data[key] = obj.newValue;
+                    }    
                 } else {
                     this.component.data[key] = initProperties[key];
                 }
@@ -1191,9 +965,6 @@ class customElementPrototype extends elementPrototype{
         this.callback('init');
         this.onCallBack('init');
         this.registerYields();
-        if(this.component.data.lyteUnbound) {
-        	LyteComponent.unbound = true;
-        }
         let content = this.renderNodes(this.constructor._template.content, this.constructor._dynamicNodes,undefined,undefined, undefined, undefined, this.constructor._templateContent);
         return content;
     }
@@ -1290,8 +1061,8 @@ class customElementPrototype extends elementPrototype{
                             if(!dynamicN.hasAttribute(attrName)) {
                                 dynamicN.setAttribute(attrName, "{{dummy}}");
                             }
-                        	var node = this.bindNode(dynamicN.attributes.getNamedItem(attrName), toBeRemoved, helperNode, options, attr, undefined, establishBindings);
-                            if(node !== dynamicN.attributes.getNamedItem(attrName)) {
+                        	var node = this.bindNode(dynamicN.getAttributeNode(attrName), toBeRemoved, helperNode, options, attr, undefined, establishBindings);
+                            if(node !== dynamicN.getAttributeNode(attrName)) {
                             	dynamicN._removedAttributes = dynamicN._removedAttributes || {};
                             	dynamicN._removedAttributes[attrName] = node;
                             }
@@ -1319,13 +1090,13 @@ class customElementPrototype extends elementPrototype{
                 let returnVal;
                 switch(type) {
                 case "for" : 
-                	returnVal = this.updateForHelper(dynamicN,{"type" : "default"} , options.node? options : undefined, establishBindings);
+                	returnVal = this.updateForHelper(dynamicN,{"type" : "default"} , options.node? options : undefined);
                 	break;
                 case "forIn" : 
-                	returnVal = this.updateForInHelper(dynamicN,{"type" : "default"} , options.node? options : undefined, establishBindings);
+                	returnVal = this.updateForInHelper(dynamicN,{"type" : "default"} , options.node? options : undefined);
                 	break;
                 case "component" : 
-                	returnVal = this.updateDynamicComponent(dynamicN, false, options.node ? options : undefined, establishBindings);
+                	returnVal = this.updateDynamicComponent(dynamicN, false, options.node ? options : undefined);
                 }
                 if(returnVal) {
                 	updateHelpers.push(returnVal);
@@ -1495,7 +1266,7 @@ class customElementPrototype extends elementPrototype{
    		 	return;
     	}
         let actualAttr = LyteComponent.String.toCamelCase(attr);
-        let isCustomProp = LyteComponent.customPropHandlers.indexOf(actualAttr);
+        isCustomProp = LyteComponent.customPropHandlers.indexOf(actualAttr);
         if(isCustomProp !== -1) {
             let propValue = LyteComponent.customPropHandlers[isCustomProp];
             let lyteProps = newValue;
@@ -1507,29 +1278,24 @@ class customElementPrototype extends elementPrototype{
                         this.set(actKey, lyteProps[key]);
                     }
                 } catch (e) {
-                    Lyte.error("LC001", attr);
+                    console.error("Error while parsing "+ attr);
                 }
             }
             return;
         }
-        if(oldValue === newValue) {
+        if(newValue===  null || oldValue === newValue) {
             return;
         }
-        var attrNode = this.attributes.getNamedItem(attr);
-        if(attrNode && attrNode.__lyteIgnore) {
-        	this.attributes.getNamedItem(attr).__lyteIgnore = false;
-        	return;
-        }
         let dataType = this.component.__data[actualAttr].type;
-        if(dataType !== "string") {
-        	let obj = {"attr" : attr, "tagName" : this.tagName};
-        	newValue = LyteComponent.typeCast(newValue, dataType, obj);
-        	if(obj.isError) {
-        		console.warn("data type of the value provided for attribute "+attr+ " of " + this.tagName + " is not valid");
-        		return;
-        	}
+        var obj = {"newValue" : newValue, "dataType" : dataType, "attr" : attr, "tagName" : this.tagName};
+        if(LyteComponent.getProperData(obj)) {
+            newValue = obj.newValue;
+        } else {
+            return;
         }
+        //newValue = newValue.startsWith("boolean:")? (newValue.substring(newValue.indexOf(":") + 1) ==="true"? true: false) : newValue;
         if(this.component.data[actualAttr] !== newValue) {
+                //this.set(actualAttr, typeof newValue === "object" ? JSON.parse(newValue): newValue);
                 this.set(actualAttr, newValue);
         }
     }
@@ -1572,14 +1338,12 @@ class customElementPrototype extends elementPrototype{
             let key = node.getAttribute("item");
             if(node._items.length) {
                 let prop = node._items[0].itemProperty;
-                for(let i=0;i<node._items.length;i++) {
-                    let dynProp = node._items[i]._dynamicProperty;
-                    for(let dP in dynProp) {
-                        let property = this.getProperty(dP); 
-                        if(property._helperNodes){
-                            property._helperNodes[del](node);                    
-                        }
-                    }    
+                let dynProp = node._items[0]._dynamicProperty;
+                for(let dP in dynProp) {
+                    let property = this.getProperty(dP); 
+                    if(property._helperNodes){
+                        property._helperNodes[del](node);                    
+                    }
                 }
                 if(prop) {
                     for(let i=0;i<node._items.length;i++) {
@@ -1595,8 +1359,8 @@ class customElementPrototype extends elementPrototype{
                     if(node._actualBinding._forHelpers) {
                         node._actualBinding._forHelpers[del](node);
                     }
-                    if(node._removedAttributes && node._removedAttributes.items && !node._removedAttributes.items.helperValue && node._removedAttributes.items._multipleProperty) {
-                    	node._removedAttributes.items._multipleProperty[0].actProp._forHelpers[del](node);
+                    if(node._removedAttributes && node._removedAttributes.items && node._removedAttributes.items._multipleProperty) {
+                    	node._removedAttributes.items._multipleProperty.actProp._forHelpers[del](node);
                     }
             	}
             }
@@ -1629,7 +1393,9 @@ class customElementPrototype extends elementPrototype{
                     }
                 }
                 if(prop) {
-                    this.removeBindings({[key] : node._items[index].itemProperty}, {[key] : node._attributes.object[index]});
+                    for(let index in node._items) {
+                        this.removeBindings({[key] : node._items[index].itemProperty}, {[key] : node._attributes.object[index]});
+                    }
                 }
 
             }
@@ -1642,8 +1408,8 @@ class customElementPrototype extends elementPrototype{
                         node._actualBinding._forHelpers[del](node);
                     }
                 }
-                if(node._removedAttributes.items && !node._removedAttributes.items.helperValue && node._removedAttributes.items._multipleProperty) {
-                	node._removedAttributes.items._multipleProperty[0].actProp._forHelpers[del](node);
+                if(node._removedAttributes.items && node._removedAttributes.items._multipleProperty) {
+                	node._removedAttributes.items._multipleProperty.actProp._forHelpers[del](node);
                 }
                 if(node._propBindingObject && node._attributes.object && node._attributes.object._bindings) {
                     node._attributes.object._bindings[del](node._propBindingObject);
@@ -1666,9 +1432,8 @@ class customElementPrototype extends elementPrototype{
                     if(node._dynamicProperty[key].isActualNode) {
                         node._dynamicProperty[key].isActualNode._helperNodes[del](node);
                     }else {
-                        let helperNodes = this.getProperty(key)._helperNodes;
-                        if(helperNodes) {
-                            helperNodes[del](node);
+                        if(this.getProperty(key)._helperNodes) {
+                            this.getProperty(key)._helperNodes[del](node);
                         }
                     }
                 }
@@ -1699,12 +1464,10 @@ class customElementPrototype extends elementPrototype{
         if(!toAppend) {
         	return;
         }
-        node._registerYield = toAppend;
         //ADded now
         let parentScope = toAppend._callee || node._callee._callee;
         if(!parentScope) {
             node.appendChild(toAppend.content.cloneNode(true, "lyte"));
-            node._helpers = [];
             return;
         }    
 	    if(!toAppend._callee) {
@@ -1722,9 +1485,7 @@ class customElementPrototype extends elementPrototype{
             parentScope.component.data[key] = node.component.data[key];
         }); 
         let content = parentScope.renderNodes(toAppend.content, toAppend._dynamicNodes, node, {"node" : node}, true, undefined, toAppend._templateContent);
-        if(!node.component.data.lyteUnbound) {        	
-        	LyteComponent.establishBindings(node._properties, node.component.data);
-        }
+        LyteComponent.establishBindings(node._properties, node.component.data);
         parentScope.executeBlockHelpers(node._helpers);
         Object.keys(node._properties).forEach(function(key) {
             parentScope.component.data[key] = contextSwitchingArray[key].value;
@@ -1732,11 +1493,11 @@ class customElementPrototype extends elementPrototype{
         });
         LyteComponent.newRemoveContext(toAppend, contextSwitchArray); 
         node.appendChild(content);
+        node._registerYield = toAppend;	    
     }
     
      // It constructs/updates the dynamicComponent creation
-    //upddc
-    updateDynamicComponent(node, update, contextSwitchInfo, establishBindings) {
+    updateDynamicComponent(node, update, contextSwitchInfo) {
     	let returnVal;
         node._callee = this;
         let keepAlive = node.hasAttribute("lyte-keep-alive");
@@ -1787,7 +1548,7 @@ class customElementPrototype extends elementPrototype{
                 	}
                 }
             }
-            let toAppend = this.renderNodes(node.content, node._dynamicNodes, node, undefined, establishBindings, undefined, node._templateContent);
+            let toAppend = this.renderNodes(node.content, node._dynamicNodes, node, undefined, undefined, undefined, node._templateContent);
             component.appendChild(toAppend);
         }
         if(newComponent) {
@@ -1809,13 +1570,10 @@ class customElementPrototype extends elementPrototype{
     }
     //updFH
     // It constructs/updates the for helper. 
-    updateForHelper(node, options, contextSwitchInfo, establishBindings) {
+    updateForHelper(node, options, contextSwitchInfo) {
         let callee = this;
         node._callee = this;
         node._attributes = node._attributes || {};
-        if(options.type === "update" && node._currentItems === node._attributes.items) {
-            return {};
-        }
         node._contextSwitchInfo = contextSwitchInfo || node._contextSwitchInfo;
         let  indexValue = node.getAttribute("index");
         if(!indexValue) {
@@ -1839,12 +1597,6 @@ class customElementPrototype extends elementPrototype{
         let firstIndex = options.firstIndex;
         let secondIndex = options.secondIndex;
         let thirdIndex = options.thirdIndex;
-        var localUnbound = false;
-        var initialUnbound = LyteComponent.unbound;
-        if(node.hasAttribute("unbound")) {
-        	localUnbound = true;
-        	LyteComponent.unbound = true;
-        }
         if(options) {
             switch(options.type) {
             case "remove"  :{
@@ -1975,7 +1727,8 @@ class customElementPrototype extends elementPrototype{
             }
             break;
             default: 
-            Lyte.error("Error in updateForHelper");
+            console.error("Error in updateForHelper");  
+
             }
         }
         if(!lastNode) {
@@ -2016,13 +1769,11 @@ class customElementPrototype extends elementPrototype{
 //                  });
                 node._items[k]._contextSwitchInfo = optns;
                 let breakCheck = {};
-                let toAppend = this.renderNodes(content, dynamicNodes, node, optns, establishBindings, breakCheck, node._templateContent);
+                let toAppend = this.renderNodes(content, dynamicNodes, node, optns, undefined, breakCheck, node._templateContent);
                 node._items[k].itemProperty = this.getProperty(itemValue);
                 node._items[k].indexProperty = this.getProperty(indexValue);    
 //                  if(options.type !== "default") {
-                if(!LyteComponent.unbound) {
-                	LyteComponent.establishBindings({[itemValue] : node._items[k].itemProperty},{[itemValue]:node._attributes.items[k]});
-                }
+                    LyteComponent.establishBindings({[itemValue] : node._items[k].itemProperty},{[itemValue]:node._attributes.items[k]});
 //                  }
                 node._forContent[k] = Array.from(toAppend.childNodes);
                 //Needs to revisit this and make sure it happen within renderNodes function itself;
@@ -2033,16 +1784,13 @@ class customElementPrototype extends elementPrototype{
                     break;
                 }
             }
-            if(localUnbound) {
-            	LyteComponent.unbound = initialUnbound;
-            }
             if(options.type === "default") {
                 returnVal = {"toAppendMain" : toAppendMain, "lastNode" : lastNode};
             } else {
                 lastNode.parentNode.insertBefore(toAppendMain, lastNode);
             }
-            if(!localUnbound && node._removedAttributes && node._removedAttributes.items && !node._removedAttributes.items.helperValue && node._removedAttributes.items._multipleProperty) {
-            	LyteComponent.establishBindings({"items" : node._removedAttributes.items._multipleProperty[0].actProp}, {"items" : items});
+            if(node._removedAttributes && node._removedAttributes.items && node._removedAttributes.items._multipleProperty) {
+            	LyteComponent.establishBindings({"items" : node._removedAttributes.items._multipleProperty.actProp}, {"items" : items});
             }
         }
         for(let i=lastIndexForIteration;i<node._items.length;i++) {
@@ -2057,18 +1805,14 @@ class customElementPrototype extends elementPrototype{
         callee.component.data[indexValue] = initialIndexValue;
         callee._properties[itemValue] = initialItemProp;
         callee._properties[indexValue] = initialIndexProp;
-        node._currentItems = items;
         return returnVal;
     }
     //It constructs/updates forIn Helper.
     //updFIH
-    updateForInHelper(node, options, contextSwitchInfo, establishBindings) {
+    updateForInHelper(node, options, contextSwitchInfo) {
         let callee = this;
         node._callee = this;
         node._attributes = node._attributes || {};
-        if(options.type === "update" && node._currentObject === node._attributes.object) {
-            return {};
-        }
         contextSwitchInfo = contextSwitchInfo ? contextSwitchInfo : node._contextSwitchInfo;
         node._contextSwitchInfo = contextSwitchInfo;
         let key = node.getAttribute("key");
@@ -2093,12 +1837,6 @@ class customElementPrototype extends elementPrototype{
         let keysArray = [];
         if(!node._items) {
             node._items = {};
-        }
-        let localUnbound = false;
-        let initialUnbound = LyteComponent.unbound;
-        if(node.hasAttribute("unbound")) {
-        	localUnbound = true;
-        	LyteComponent.unbound = true;
         }
         if(options) {
             switch(options.type) {
@@ -2136,7 +1874,7 @@ class customElementPrototype extends elementPrototype{
             }
             break;
             default: 
-            Lyte.error("Error in updateForHelper");  
+            console.error("Error in updateForHelper");  
 
             }
         }
@@ -2146,7 +1884,7 @@ class customElementPrototype extends elementPrototype{
             if(options.type !== "default") {
                 lastNode.parentNode.insertBefore(toAppendMain, lastNode);
             } else {
-                returnVal = {"toAppendMain" : toAppendMain, "lastNode" : lastNode};
+                return {"toAppendMain" : toAppendMain, "lastNode" : lastNode};
             }    
         }
         if(object && options.type !== "remove") {
@@ -2161,7 +1899,7 @@ class customElementPrototype extends elementPrototype{
                 callee._properties[value] = {};
                 let optns = {"itemIndex" : itemKey, "itemValue" : value, "keyValue" : key, "type" : "forIn", "node" : node};
                 node._items[itemKey]._contextSwitchInfo = optns;
-                let toAppend = this.renderNodes(content, dynamicNodes, node, optns, establishBindings, undefined, node._templateContent);
+                let toAppend = this.renderNodes(content, dynamicNodes, node, optns, undefined, undefined, node._templateContent);
                 node._items[itemKey].itemProperty = this.getProperty(value);
                 node._propBindingObject[itemKey] = node._items[itemKey].itemProperty;
                 node._forContent[itemKey] = Array.from(toAppend.childNodes);
@@ -2170,22 +1908,17 @@ class customElementPrototype extends elementPrototype{
                 toAppendMain.appendChild(toAppend);
             }, this); 
 //              if(options.type !== "update") {
-            	if(!LyteComponent.unbound) {
-            		if(!node._attributes.object._bindings) {
-                        Object.defineProperty(node._attributes.object, '_bindings', {
-                            value : new Set(),
-                            enumerable : false, 
-                            writable : true, 
-                            configurable : true
-                        });
-                    }
-                    node._attributes.object._bindings.add(node._propBindingObject);
-                    LyteComponent.establishBindings(node._propBindingObject, node._attributes.object);
-            	}
+                if(!node._attributes.object._bindings) {
+                    Object.defineProperty(node._attributes.object, '_bindings', {
+                        value : new Set(),
+                        enumerable : false, 
+                        writable : true, 
+                        configurable : true
+                    });
+                }
+                node._attributes.object._bindings.add(node._propBindingObject);
+                LyteComponent.establishBindings(node._propBindingObject, node._attributes.object);
 //              }
-				if(localUnbound) {
-					LyteComponent.unbound = initialUnbound;	
-				}
                 if(options.type !== "default") {
                     lastNode.parentNode.insertBefore(toAppendMain, lastNode);
                 } else {
@@ -2197,7 +1930,6 @@ class customElementPrototype extends elementPrototype{
         callee.component.data[value] = initialValueValue;
         callee._properties[key] = initialKeyProp;
         callee._properties[value] = initialValueProp;
-        node._currentObject = object;
         return returnVal;
     }
         
@@ -2328,7 +2060,7 @@ class customElementPrototype extends elementPrototype{
         if(defaultContent) {
             template = defaultContent
         } else {
-            template = (window.isIE11Lyte || window.isEdgeLyte) ? {} : node.content.querySelector('[case=\''+LyteComponent.cssEscape(dummyCaseName)+'\']');
+            template = (window.isIE11Lyte || window.isEdgeLyte) ? {} : node.content.querySelector('[case=\''+dummyCaseName+'\']');
         }
         let contentArr = [];
         while(dummyScope) {
@@ -2337,7 +2069,7 @@ class customElementPrototype extends elementPrototype{
             contentArr.push(processedContent);
             if(dummyScope.additional) {
                 if(dummyScope.additional.next) {
-                    template = (window.isIE11Lyte || window.isEdgeLyte) ? {} : node.content.querySelector('[case=\''+LyteComponent.cssEscape(dummyScope.additional.next)+'\']');
+                    template = (window.isIE11Lyte || window.isEdgeLyte) ? {} : node.content.querySelector('[case=\''+dummyScope.additional.next+'\']');
                     dummyScope = node._cases[dummyScope.additional.next];
                 } else {
                     template = (window.isIE11Lyte || window.isEdgeLyte) ? {} : node.content.querySelector('[default]');
@@ -2428,7 +2160,7 @@ class customElementPrototype extends elementPrototype{
     
     static _registerComponent(a,b) {
         let componentsDiv = LyteComponent.lyteComponentsDiv;
-        let styleDiv = Lyte.$.assetsDiv;
+        let styleDiv = LyteComponent.styleDiv;
         if(this._template && typeof this._template === "string"){
             this._template.replace(/\\'/g,"'");
             let div = document.createElement("div");
@@ -2467,33 +2199,29 @@ class customElementPrototype extends elementPrototype{
         this.splitTextNodes(s);
         //This is used to find the dynamicNodes and helper nodes for the given component. 
         if(!this._dynamicNodes){
-            if(Lyte.Compile.getDynamicNodes) {
-            this._dynamicNodes = Lyte.Compile.getDynamicNodes(a).dynamicNodes;
-            } else {
-            Lyte.error("LC002", a);  
-            }
-	    } 
-        if(this._dynamicNodes) {
+        console.error("Component " + a + " is not compiled. Please compile using Lyte CLI. ");
+	    } else {
         doCompile(s, this._dynamicNodes, a);
         if(window.isEdgeLyte) { 
           this._templateContent = this._template.outerHTML;
         } else if(window.isIE11Lyte) {
           this._templateContent = s.outerHTML;
         }
-        this._templateAttributes = this._templateAttributes || {type : "attr", "attr" : {}, position: []};
-        var ta = [this._templateAttributes];
-        doCompile(this._template, ta, a);
-        this._templateAttributes = ta[0];
-        if(this._templateAttributes && this._templateAttributes.attr) {
-            var attributesT = this._template.attributes;
-            try{
-                for(let i=0;i<attributesT.length;i++) {
-                    if(!this._templateAttributes.attr[attributesT[i].name] && attributesT[i].name !== "tag-name" && attributesT[i].name !== "use-strict") {
-                        this._templateAttributes.attr[attributesT[i].name] = {"name" : attributesT[i].name, "staticValue" :  attributesT[i].value};
-                    }
-                }    
-            } catch(e) {
-                Lyte.error("Error with templateAttributes. ");
+        if(this._templateAttributes) {
+            var ta = [this._templateAttributes];
+            doCompile(this._template, ta, a);
+            this._templateAttributes = ta[0];
+            if(this._templateAttributes && this._templateAttributes.attr) {
+                var attributesT = this._template.attributes;
+                try{
+                    for(let i=0;i<attributesT.length;i++) {
+                        if(!this._templateAttributes.attr[attributesT[i].name] && attributesT[i].name !== "tag-name" && attributesT[i].name !== "use-strict") {
+                            this._templateAttributes.attr[attributesT[i].name] = {"name" : attributesT[i].name, "staticValue" :  attributesT[i].value};
+                        }
+                    }    
+                } catch(e) {
+                    console.error("Error with templateAttributes. ")
+                }
             }
         }
         }
@@ -2579,14 +2307,13 @@ class customElementPrototype extends elementPrototype{
                 return;
             }
             else{
-                helperArgs = this.processArgs(this,helperFunc.args,dynamicValuesArray,undefined,node);
+                helperArgs = this.processArgs(this,helperFunc.args,dynamicValuesArray);
             }
             nodeValue = this.processHelper({"name" : helperFunc.name, "args" : helperArgs}, node);
             if(helperFunc.name === "unescape"){
 //              let test = node.replaceWith.apply(node,nodeValue.childNodes);
                 let obj = {initialNode : node, dynamicNodeValue : nodeValue};
                 node = {dynamicPositions : obj, "_callee" : node._callee, helperValue : node.helperValue};
-                nodeValue = undefined;
                 processLast.push(node);
             }
         } else {
@@ -2602,7 +2329,7 @@ class customElementPrototype extends elementPrototype{
         //	node.ownerElement._attributeDetails[node.nodeName].bindedNode = node;
         }
         let actMultiProp; 
-        if(helperFunc.name !== "unbound" && !LyteComponent.unbound) {
+        if(helperFunc.name !== "unbound") {
             let dynamicProp;
             if(helperNode) {
                 dynamicProp = forType? helperNode._items[forIndex]._dynamicProperty : helperNode._dynamicProperty;
@@ -2645,9 +2372,7 @@ class customElementPrototype extends elementPrototype{
             					});
             				}
             				actProperty._dynamicNodes.push(node);
-            				if(boundValue !== indexValue) {
-            					actMultiProp = actProperty;
-            				}
+            				actMultiProp = actProperty;
             			}
             		} else {
             			if(!actProperty._dynamicNodes) {
@@ -2680,8 +2405,7 @@ class customElementPrototype extends elementPrototype{
             		}
             	}
             	if(dynamicValues.length > 1) {
-            		node._multipleProperty = node._multipleProperty || [];
-            		node._multipleProperty.push({"dynamicProp" : actMultiProp ? undefined : dynamicProp, "actProp" : this.getProperty(dynamicValues[0]), "helperNode" : helperNode, "dynamicValues" : dynamicValues});
+            		node._multipleProperty = {"dynamicProp" : actMultiProp ? undefined : dynamicProp, "actProp" : this.getProperty(dynamicValues[0]), "helperNode" : helperNode};
             	}
             }
         }
@@ -2706,7 +2430,7 @@ class customElementPrototype extends elementPrototype{
                 parentNode._attributes = parentNode._attributes || {};
                 parentNode._attributes[node.nodeName] = nodeValue;
                 if(parentNode.nodeName === "TEMPLATE" && isHelper && nodeValue) {
-                    if((parentNode.getAttribute("is") === "for" && node.nodeName === "items") || (parentNode.getAttribute("is") === "forIn" && node.nodeName === "object") && !LyteComponent.unbound) {
+                    if((parentNode.getAttribute("is") === "for" && node.nodeName === "items") || (parentNode.getAttribute("is") === "forIn" && node.nodeName === "object")) {
                         if(!nodeValue._bindings) {
                             Object.defineProperty(nodeValue, '_bindings', {
                                 value : new Set(),
@@ -2754,7 +2478,7 @@ class customElementPrototype extends elementPrototype{
             }
             if (/^(INPUT|TEXTAREA|SELECT)$/.test(parentNode.nodeName)) {
                         if (node.nodeName === "value") {
-                            parentNode.value = (nodeValue === undefined) ? "" : nodeValue;
+                            parentNode.value = nodeValue;
                         } else if (node.nodeName === "checked") {
                             parentNode.checked = nodeValue;
                         }
@@ -2802,58 +2526,54 @@ class customElementPrototype extends elementPrototype{
     //updN
     updateNode(node, updatePath) {
         var del = "delete";
-        let multiplePropNode = [];
+        let multiplePropNode = false;
         let multipleProp;
-        if(node._multipleProperty) {
-        	for(var i=0;i<node._multipleProperty.length;i++) {
-        		if(node._multipleProperty[i] && node._multipleProperty[i].dynamicValues.lastIndexOf(updatePath) > 0) {
-                    multiplePropNode[i] = false;
-                    multipleProp = node._multipleProperty[i];
-		            let nodes;
-		            if(multipleProp.dynamicProp) {
-                        multiplePropNode[i] = multipleProp;
-		                nodes = multipleProp.dynamicProp[multipleProp.actProp._path];
-		                if(nodes) {
-		                    let index = nodes.indexOf(node);
-		                    nodes.splice(index, 1);
-		                }
-		                let helperNode = multipleProp.helperNode;
-		                if(nodes.length === 0) {
-		                    if(helperNode.getAttribute("is") === "if") {
-		                        multipleProp.actProp._helperNodes[del](helperNode);
-		                        delete multipleProp.dynamicProp[multipleProp.actProp._path];
-		                    } else {
-		                        delete multipleProp.dynamicProp[multipleProp.actProp._path];
-		                        if(helperNode._items) {
-		                            let removeHelper = true;
-		                            for(let i=0;i<helperNode._items.length;i++) {
-		                                if(helperNode._items[i]._dynamicProperty && helperNode._items[i]._dynamicProperty[multipleProp.actProp._path]) {
-		                                    removeHelper = false;
-		                                    break;
-		                                }
-		                            }
-		                            if(removeHelper) {
-		                                multipleProp.actProp._helperNodes[del](helperNode);
-		                                //console.log('for helper is removed');
-		                            }
-		                        }
-		                    }
-		                }
-		            }
-		            if(!multiplePropNode[i]) {
-		                multiplePropNode[i] = "dynamicNodes";
-		                nodes = multipleProp.actProp._dynamicNodes;
-		                if(nodes) {
-		                    let index = nodes.indexOf(node);
-		                    nodes.splice(index, 1);
-		                    if(!nodes.length) {
-		                        delete multipleProp.actProp._dynamicNodes;
-		                    }
-		                }
-		            }
-		        }
-			}
-		}
+        if(node._multipleProperty && updatePath !== node._multipleProperty.actProp._path) {
+            multiplePropNode = false;
+            multipleProp = node._multipleProperty;
+            let nodes;
+            if(multipleProp.dynamicProp) {
+                multiplePropNode = multipleProp;
+                nodes = multipleProp.dynamicProp[multipleProp.actProp._path];
+                if(nodes) {
+                    let index = nodes.indexOf(node);
+                    nodes.splice(index, 1);
+                }
+                let helperNode = multipleProp.helperNode;
+                if(nodes.length === 0) {
+                    if(helperNode.getAttribute("is") === "if") {
+                        multipleProp.actProp._helperNodes[del](helperNode);
+                        delete multipleProp.dynamicProp[multipleProp.actProp._path];
+                    } else {
+                        delete multipleProp.dynamicProp[multipleProp.actProp._path];
+                        if(helperNode._items) {
+                            let removeHelper = true;
+                            for(let i=0;i<helperNode._items.length;i++) {
+                                if(helperNode._items[i]._dynamicProperty && helperNode._items[i]._dynamicProperty[multipleProp.actProp._path]) {
+                                    removeHelper = false;
+                                    break;
+                                }
+                            }
+                            if(removeHelper) {
+                                multipleProp.actProp._helperNodes[del](helperNode);
+                                //console.log('for helper is removed');
+                            }
+                        }
+                    }
+                }
+            }
+            if(!multiplePropNode) {
+                multiplePropNode = "dynamicNodes";
+                nodes = multipleProp.actProp._dynamicNodes;
+                if(nodes) {
+                    let index = nodes.indexOf(node);
+                    nodes.splice(index, 1);
+                    if(!nodes.length) {
+                        delete multipleProp.actProp._dynamicNodes;
+                    }
+                }
+            }
+        }
         if(!node.syntaxValue && !node.helperValue) {
             return;
         }
@@ -2870,11 +2590,11 @@ class customElementPrototype extends elementPrototype{
         	LyteComponent.changeContext(contextSwitchInfo.node, contextSwitchArray, contextSwitchInfo, true);
         }
         let nodeValue;
-        let dynamicValues = [];
         if(node.helperValue){
             nodeValue = node.helperValue;
                     let helperFunc = nodeValue;
-                    let helperRetVal = this.processHelper({name : helperFunc.name, args : this.processArgs(this,helperFunc.args, dynamicValues)}, node);  
+                    let dynamicValues = [];
+                    let helperRetVal = this.processHelper({name : helperFunc.name, args : this.processArgs(this,helperFunc.args)}, node); 
                     nodeValue = helperRetVal;
                     if(helperFunc.name === "unescape") {
                         let oldDynamicPosition = node.dynamicPositions;
@@ -2895,7 +2615,6 @@ class customElementPrototype extends elementPrototype{
                         oldStartingNode.replaceWith.apply(oldStartingNode,nodeValue.childNodes);
                         let obj = {startingNode : startingNode, length: childLen};
                         node.dynamicPositions = obj;
-                        nodeValue = undefined;
                     }
         } else {
             let boundValue = node.syntaxValue;
@@ -2904,51 +2623,42 @@ class customElementPrototype extends elementPrototype{
                 path = boundValue;
                 boundValue = boundValue.substring(0,boundValue.indexOf('.'));
             }
+            let dynamicValues = [];
             let value = path ? LyteComponent.get(this.component.data, path, dynamicValues) : this.component.data[boundValue]; 
+            if(multiplePropNode) {
+                let prop = this.getProperty(dynamicValues[0]);
+                let totalProp = this.getProperty(dynamicValues[0].substring(0, dynamicValues[0].indexOf('.')));
+                let value = this.getData(dynamicValues[0].substring(0, dynamicValues[0].indexOf('.')));              
+                if(multiplePropNode === "dynamicNodes") {
+                    if(!prop._dynamicNodes) {
+                        Object.defineProperty(prop, '_dynamicNodes', {
+                            value: [],
+                            enumerable: false, 
+                            writable: true,
+                            configurable: true
+                        });
+                    }
+                    prop._dynamicNodes.push(node);
+                } else {
+                    if(!prop._helperNodes) {
+                        Object.defineProperty(prop, '_helperNodes', {
+                            value : new Set(), 
+                            writable: true, 
+                            enumerable: false,
+                            configurable: true
+                        });
+                    }
+                    prop._helperNodes.add(
+                            multipleProp.helperNode
+                    );
+                    let dynamicProp = multipleProp.dynamicProp;
+                    dynamicProp[prop._path] ? dynamicProp[prop._path].push(node): (dynamicProp[prop._path] = []).push(node);
+                }
+                LyteComponent.establishBindings(totalProp, value);
+                node._multipleProperty.actProp = prop;
+            }
             nodeValue = !typeof value === "boolean" && !typeof value === "number" ? (value? value : ""): value;
         }
-		if(!(dynamicValues[0] instanceof Array)) {
-        	dynamicValues = [dynamicValues];
-		}
-        
-        if(multiplePropNode) {
-        	for(var i=0;i<multiplePropNode.length;i++) {
-        		if(multiplePropNode[i]) {
-					let multipleProp = node._multipleProperty[i];
-                    let prop = this.getProperty(dynamicValues[i][0]);
-                    let totalProp = this.getProperty(dynamicValues[i][0].substring(0, dynamicValues[i][0].indexOf('.')));
-                    let value = this.getData(dynamicValues[i][0].substring(0, dynamicValues[i][0].indexOf('.')));                            
-	                if(multiplePropNode[i] === "dynamicNodes") {
-	                    if(!prop._dynamicNodes) {
-	                        Object.defineProperty(prop, '_dynamicNodes', {
-	                            value: [],
-	                            enumerable: false, 
-	                            writable: true,
-	                            configurable: true
-	                        });
-	                    }
-	                    prop._dynamicNodes.push(node);
-	                } else {
-	                    if(!prop._helperNodes) {
-	                        Object.defineProperty(prop, '_helperNodes', {
-	                            value : new Set(), 
-	                            writable: true, 
-	                            enumerable: false,
-	                            configurable: true
-	                        });
-	                    }
-	                    prop._helperNodes.add(
-	                            multipleProp.helperNode
-	                    );
-	                    let dynamicProp = multipleProp.dynamicProp;
-	                    dynamicProp[prop._path] ? dynamicProp[prop._path].push(node): (dynamicProp[prop._path] = []).push(node);
-	                }
-	                LyteComponent.establishBindings(totalProp, value);
-                    node._multipleProperty[i].actProp = prop;
-                    node._multipleProperty[i].dynamicValues = dynamicValues[i];
-	        	}
-	        }
-		}
         
         if(node.nodeType === 2) {
         	let parentNodes = [];
@@ -2962,52 +2672,48 @@ class customElementPrototype extends elementPrototype{
             	} else {
             		parentNodes.push(pN._renderedComponent[pN.getAttribute("component-name")]);
             	}
+            } else {
+            	parentNodes.push(pN);
             }
-            parentNodes.push(pN);
             for(let i=0;i<parentNodes.length;i++) {
             	let parentNode = parentNodes[i];
             	if(parentNode.set) {
-                    parentNode.set(LyteComponent.String.toCamelCase(node.nodeName), nodeValue, true);
+                    parentNode.set(LyteComponent.String.toCamelCase(node.nodeName), nodeValue);
                     } else {
                         parentNode._initProperties = parentNode._initProperties || {};
                         parentNode._initProperties[LyteComponent.String.toCamelCase(node.nodeName)] = nodeValue;
                     }
+                    
                     if(parentNode.tagName === "LYTE-YIELD" && parentNode.component.data && node.nodeName && parentNode.component.data[node.nodeName] !== nodeValue /*parentNode.getAttribute("is") === "insertYield"*/) {
                         LyteComponent.set(parentNode.component.data, LyteComponent.String.toCamelCase(node.nodeName), nodeValue, undefined, parentNode);
                     }
                     parentNode._attributes = parentNode._attributes || {};
                     //!== "string"
                     if(LyteComponent.isCustomElement(parentNode,true) && typeof nodeValue !== "string" && typeof nodeValue !== "undefined") {
-                        if(node.ownerElement.nodeName === "TEMPLATE") {
-                            if(node.helperValue) {
-                            	if((node.ownerElement.getAttribute("is") ===  "for" && node.nodeName === "items") || (node.ownerElement.getAttribute("is") ===  "forIn" && node.nodeName === "object")) {
-                            		let oldValue = node.ownerElement._attributes[node.nodeName];
-                            		let newValue = nodeValue;
-                            		LyteComponent.removeSelectedBindingDeep(node.ownerElement._actualBinding, oldValue);
-                            		if(newValue) {
-                            			if(!newValue._bindings) {
-                            				Object.defineProperty(newValue, '_bindings', {
-                            					enumerable: false, 
-                            					writable: true,
-                            					value : new Set(),
-                            					configurable: true
-                            				});
-                            			}
-                            			newValue._bindings.add(node.ownerElement._actualBinding);
-                            			LyteComponent.establishBindings(node.ownerElement._actualBinding, newValue);
-                            		}
-                            		if(node.nodeName === "object") {
-                            			LyteComponent.removeSelectedBindingDeep(node.ownerElement._propBindingObject, oldValue);
-                            		}
-                            		//console.log("old Value ", oldValue, " new Value ", newValue);
-                            	}
+                        if(node.ownerElement.nodeName === "TEMPLATE" && node.helperValue) {
+                            if((node.ownerElement.getAttribute("is") ===  "for" && node.nodeName === "items") || (node.ownerElement.getAttribute("is") ===  "forIn" && node.nodeName === "object")) {
+                                let oldValue = node.ownerElement._attributes[node.nodeName];
+                                let newValue = nodeValue;
+                                LyteComponent.removeSelectedBindingDeep(node.ownerElement._actualBinding, oldValue);
+                                if(newValue) {
+                                	if(!newValue._bindings) {
+                                		 Object.defineProperty(newValue, '_bindings', {
+                                             enumerable: false, 
+                                             writable: true,
+                                             value : new Set(),
+                                             configurable: true
+                                         });
+                                	}
+                                    newValue._bindings.add(node.ownerElement._actualBinding);
+                                    LyteComponent.establishBindings(node.ownerElement._actualBinding, newValue);
+                                }
+                                if(node.nodeName === "object") {
+                                    LyteComponent.removeSelectedBindingDeep(node.ownerElement._propBindingObject, oldValue);
+                                }
+                                //console.log("old Value ", oldValue, " new Value ", newValue);
                             }
-                            parentNode.removeAttribute(node.nodeName);
-                        } else {
-                            //Needs revisiting
-                            //parentNode.removeAttribute(node.nodeName);
                         }
-
+                        parentNode.removeAttribute(node.nodeName);
                     } else {
                         if(typeof nodeValue === "boolean") {
                             parentNode._attributes = parentNode._attributes || {};
@@ -3031,7 +2737,7 @@ class customElementPrototype extends elementPrototype{
                     parentNode._attributes[node.nodeName] = nodeValue;
                     if(/^(INPUT|TEXTAREA|SELECT)$/.test(parentNode.nodeName)) {
                         if(node.nodeName === "value") {
-                            parentNode.value = (nodeValue === undefined) ? "" : nodeValue;
+                            parentNode.value = nodeValue;
                         } else if(node.nodeName === "checked") {
                             parentNode.checked = nodeValue;
                         }
@@ -3052,9 +2758,7 @@ class customElementPrototype extends elementPrototype{
                             this.updateSwitchHelper("switch",parentNode, undefined, true, true);
                             break;
                         case "component" : 
-                            if(node.nodeName === "component-name") {
-                                this.updateDynamicComponent(parentNode, "update");    
-                            }
+                            this.updateDynamicComponent(parentNode, "update");
                             break;
                         default:            
                     }
@@ -3147,13 +2851,17 @@ class customElementPrototype extends elementPrototype{
                 } else {
                     args[i] = args[i].trim();
                     let dynamicVals = [];
-                	if(args[i] === "event" && event) {
-                		args[i] = event;
-                	} else if(args[i] === "this" && node) {
-                		args[i] = node.nodeType === 2 ? node.ownerElement : node;
-                	} else {
-                		args[i] = LyteComponent.get(scope.component.data,args[i],dynamicVals);
-                	}
+                    if(event) {
+                    	if(args[i] === "event") {
+                    		args[i] = event;
+                    	} else if(args[i] === "this") {
+                    		args[i] = node;
+                    	} else {
+                    		args[i] = LyteComponent.get(scope.component.data,args[i],dynamicVals);
+                    	}
+                    } else {
+                    	args[i] = LyteComponent.get(scope.component.data,args[i],dynamicVals);
+                    }
                     dynamicValues.push(dynamicVals);
                 }
             } else if(args[i] && args[i].type){
@@ -3179,7 +2887,7 @@ class customElementPrototype extends elementPrototype{
         	args.push(node.ownerElement);
         }
         if(!Lyte.Component.registeredHelpers[helperFunc.name]){
-            Lyte.error("LC003" , helperFunc.name);
+            console.error("helper ",helperFunc.name," is not defined");
             return;
 	}
         return Lyte.Component.registeredHelpers[helperFunc.name].apply(this,args.concat(helperFunc.args));
@@ -3206,7 +2914,7 @@ class customElementPrototype extends elementPrototype{
     createEventListeners(node,actionType,actObj){
         let self = this;
         node._callee = this;
-        if(!/^(focus|focusin|focusout|resize|scroll|click|dblclick|mousedown|mouseup|mousemove|mouseover|mouseout|change|select|submit|keydown|keypress|keyup|contextmenu)$/.test(actionType)){
+        if(!/^(focus|focusin|focusout|resize|scroll|click|dblclick|mousedown|mouseup|mousemove|mouseover|mouseout|mouseenter|mouseleave|change|select|submit|keydown|keypress|keyup|contextmenu)$/.test(actionType)){
             let infoAttr = actionType.substr(2);
             let infoAttrVal = node.getAttribute(infoAttr);
             var evntListener = function(event) {
@@ -3239,12 +2947,7 @@ class customElementPrototype extends elementPrototype{
         this._yields = {};
         let yields = this.querySelectorAll('template[is=registerYield],template[is=yield]');
         for(let i=0;i<yields.length;i++) {
-            let parentYield;
-            if(yields[i].hasAttribute("from-parent") && this._callee && (parentYield = this._callee._yields[yields[i].getAttribute("yield-name")]) ) {
-                this._yields[yields[i].getAttribute("yield-name")] = parentYield;
-            } else {
-                this._yields[yields[i].getAttribute("yield-name")] = yields[i];
-            }
+            this._yields[yields[i].getAttribute("yield-name")] = yields[i];
         }
     }
     
@@ -3280,7 +2983,7 @@ class customElementPrototype extends elementPrototype{
                             this.setAttribute(templateAttributes.attr[key].name, attr.staticValue);
                         } else {
                             this.setAttribute(templateAttributes.attr[key].name, "{{dummy}}");
-							this.bindNode(this.attributes.getNamedItem(templateAttributes.attr[key].name), [], undefined, {}, templateAttributes.attr[key], undefined, undefined, true );
+                            this.bindNode(this.getAttributeNode(templateAttributes.attr[key].name), [], undefined, {}, templateAttributes.attr[key], undefined, undefined, true );
                         }
                     }
         			
@@ -3297,20 +3000,20 @@ class customElementPrototype extends elementPrototype{
         }
         this._toRegEvnts = {};
         let content =  this.afterConnected();
-        if(!LyteComponent.unbound) {
-        	LyteComponent.establishObserverBindings.call(this,this.constructor._observers);
-        	//this.establishObserverBindings();
-        	Object.defineProperty(this.component, '_bindings', {
-        		enumerable: false, 
-        		writable: true, 
-        		configurable: true,
-        		value : new Set()
-        	});
-        	this.component._bindings.add(this._properties);
-        	LyteComponent.establishBindings(this._properties, this.component.data);
-        }
-        LyteComponent.unbound = false;
+        LyteComponent.establishObserverBindings.call(this,this.constructor._observers);
+        //this.establishObserverBindings();
+        Object.defineProperty(this.component, '_bindings', {
+            enumerable: false, 
+            writable: true, 
+            configurable: true,
+            value : new Set()
+        });
+        this.component._bindings.add(this._properties);
+        LyteComponent.establishBindings(this._properties, this.component.data);
         this.appendChild(content);
+        if(this.tagName == "CRM-STAGEBOARD" || this.tagName === "TEST-COMPONENT5"){
+          console.timeEnd(this.tagName);
+        }
 	    this.setAttribute("lyte-rendered", "");
         const customEvent = new CustomEvent("onReady");
         this.dispatchEvent(customEvent);
@@ -3324,7 +3027,7 @@ class customElementPrototype extends elementPrototype{
                 try{
                     callbacks[i].value.call(this.component);    
                 } catch(e) {
-                    Lyte.error(e);
+                    console.error(e);
                 }
                 
             }
@@ -3332,16 +3035,11 @@ class customElementPrototype extends elementPrototype{
     }
     callback(name){
         var func = this.component[name];
-        var args;
         if(func){
-            if(arguments.length > 1) {
-                args = Array.from(arguments);
-                args.splice(0,1)
-            }
             try{
-                func.apply(this.component, args || []);    
+                func.apply(this.component);    
             } catch(e) {
-                Lyte.error(e);
+                console.error(e);
             }
         }
     }
@@ -3401,10 +3099,7 @@ class customElementPrototype extends elementPrototype{
 	var self = this;
 	//setTimeout added to delay setting component to null until the LyteYield’s disconnectedCallbacks have been called. 
         setTimeout(function() {
-            if(!self.component) {
-                return;
-            }
-        self.component.$node = null;
+	 self.component.$node = null;
         self.component.__data = null;
         self.component.data.__component__ = null;
         self.component.data = null;
@@ -3496,8 +3191,8 @@ let LyteComponent = {
                         //args.unshift(window.event);
                         let parent = node.parentNode;
                         let val = actionsObj[actObj.name].apply(this.component,args);
-                        hasHandled = true;
-                        if(val !== false && !event.cancelBubble){
+                        hasHandled = true;   
+                        if(val !== false){
                         	if(actObj.from && node.getAttribute(event.type) && node._boundEvents && node._boundEvents[event.type]) {
                         		let actions = node._callee.constructor._actions;
                         		let actObj = node._boundEvents[event.type];
@@ -3505,28 +3200,14 @@ let LyteComponent = {
 		                        cloneActObj.args.shift();
                         		LyteComponent.throwAction.call(node._callee,node._callee,event.type,cloneActObj, undefined, undefined, node, event, hasHandled);
                         	} else {
-                                if(LyteComponent.hasLyteEvents(node, eventName)) {
-                                    let eventStopped = LyteComponent.handleLyteEvents(node, event);
-                                    val = eventStopped ? false : true;       
-                                }
-                                if(val === false) {
-                                    return;
-                                }
                         		if(LyteComponent.isCustomElement(node)){
                         			scope = parent;
                         		}
                         		if(parent){
-                                    let eventStopped;
                         			while(parent && !parent.getAttribute(eventName) && parent.tagName != "BODY"){
-                        				if(LyteComponent.hasLyteEvents(parent, eventName)) {
-                                            eventStopped = LyteComponent.handleLyteEvents(parent, event);
-                                            if(eventStopped) {
-                                                break;
-                                            }
-                                        }
-                                        parent = parent.parentNode;
+                        				parent = parent.parentNode;
                         			}
-                        			if(eventStopped || !parent || parent.tagName === "BODY"){
+                        			if(!parent || parent.tagName === "BODY"){
                         				return;
                         			}
                         			if(!parent._callee){
@@ -3543,7 +3224,7 @@ let LyteComponent = {
                         		           let cloneActObj = Lyte.deepCopyObject(actObj);
 		                                   cloneActObj.args.shift();
                                            LyteComponent.throwAction.call(parent._callee,parent._callee,eventName,cloneActObj,undefined,undefined,parent,event, hasHandled);  
-                                       }
+                                       } 
                         			}
                         		}
                         	}
@@ -3555,7 +3236,7 @@ let LyteComponent = {
                     } 
                 }
                 else{
-                    Lyte.error("LC004" , actObj.name);
+                    console.error("Action named " + actObj.name + " doesn't exist");
                 }
             } else if(isCustom) {
                 var eventsObj = actionsObj[eventName]  || actionsObj[LyteComponent.String.toCamelCase(eventName)] || actionsObj[LyteComponent.String.dasherize(eventName)];
@@ -3582,12 +3263,12 @@ let LyteComponent = {
         "isCustomElement" : function(node, isTemplate) {
             return (node.tagName ==="TEMPLATE" && isTemplate )  || (node.nodeName && node.nodeName.indexOf('-') !== -1 && (Lyte.Component.registeredComponents[node.localName] || node.tagName === "LYTE-YIELD"));
         },
-        "componentSet" : function(key, value, forceExecute, fromParent) {
+        "componentSet" : function(key, value, forceExecute) {
             if(!forceExecute && this.get(key) === value) {
                 return;
             }
             //temporary fix
-            LyteComponent.set(this.data, key, value, undefined, fromParent);
+            LyteComponent.set(this.data, key, value, undefined, this.$node);
         },
         "componentGet" : function(key) {
             return key ? LyteComponent.get(this.data, key) : this.data;
@@ -3595,8 +3276,8 @@ let LyteComponent = {
         "nodeGet" : function(key) {
             return key ? this.component.get(key) : this.component.data;
         },
-        "nodeSet" : function(key, value, fromParent) {
-            this.component.set(key, value, undefined, fromParent);
+        "nodeSet" : function(key, value) {
+            this.component.set(key, value);
         },
         "registerComponent" : function(componentName, definition, options) {
             if(Lyte.Component.registeredComponents[componentName]) {
@@ -3634,24 +3315,12 @@ let LyteComponent = {
             Component.prototype.setMethods = LyteComponent.componentSetMethods;
             customCrmComponent._mixins = options.mixins;
             let mixinslen = mixinsToBeUsed.length;
-
-            let actionsFromMixin = {};
-            let methodsFromMixin = {};
-            let newDefinition = {};
             for(let i=0; i<mixinslen ; i++) {
                 for(let item in mixinsToBeUsed[i]){
-                    if(item === "actions") {
-                        Object.assign(actionsFromMixin, mixinsToBeUsed[i][item]);    
-                    } else if(item === "methods") {
-                        Object.assign(methodsFromMixin, mixinsToBeUsed[i][item]);    
-                    } else {
-                        //Component.prototype[item] = mixinsToBeUsed[i][item];    
-                        newDefinition[item] = mixinsToBeUsed[i][item];
-                    }
+                        Component.prototype[item] = mixinsToBeUsed[i][item];
                 }
             }
-            definition = Object.assign(newDefinition, definition);
-            customCrmComponent._actions = Object.assign({}, actionsFromMixin, definition.actions);
+            customCrmComponent._actions = definition.actions? definition.actions : {};
             customCrmComponent._template = definition._template;
             delete definition._template;
             customCrmComponent._dynamicNodes = definition._dynamicNodes;
@@ -3662,7 +3331,7 @@ let LyteComponent = {
             customCrmComponent._observers = [];
 //            let properties = definition.data ? definition.data : {};
             let properties = definition.data ? definition.data : undefined;
-            let methods = Object.assign({},methodsFromMixin, definition.methods);
+            let methods = definition.methods ? definition.methods: {};
 //            customCrmComponent._observedAttributes = Object.keys(properties);
             customCrmComponent._observedAttributes = definition._observedAttributes || [];
             customCrmComponent._observedMethodAttributes = definition._observedMethodAttributes || {};
@@ -3713,78 +3382,17 @@ let LyteComponent = {
         "registerMixin" : function(name,mixin){
             Lyte.Mixin.register.call(Lyte, name, mixin);
         },
-        "typeCast" : function(value, dataType, obj) {
-        	if(value === null) {
-        		if(dataType !== "boolean") {
-        			return undefined;
-        		} else {
-        			return false;
-        		}
-        	}
-        	try {
-        		switch(dataType) {
-            	case "string" : 
-            		return typeof value === "object" ? JSON.stringify(value) : value.toString(); 	
-            	break;
-            	case "number" :
-            		{
-            		let val = +value;
-            		if(isNaN(val)) {
-            			throw "TypeCast exception";
-            		} 
-            		return val;
-            		}
-            	break;
-            	case "array" : 
-            	case "object" :
-            		return JSON.parse(value);
-            		break;
-            	case "boolean" :
-            		return ( (!value && value !== "") || value=== "false") ? false : true; 
-            	break;
-            	default : 
-            		return value;
-            	}
-        	} catch(e) {
-        		if(obj) {
-        			obj.isError = true;
-        		}
-        		return value;
-        	}
-        	
-        },
-        "getDataType" : function(value) {
-            var type = typeof value;
-            if(type === "object") {
-                if(value instanceof Array) {
-                    return "array";
-                }
-            }
-            return type;
-        },
-        "update":function(object, property, value, fromStore,oldValue,setterScope, actualProperty, fromParent){
+        "update":function(object, property, value, fromStore,oldValue,setterScope, actualProperty){
         	let fromComponent = object.__component__;
-        	let updateAttr = true;
         	if(!oldValue){
                 oldValue = object[property];
                 if(!object.hasOwnProperty(property) && !(object instanceof Array)) {
                     LyteComponent.objectFunctions(object, "add", property, value, true)
                 }
                 if(fromComponent && fromComponent.tagName !== "LYTE-YIELD") {
-                	let dataType, dataDef = fromComponent.component.__data[property];
-                	if(dataDef && (dataType = dataDef.type)) {
-                		updateAttr = !dataDef.hideAttr;
-                		if(dataType !== LyteComponent.getDataType(value) && (value !== undefined || dataType === "boolean")) {
-                			value = LyteComponent.typeCast(value, dataType);
-                		}
-                	}
-                	if(value === oldValue) {
-                		return;
-                	}
                 	let error = Lyte.validate(object, property, value, fromComponent.component);
                 	if(error) {
                 		LyteComponent.set(fromComponent.component.data.errors, property, error);
-                		fromComponent.callback("onError", property, error);
                 		return;
                 	} else {
                 		if(fromComponent.component.data.errors[property]) {
@@ -3797,24 +3405,10 @@ let LyteComponent = {
                 }
             }
             let toBeExecuted = fromComponent ? true : false;
-            let dasherizedAttr = LyteComponent.String.dasherize(property);
-            if(fromComponent && actualProperty && ( (typeof value === "string" && fromComponent.getAttribute(dasherizedAttr) !==  value) || fromComponent.hasAttribute(dasherizedAttr) )) {
-                 if((!LyteComponent.customPropRegex.exec(property) || fromComponent.hasAttribute(dasherizedAttr) ) && updateAttr) {
-                     if(typeof value === "object") {
-                    	 let jsonString = JSON.stringify(value);
-                    	 fromComponent.attributes.getNamedItem(dasherizedAttr).__lyteIgnore = true;
-                    	 fromComponent.setAttribute(dasherizedAttr, jsonString);
-                     } else {
-                    	 let attributeString = LyteComponent.typeCast(value, "string");
-                    	 if(fromComponent.getAttribute(dasherizedAttr) !== attributeString) {
-                             let detAttr = fromComponent.attributes.getNamedItem(dasherizedAttr);
-                             if(detAttr) {
-                                 detAttr.__lyteIgnore = true;
-                             }
-                             attributeString = attributeString || "";
-                             fromComponent.setAttribute(dasherizedAttr, attributeString);
-                         }
-                     }
+            if(fromComponent && actualProperty && typeof value === "string" && fromComponent.getAttribute(LyteComponent.String.dasherize(property)) !==  value) {
+                let dasherizedAttr = LyteComponent.String.dasherize(property);
+                 if(!LyteComponent.customPropRegex.exec(property) || fromComponent.hasAttribute(dasherizedAttr)) {
+                    fromComponent.setAttribute(LyteComponent.String.dasherize(property), value);
                  }
             }
             if(value && typeof value !== "string" && typeof value !== "boolean" && typeof value !== "number" ) {
@@ -3937,7 +3531,7 @@ let LyteComponent = {
                     }
                 }
             }
-            if(toBeExecuted && !fromParent && fromComponent._attributeDetails && fromComponent._callee) {
+            if(toBeExecuted && fromComponent._attributeDetails && fromComponent._callee) {
             	//let syntaxValue = fromComponent.getAttributeNode(property).syntaxValue;
             	let attrDetail = fromComponent._attributeDetails[LyteComponent.String.dasherize(property)];
             	let syntaxValue;
@@ -3961,7 +3555,7 @@ let LyteComponent = {
             		}
             		//self.setData(this._lbind,this.value);
             		if(exec) {
-            			LyteComponent.set(obj.context, obj.lastKey, value);
+            			LyteComponent.set(obj.context, obj.lastKey, value, undefined, fromComponent._callee);
             		}
             		if(contextSwitchArray) {
             			LyteComponent.removeContext(fromComponent._contextSwitchInfo.node, contextSwitchArray, fromComponent._contextSwitchInfo )
@@ -3969,7 +3563,7 @@ let LyteComponent = {
             	}
             }
         },
-        "set" : function(object, property, value, fromStore, fromParent) {
+        "set" : function(object, property, value, fromStore) {
             if(typeof property === "string" && object[property] === value) {
         		return;
         	}
@@ -4003,23 +3597,18 @@ let LyteComponent = {
                             return record;
                         }
                         for(let i=0; i<oldValues.length; i++){
-                            LyteComponent.update(object,oldValues[i].key,object[oldValues[i].key],fromStore,(oldValues[i].oldValue === undefined)?null:oldValues[i].oldValue ,setterScope, actualProperty, fromParent);
+                            LyteComponent.update(object,oldValues[i].key,object[oldValues[i].key],fromStore,(oldValues[i].oldValue === undefined)?null:oldValues[i].oldValue ,setterScope, actualProperty);
                         }
                 } else {
                     //object[property] =  value;
                     for(let key in property){
-                        LyteComponent.update(object,key,property[key],fromStore,undefined,setterScope, actualProperty, fromParent);
+                        LyteComponent.update(object,key,property[key],fromStore,undefined,setterScope, actualProperty);
                     }
                 }
             }
             else{
                 if(Lyte.isRecord(object) && !fromStore) {
                     let old = object[property];
-					let dataType = object.$.model.fieldList[property];
-                    dataType = dataType ? dataType.type : undefined;
-                    if(dataType && (value !== undefined || dataType === "boolean") && dataType !== LyteComponent.getDataType(value)) {
-                        value = LyteComponent.typeCast(value, dataType);
-                    }
                     let record = store.$.setData(object.$, property,value);
                     if(record.$.isError){
                         return record;
@@ -4027,13 +3616,13 @@ let LyteComponent = {
                     //Commented because update will happend when "set" is called from setData of store. 
                     //LyteComponent.update(object,property,value,fromStore,(old === undefined) ? null : old,setterScope , actualProperty);    
                 } else {
-                    LyteComponent.update(object,property,value,fromStore,undefined,setterScope,actualProperty, fromParent);
+                    LyteComponent.update(object,property,value,fromStore,undefined,setterScope,actualProperty);
                 }
             }
         },
         "newAddContext" : function(node, contextSwitchArray) {
         	let isYield = node.tagName === "LYTE-YIELD";
-        	if(node._contextSwitchInfo && (!isYield || node._contextSwitchInfo.node.tagName !== "LYTE-YIELD")) {
+        	if(node._contextSwitchInfo) {
         		LyteComponent.changeContext(node._contextSwitchInfo.node, contextSwitchArray, node._contextSwitchInfo, isYield);
         	} else if(isYield && node._callee._contextSwitchInfo) {
         		LyteComponent.changeContext(node._callee._contextSwitchInfo.node, contextSwitchArray, node._callee._contextSwitchInfo, true);
@@ -4041,7 +3630,7 @@ let LyteComponent = {
         }, 
         "newRemoveContext" : function(node, contextSwitchArray) {
         	let isYield = node.tagName === "LYTE-YIELD";
-        	if(node._contextSwitchInfo && (!isYield || node._contextSwitchInfo.node.tagName !== "LYTE-YIELD")) {
+        	if(node._contextSwitchInfo) {
         		LyteComponent.removeContext(node._contextSwitchInfo.node, contextSwitchArray, node._contextSwitchInfo, isYield);
         	} else if(isYield && node._callee._contextSwitchInfo) {
         		LyteComponent.removeContext(node._callee._contextSwitchInfo.node, contextSwitchArray, node._callee._contextSwitchInfo, true);
@@ -4051,8 +3640,7 @@ let LyteComponent = {
             if(!contextSwitchInfo) {
                 return;
             }
-            let isYield = node.tagName === "LYTE-YIELD";
-            if(node._contextSwitchInfo && (!isYield || node._contextSwitchInfo.node.tagName !== "LYTE-YIELD")) {
+            if(node._contextSwitchInfo) {
                 LyteComponent.changeContext(node._contextSwitchInfo.node, contextSwitchArray, node._contextSwitchInfo, node.tagName === "LYTE-YIELD" || proceedFurther);
             } else if((node.tagName === "LYTE-YIELD" || proceedFurther) && node._callee && node._callee._contextSwitchInfo) {
             	LyteComponent.changeContext(node._callee._contextSwitchInfo.node, contextSwitchArray, node._callee._contextSwitchInfo);
@@ -4087,7 +3675,7 @@ let LyteComponent = {
             } else {
                 //handling for yield
                 let dummyObject = {};
-                let callee = node._registerYield._callee;
+                let callee = node._callee._callee;
                 Object.keys(contextSwitchInfo.node._properties).forEach(function(key) {
                     dummyObject[key] = {};
                     dummyObject[key].value = callee.component.data[key];
@@ -4102,8 +3690,7 @@ let LyteComponent = {
             if(!contextSwitchInfo) {
                 return;
             }
-            let isYield = node.tagName === "LYTE-YIELD";
-            if(node._contextSwitchInfo && (!isYield || node._contextSwitchInfo.node.tagName !== "LYTE-YIELD")) {
+            if(node._contextSwitchInfo) {
                 LyteComponent.removeContext(node._contextSwitchInfo.node, contextSwitchArray, node._contextSwitchInfo, node.tagName === "LYTE-YIELD" || proceedFurther);
             } else if((node.tagName === "LYTE-YIELD" || proceedFurther) && node._callee && node._callee._contextSwitchInfo) {
             	LyteComponent.removeContext(node._callee._contextSwitchInfo.node, contextSwitchArray, node._callee._contextSwitchInfo)
@@ -4131,7 +3718,7 @@ let LyteComponent = {
                 callee._properties[itemValue] = removedObject.initialItemProp;
                 callee._properties[indexValue] = removedObject.initialIndexProp;
             } else {
-                let callee = node._registerYield._callee;
+                let callee = node._callee._callee;
                 let removedObject = contextSwitchArray.shift();
                 Object.keys(contextSwitchInfo.node._properties).forEach(function(key) {
                     callee.component.data[key] = removedObject[key].value;
@@ -4153,7 +3740,7 @@ let LyteComponent = {
             options.type = functionName;
             options.property = property;
             if(!/^(add|delete)$/.test(functionName)) {
-                Lyte.error("LC005", functionName);
+                console.error("No such function exists in objectFunctions");
                 return;
             }
             let bindings = object._bindings;
@@ -4195,7 +3782,6 @@ let LyteComponent = {
                 console.warn(functionName + " operation cannot be performed on empty array");
                 return;
             }
-            let commArgs = arguments[2];
             switch(functionName) {
             case "replaceAt" : 
                 {
@@ -4222,9 +3808,6 @@ let LyteComponent = {
                             let helperbind = item._forHelpers.toArrayLyte();
                             for(let j=0;j<helperbind.length;j++){
                                 let helper = helperbind[j];
-                                if(helper.hasAttribute("unbound")) {
-                            		continue;
-                            	}
                                 let finalIndex = index + deletedItems.length;
                                 let itemValue = helper.getAttribute("item");
                                 for(let i=index, j=0;i<finalIndex;i++,j++) {
@@ -4303,9 +3886,6 @@ let LyteComponent = {
                             let helperbind = item._forHelpers.toArrayLyte();
                             for(let j=0;j<helperbind.length;j++){
                                 let helper = helperbind[j];
-                                if(helper.hasAttribute("unbound")) {
-                            		continue;
-                            	}
                                 let finalIndex = index + deletedItems.length;
                                 let itemValue = helper.getAttribute("item");
                                 for(let i=index, j=0;i<finalIndex;i++,j++) {
@@ -4394,9 +3974,6 @@ let LyteComponent = {
                             let helperbind = item._forHelpers.toArrayLyte();
                             for(let j=0;j<helperbind.length;j++){
                                 let helper = helperbind[j];
-                                if(helper.hasAttribute("unbound")) {
-                            		continue;
-                            	}
                                 let finalIndex = index + deletedItems.length;
                                 let itemValue = helper.getAttribute("item");
                                 for(let i=index, j=0;i<finalIndex;i++,j++) {
@@ -4450,21 +4027,6 @@ let LyteComponent = {
                 return deletedItems;
                 }
                 break;
-            case "removeObject" : 
-                    commArgs = [commArgs];
-            case "removeObjects" :
-                if(!(commArgs instanceof Array)) {
-                    commArgs = [commArgs];
-                }
-                for(var i=0;i<commArgs.length;i++) {
-                    let inde = array.indexOf(commArgs[i]);
-                    if(inde !== -1) {
-                       LyteComponent.arrayFunctions(array, 'removeAt', inde);                         
-                    }
-                }
-                //Lyte.arrayUtils(array, 'removeObject', actObj);
-                //Lyte.arrayUtils(array, 'removeObjects', []);
-            break;
             case "unshift" : 
             case "unshiftObject" : 
             case "unshiftObjects" : 
@@ -4499,9 +4061,6 @@ let LyteComponent = {
                         if(item._forHelpers) {
                             let forbind = item._forHelpers.toArrayLyte();
                             for(let j=0;j<forbind.length;j++){
-                            	if(forbind[j].hasAttribute("unbound")) {
-                            		continue;
-                            	}
                                 let helper = forbind[j];
                                 let contextSwitchArray = [];
                                 LyteComponent.newAddContext(helper, contextSwitchArray);
@@ -4540,8 +4099,7 @@ let LyteComponent = {
                         }
                     }
                 }
-                let position = parseInt(arguments[2]);
-		LyteComponent.callArrayObservers(array,{type:"array",insertedItems:(!(arguments[3] instanceof Array)) ? [arguments[3]]: arguments[0].slice(position,position+len),index:position});
+                LyteComponent.callArrayObservers(array,{type:"array",insertedItems:(!(arguments[3] instanceof Array)) ? [arguments[3]]: arguments[0].slice(parseInt(arguments[2]),len+1),index:parseInt(arguments[2])});
                 }
                 break;
             case "concat" : 
@@ -4549,7 +4107,7 @@ let LyteComponent = {
                 LyteComponent.arrayFunctions(array, 'insertAt', array.length, arguments[2]);
                 break;
             default: 
-                Lyte.error("LC006" , functionName);
+                console.error("array Function " + functionName + " doesn't exist");
                 return;
             }
         },
@@ -4604,7 +4162,7 @@ let LyteComponent = {
             let currentProp = node.getProperty(props[0]);
             let currentValue = actualData[props[0]];
             for(let i=0;i<props.length;i++) {
-                if(!currentValue || typeof currentValue !== "object") {
+                if(typeof currentValue !== "object") {
                     break;
                 } 
                 if(!currentValue._bindings) {
@@ -4692,7 +4250,7 @@ let LyteComponent = {
                 if(actData && actData._bindings) {
                     actData._bindings[del](binding[i]);
                     if(!actData._bindings.size) {
-                        delete actData._bindings;
+                        delete actualData._bindings;
                     }
                 }
                 if(typeof binding[i] === "object" && actData) {
@@ -4843,7 +4401,7 @@ let LyteComponent = {
                     if(context === undefined){
                         return undefined;
                     }
-                    var inner = LyteComponent.getDynamicData.call(self,self.component.data,item);
+                    var inner = self.getDynamicData.call(self,self.component.data,item);
                     if(inner === undefined){
                         return undefined;
                     }
@@ -4987,7 +4545,7 @@ let LyteComponent = {
             if(componentName) {
                 var component = document.createElement(componentName);
             } else {
-                Lyte.error("LC007");
+                console.error("Component name not specified");
                 return;
             }
             if(data){
@@ -4997,9 +4555,8 @@ let LyteComponent = {
                 let actOutlet = document.querySelector(outlet);
                 if(actOutlet) {
                     actOutlet.appendChild(component);
-                    component._callee = component.getCallee(actOutlet);
                 } else {
-                    Lyte.error("LC008", outlet);
+                    console.warn("Specified outlet doesn't exist");
                 }
             }
             return component;
@@ -5046,7 +4603,7 @@ let LyteComponent = {
             let args = Array.prototype.slice.call(arguments, 1);
             var methodName = LyteComponent.String.toCamelCase(arguments[0]);
             if(!this.methods[methodName]) {
-                Lyte.error("LC009", methodName);
+                console.error(methodName + " method not found");
                 return;
             }
             return this.methods[methodName].apply(this, args);
@@ -5158,19 +4715,12 @@ let LyteComponent = {
             }
             obj.newValue = newValue;
             return true;
-        }, 
-        "cssEscape" : function(string) {
-            if(string) {
-                return string.replace(/['"]/g, "\\$&");    
-            } else {
-                return string;
-            }
-            
         }
 
 }
 Lyte.Component.render = LyteComponent.render;
 LyteComponent.lyteComponentsDiv = document.createElement("div");
+LyteComponent.styleDiv = document.createElement("div");
 LyteComponent.lyteComponentsDiv.setAttribute("id", "lyte-components-div");
 LyteComponent.dummyLyteComponentsDiv = document.createElement("div");
 LyteComponent.dummyLyteComponentsDiv.setAttribute("id", "dummy-lyte-components-div");
@@ -5366,7 +4916,7 @@ function doCompile(dynamicN, dynamicNodes, componentName) {
                     else if(/{{.*}}/.test(val) && !(/\\{{.*}}/.test(val))){
                         actObj = this.splitMixedText(val);
                     }
-                    if( actObj && (actObj.name === "action" || actObj.name === "method") && /^(onfocus|onfocusin|onfocusout|onresize|onscroll|onclick|ondblclick|onmousedown|onmouseup|onmousemove|onmouseover|onmouseout|onchange|onselect|onsubmit|onkeydown|onkeypress|onkeyup|oncontextmenu)$/.test(node.attributes[i].name)){
+                    if( actObj && (actObj.name === "action" || actObj.name === "method") && /^(onfocus|onfocusin|onfocusout|onresize|onscroll|onclick|ondblclick|onmousedown|onmouseup|onmousemove|onmouseover|onmouseout|onmouseenter|onmouseleave|onchange|onselect|onsubmit|onkeydown|onkeypress|onkeyup|oncontextmenu)$/.test(node.attributes[i].name)){
                             attr[node.attributes[i].name.substr(2)] = {name:node.attributes[i].name.substr(2),helperInfo: actObj, globalEvent: true};
                             let actArgs = deepCopyObject(actObj.args);
                             let actName = actArgs.splice(0,1)[0];
@@ -5458,7 +5008,7 @@ function doCompile(dynamicN, dynamicNodes, componentName) {
                 }
             } else {
             	for(let key in info.cases) {
-            		doCompile(dynN.content.querySelector("[case='"+LyteComponent.cssEscape(key)+ "']").content, info.cases[key].dynamicNodes,componentName);
+            		doCompile(dynN.content.querySelector("[case='"+key+ "']").content, info.cases[key].dynamicNodes,componentName);
             	}
             	if(info[def].dynamicNodes) {
             		doCompile(dynN.content.querySelector("[default]").content, info[def].dynamicNodes,componentName);
@@ -5796,52 +5346,3 @@ Lyte.Component.register("lyte-event-listener",{
         });
 
 Lyte.Component.registerCustomPropHandler("ltProp");
-
-LyteComponent.addLyteEventListener = function(element, eventName, func, context) {
-  element._lyteEvents = element._lyteEvents || {};
-  element._lyteEvents[eventName] = element._lyteEvents[eventName] || []; 
-  var ind = element._lyteEvents[eventName].push({"func" : func, "fromEventListener" : true, "context" : context});
-  return eventName + "-" + ind; 
-}
-
-LyteComponent.removeLyteEventListener = function(element, listenerId) {
-    if(!listenerId) {
-        Lyte.error("No listenerId provided");
-        return;
-    }
-    var split = listenerId.split('-');
-    var eventName = split[0];
-    var index = parseInt(split[1]);
-    if(!element._lyteEvents || !element._lyteEvents[split[0]] || isNaN(index)) {
-        Lyte.error("Invalid listenerId / listener is not available");
-        return;
-    }
-    element._lyteEvents[split[0]][split[1] - 1] = {};
-}
-
-LyteComponent.hasLyteEvents = function(element, eventName) {
-    if(element._lyteEvents && element._lyteEvents[eventName]) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-LyteComponent.handleLyteEvents = function(element, event) {
-    var funcs = element._lyteEvents[event.type];
-    var ret;
-    var eventStopped;
-    for(var i=0;i<funcs.length;i++) {
-        if(funcs[i].func) {
-            ret = funcs[i].func.call(funcs[i].context ? funcs[i].context : window, event);
-            if(ret === false || event.cancelBubble) {
-                eventStopped = true;
-                break;
-            } 
-        }
-    }
-    if(eventStopped) {
-        event.stopPropagation();
-    }
-    return eventStopped;
-}

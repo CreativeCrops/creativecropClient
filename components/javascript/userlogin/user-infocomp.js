@@ -1,7 +1,7 @@
 Lyte.Component.register("user-infocomp", {
 	data : function(){
 		return {
-
+            user:Lyte.attr("object",{default:{}}),
 		}		
 	},
 	init:function () {
@@ -15,10 +15,20 @@ Lyte.Component.register("user-infocomp", {
             $("#userinfocomp").hide()
         },
         NextOption:function (el) {
+
+
+            let data=store.peekAll("user")[0]
+            data.$.set("phone",parseInt(document.getElementById("phone").value))
+            data.$.set("DOB",document.getElementById("day").value+"-"+document.getElementById("mon").value+"-"+document.getElementById("year").value)
+            data.$.set("gander",document.getElementById("gender").value)
+
+
             $("#userinfocomp").hide();
-            let e=$("#useraddresscomp")
+            let e = $("#useraddresscomp")
             e.find("div").addClass("anm").removeClass("anm1")
             e.show()
+
+
         }
 	}
 });

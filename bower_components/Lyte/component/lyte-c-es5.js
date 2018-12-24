@@ -87,63 +87,17 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-Lyte = {
-  version: "2.0.0",
-  $: {},
-  registeredMixins: {},
-  Mixin: {},
-  debug: false,
-  performance: false,
-  toBeRegistered: []
-};
-
+Lyte = {};
+Lyte.version = "1.0.6";
+Lyte.registeredMixins = {};
+Lyte.Mixin = {};
+Lyte.debug = false;
+Lyte.performance = false;
+Lyte.toBeRegistered = [];
 var consoleTime = [];
-
-(function assetsDivCreation() {
-  Lyte.$.assetsDiv = document.createElement("div");
-  Lyte.$.assetsDiv.setAttribute("id", "lyteAssetsDiv");
-  document.head.appendChild(Lyte.$.assetsDiv);
-})();
-
-Lyte.registerErrorCodes = function (obj) {
-  Object.assign(Lyte.errorCodes, obj);
-};
-
-Lyte.getErrorMessage = function (code) {
-  var args = Array.from(arguments).slice(1);
-  if (Lyte.errorCodes[code]) {
-    return Lyte.errorCodes[code].replace(/{(\d+)}/g, function (t, i) {
-      return args[i];
-    });
-  } else {
-    return code;
-  }
-};
-
-Lyte.error = function () {
-  var errorObj = arguments[0].stack || Error(Lyte.getErrorMessage.apply(Lyte, arguments));
-  if (Lyte.onerror) {
-    Lyte.onerror.call(this, errorObj);
-  }
-  Lyte.triggerEvent("error", errorObj);
-  console.error.call(console, errorObj);
-};
-
-Lyte.warn = function () {
-  var errorObj = arguments[0].stack || Error(Lyte.getErrorMessage.apply(Lyte, arguments));
-  console.warn.call(console, errorObj);
-};
 
 Lyte.Mixin.register = function (name, mixin) {
   Lyte.registeredMixins[name] = mixin;
-};
-
-Lyte.Mixin.exists = function (name) {
-  if (!Lyte.registeredMixins[name]) {
-    Lyte.error('Mixin used before being registered.');
-    return false;
-  }
-  return true;
 };
 
 Lyte.log = function (text, color) {
@@ -179,156 +133,42 @@ Lyte.isComponent = function (object) {
   return false;
 };
 
-/* --------- lyte router v2 changes starts---- */
-var reqFiles = {};
-
 Lyte.injectResources = function (files, every, completed) {
-  var successFiles = [],
-      errorFiles = [];
-  every = every || function () {};
-  completed = completed || function () {};
-  return new Promise(function (resolve) {
-    processRequirements(files, resolve);
-  }).then(function () {
-    completed(successFiles, errorFiles);
-  });
-
-  function processRequirements(files, resolve) {
-    if (!files) {
-      resolve();
-    } else {
-      if (!Array.isArray(files)) {
-        files = [files];
+  if (files) {
+    files = Array.isArray(files) ? files : [files];
+    var filesLoaded = -files.length;
+    files.forEach(function (file) {
+      var tag,
+          fileSplit = file.split('.'),
+          type = fileSplit[fileSplit.length - 1],
+          tags = { js: 'script', css: 'link' };
+      tag = document.createElement(tags[type]);
+      if (fileSplit.length == 1) {
+        console.error('Type of file is not specified in injectResources.');
+        return;
       }
-      if (!files.length) {
-        resolve();
-      }
-      var len = -files.length;
-      files.forEach(function (file) {
-        if (typeof file == "string") {
-          requestFile(file, Lyte.injectResources.availableTags[file], function () {
-            loaded();
-          });
-        } else if (Array.isArray(file)) {
-          new Promise(function (r) {
-            processRequirements(file, r);
-          }).then(function () {
-            loaded();
-          });
-        } else {
-          new Promise(function (r) {
-            processRequirements(file.parent, r);
-          }).then(function () {
-            new Promise(function (r1) {
-              processRequirements(file.child, r1);
-            }).then(function () {
-              loaded();
-            });
-          });
-        }
-      });
-    }
-
-    function loaded() {
-      len++;
-      if (len == 0) {
-        resolve();
-      }
-    }
-
-    function requestFile(file, cached, resolve) {
-      if (reqFiles[file]) {
-        reqFiles[file].push(resolve);
+      if (type == 'css') {
+        tag.setAttribute('href', file);
+        tag.setAttribute('type', "text/css");
+        tag.setAttribute('rel', "stylesheet");
       } else {
-        reqFiles[file] = [resolve];
-        if (cached && cached.event.type != "error") {
-          if (Lyte.removeFromCache.arr.indexOf(file) != -1) {
-            Lyte.removeFromCache.arr.splice(Lyte.removeFromCache.arr.indexOf(file), 1);
-          }
-          fileLoaded.call(cached.tag, cached.event, true);
-          resolve();
-        } else {
-          makeRequest(file, function (event) {
-            reqFiles[file].forEach(function (resolve) {
-              resolve();
-            });
-            fileLoaded.call(this, event);
-            every.call(this, event);
-          });
+        tag.setAttribute('src', file);
+      }
+      tag.onerror = tag.onload = function (event) {
+        filesLoaded++;
+        if (every) {
+          every.call(this, event);
         }
-      }
-    }
-
-    function fileLoaded(event, cached) {
-      var file = this.getAttribute('src') || this.getAttribute('href');
-      delete reqFiles[file];
-      if (!cached) {
-        if (Lyte.injectResources.availableTags[file]) {
-          Lyte.injectResources.availableTags[file].tag.remove();
+        if (completed && filesLoaded == 0) {
+          completed();
         }
-        this.onerror = this.onload = undefined;
-        Lyte.injectResources.availableTags[file] = { tag: this, event: { type: event.type } };
-      }
-    }
-  }
-
-  function makeRequest(file, callBack) {
-    var tag,
-        fileSplit = file.split('.'),
-        type = fileSplit[fileSplit.length - 1],
-        tags = { js: 'script', css: 'link' };
-    tag = document.createElement(tags[type]);
-    if (fileSplit.length == 1) {
-      Lyte.error('Type of file is not specified in injectResources.');
-      return;
-    }
-    if (type == 'css') {
-      tag.setAttribute('href', file);
-      tag.setAttribute('type', "text/css");
-      tag.setAttribute('rel', "stylesheet");
-    } else {
-      tag.setAttribute('src', file);
-    }
-    tag.onerror = tag.onload = function (event) {
-      if (event.type == "error") {
-        errorFiles.push(event);
-      } else {
-        successFiles.push(event);
-      }
-      if (callBack) {
-        callBack.call(this, event);
-      }
-    };
-    document.getElementById("lyteAssetsDiv").appendChild(tag);
-  };
-};
-
-Lyte.injectResources.availableTags = [];
-
-Lyte.removeFromCache = function (arr) {
-  Lyte.removeFromCache.assign(arr);
-  if (Lyte.removeFromCache.arr.length) {
-    Lyte.removeFromCache.arr.forEach(function (file) {
-      if (Lyte.injectResources.availableTags[file]) {
-        Lyte.injectResources.availableTags[file].tag.remove();
-        delete Lyte.injectResources.availableTags[file];
-      }
+      };
+      document.head.appendChild(tag);
     });
-    Lyte.removeFromCache.arr = [];
   }
 };
 
-Lyte.removeFromCache.arr = [];
-
-Lyte.removeFromCache.assign = function (arr) {
-  arr = arr == "*" ? Object.keys(Lyte.injectResources.availableTags) : Array.isArray(arr) ? arr : [arr];
-  Lyte.removeFromCache.arr = Lyte.removeFromCache.arr.concat(arr);
-  return;
-};
-
-/* --------- lyte router v2 changes ends ---- */
-
-Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
+Lyte.checkProperty = function (property, dataVal, key, fieldVal, record) {
   var exts = "extends";
   switch (property) {
     case "type":
@@ -340,19 +180,12 @@ Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
         } else if (Lyte.Transform[fieldVal][exts] != (typeof dataVal === "undefined" ? "undefined" : _typeof(dataVal))) {
           return { code: "ERR03", message: Lyte.errorCodes.ERR03, expected: fieldVal };
         }
-      } else if (dataVal !== undefined) {
-        if (Array.isArray(dataVal)) {
-          if (fieldVal != "array") {
-            return { code: "ERR03", message: Lyte.errorCodes.ERR03, expected: fieldVal };
-          }
-        } else if (fieldVal != (typeof dataVal === "undefined" ? "undefined" : _typeof(dataVal))) {
+      } else if (Array.isArray(dataVal)) {
+        if (fieldVal != "array") {
           return { code: "ERR03", message: Lyte.errorCodes.ERR03, expected: fieldVal };
         }
-      }
-      break;
-    case "mandatory":
-      if (dataVal == undefined || dataVal == null || dataVal == "") {
-        return { code: "ERR02", message: Lyte.errorCodes.ERR02 };
+      } else if (fieldVal != (typeof dataVal === "undefined" ? "undefined" : _typeof(dataVal))) {
+        return { code: "ERR03", message: Lyte.errorCodes.ERR03, expected: fieldVal };
       }
       break;
     case "maximum":
@@ -367,18 +200,18 @@ Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
       break;
     case "maxLength":
     case "maxItems":
-      if (dataVal && dataVal.length > fieldVal) {
+      if (dataVal.length > fieldVal) {
         return { code: "ERR06", message: Lyte.errorCodes.ERR06, expected: fieldVal };
       }
       break;
     case "minLength":
     case "minItems":
-      if (dataVal && dataVal.length < fieldVal) {
+      if (dataVal.length < fieldVal) {
         return { code: "ERR07", message: Lyte.errorCodes.ERR07, expected: fieldVal };
       }
       break;
     case "pattern":
-      if (dataVal && typeof dataVal == "string" && !new RegExp(fieldVal).test(dataVal)) {
+      if (typeof dataVal == "string" && !new RegExp(fieldVal).test(dataVal)) {
         return { code: "ERR08", message: Lyte.errorCodes.ERR08, expected: fieldVal };
       }
       break;
@@ -409,7 +242,7 @@ Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
         if (!resp) {
           return { code: "ERR10", message: Lyte.errorCodes.ERR10, expected: fieldVal };
         }
-      } else if (dataVal && dataVal != fieldVal) {
+      } else if (dataVal != fieldVal) {
         return { code: "ERR10", message: Lyte.errorCodes.ERR10, expected: fieldVal };
       }
       break;
@@ -453,16 +286,14 @@ Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
 Lyte.types = ["string", "object", "number", "boolean", "array"];
 
 Lyte.attr = function (type, opts) {
-  var obj = {};
-  obj.type = type;
   if (opts == undefined) {
     opts = {};
   }
   if (this.types.indexOf(type) == -1 && !Lyte.Transform.hasOwnProperty(type)) {
     throw new Error("Not a valid field type - " + type);
   }
-  Object.assign(obj, opts);
-  return obj;
+  opts.type = type;
+  return opts;
 };
 
 Lyte.defineRelation = function (name, type, opts) {
@@ -504,7 +335,7 @@ Lyte.registerValidator = function (customValidatorName, func) {
 };
 
 Lyte.patterns = {
-  email: /^([A-Za-z0-9._%\-'+/]+@[A-Za-z0-9.-]+\.[a-zA-Z]{2,22})$/,
+  email: /([A-Za-z0-9._%\-'+/]+@[A-Za-z0-9.-]+\.[a-zA-Z]{2,22})$|[\s]+/,
   url: /(^(ht|f)tp(s?):\/\/[0-9a-zA-Z][-.\w]*(:[0-9])*(\/?)([a-zA-Z0-9\-.?,:'/\\+=&amp;%$#_[\]@!()*;~]*)?$)/,
   ampm: /^(AM|PM|am|pm)$/,
   hour: /^(0?[0-9]|1[0-9]|2[0-4])$/,
@@ -519,9 +350,8 @@ Lyte.patterns = {
 Lyte.validate = function (object, key, value, component) {
   var definition = component.__data[key];
   var isError = false;
-  var type = definition ? definition.type : undefined;
   for (var defKey in definition) {
-    isError = Lyte.checkProperty(defKey, value, key, definition[defKey], object, type);
+    isError = Lyte.checkProperty(defKey, value, key, definition[defKey], object);
     if (isError !== true) {
       return isError;
     }
@@ -539,7 +369,7 @@ Lyte.errorCodes = {
   ERR08: "String does not match the specified pattern", ERR09: "Values in array are not unique", ERR10: "Value is not equal to the specified constant", ERR11: "Model of related field is not defined",
   ERR12: "Model of backward relation is not defined", ERR13: "Record not found", ERR14: "Model does not match the related field model", ERR15: "Error in creating a record as a relation",
   ERR16: "Record with primary key already exists", ERR17: "Value cannot be changed because record has been deleted", ERR18: "Action not defined", ERR19: "Model not defined",
-  ERR20: "Key not specified", ERR21: "'belongsTo' relationship expects a single object/id", ERR22: "Type not specified for polymorphic relation", ERR23: "Primary Key value not present", ERR24: "Error while relating record", ERR25: "Backward relation not present"
+  ERR20: "Key not specified", ERR21: "'belongsTo' relationship expects a single object/id", ERR22: "Type not specified for polymorphic relation", ERR23: "Primary Key value not present", ERR24: "Error while relating record"
 };
 
 Lyte.registeredGlobalEvents = {};
@@ -570,7 +400,7 @@ Lyte.triggerEvent = function () {
 
 Lyte.addEventListener = function (eventName, func) {
   if (typeof func !== "function") {
-    Lyte.error("Second parameter to LyteComponent.addGlobalEventListener() must be a function");
+    console.error("Second parameter to LyteComponent.addGlobalEventListener() must be a function");
     return;
   }
   var s = this.registeredGlobalEvents[eventName];
@@ -583,22 +413,21 @@ Lyte.addEventListener = function (eventName, func) {
 
 Lyte.removeEventListener = function (id) {
   if (!id) {
-    Lyte.error("listener unique id not specified");
+    console.error("listener unique id not specified");
     return;
   }
   var globalId = id.split("-");
   var s = this.registeredGlobalEvents[globalId[0]];
   if (!s || !s.listeners[globalId[1]]) {
-    Lyte.error("No such listener registered");
+    console.error("No such listener registered");
     return;
   }
   s.listeners[globalId[1]] = null;
 };
 
 Lyte.deepCopyObject = function (obj) {
-  var targetVal = Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
   var current,
-      copies = [{ source: obj, target: targetVal }],
+      copies = [{ source: obj, target: Object.create(Object.getPrototypeOf(obj)) }],
       keys,
       propertyIndex,
       descriptor,
@@ -616,7 +445,7 @@ Lyte.deepCopyObject = function (obj) {
         continue;
       }
       nextSource = descriptor.value;
-      descriptor.value = Array.isArray(nextSource) ? [] : nextSource instanceof Set ? new Set() : Object.create(Object.getPrototypeOf(nextSource));
+      descriptor.value = Array.isArray(nextSource) ? [] : Object.create(Object.getPrototypeOf(nextSource));
       indexOf = sourceReferences.indexOf(nextSource);
       if (indexOf != -1) {
         descriptor.value = targetReferences[indexOf];
@@ -633,14 +462,10 @@ Lyte.deepCopyObject = function (obj) {
 };
 
 Lyte.resolvePromises = function (promises) {
-  if (typeof promises != "string") {
-    if (Array.isArray(promises)) {
-      return promiseArray(promises);
-    } else if ((typeof promises === "undefined" ? "undefined" : _typeof(promises)) == "object") {
-      return promiseHash(promises);
-    }
-  } else {
-    return promises;
+  if (Array.isArray(promises)) {
+    return promiseArray(promises);
+  } else if ((typeof promises === "undefined" ? "undefined" : _typeof(promises)) == "object") {
+    return promiseHash(promises);
   }
 
   function promiseHash(promiseObj) {
@@ -648,11 +473,8 @@ Lyte.resolvePromises = function (promises) {
         promises = [],
         promiseKeys = Object.keys(promiseObj);
     promiseKeys.forEach(function (key) {
-      var value = promiseObj[key];
-      if (value instanceof Promise) {
-        actPromKeys.push(key);
-        promises.push(value);
-      }
+      actPromKeys.push(key);
+      promises.push(promiseObj[key]);
     });
     if (!promises.length) {
       return promiseObj;
@@ -660,17 +482,13 @@ Lyte.resolvePromises = function (promises) {
       var obj = {},
           promise = new Promise(function (resolve, reject) {
         Promise.all(promises).then(function (data) {
-          promiseKeys.forEach(function (promiseKey) {
-            if (actPromKeys.indexOf(promiseKey) != -1) {
-              obj[promiseKey] = data[actPromKeys.indexOf(promiseKey)];
-            } else {
-              obj[promiseKey] = promiseObj[promiseKey];
-            }
+          data.forEach(function (dataVal, index) {
+            obj[actPromKeys[index]] = dataVal;
           });
           resolve(obj);
         }, function (err) {
           reject(err);
-          Lyte.error(err);
+          console.error(err);
         });
       });
       return promise;
@@ -678,18 +496,7 @@ Lyte.resolvePromises = function (promises) {
   }
 
   function promiseArray(promiseArray) {
-    var array = [],
-        hasPromise = false;
-    promiseArray.every(function (item, i) {
-      if (item instanceof Promise) {
-        hasPromise = true;
-        return false;
-      }
-      return true;
-    });
-    if (!hasPromise) {
-      return promiseArray;
-    }
+    var array = [];
     var promise = new Promise(function (resolve, reject) {
       Promise.all(promiseArray).then(function (data) {
         promiseArray.forEach(function (key, index) {
@@ -698,7 +505,7 @@ Lyte.resolvePromises = function (promises) {
         resolve(array);
       }, function (err) {
         reject(err);
-        Lyte.error(err);
+        console.error(err);
       });
     });
     return promise;
@@ -782,7 +589,7 @@ if (document.readyState === "complete" || document.readyState === "interactive")
   document.addEventListener("DOMContentLoaded", function (e) {
     domContentLoaded1();
   }, true);
-};var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+}var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -794,18 +601,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-Lyte.registerErrorCodes({
-    "LC001": "Error while parsing custom prop handler attribute {0}. Check if the value provided is a valid JSON",
-    "LC002": "{0} Component is not compiled. Please compile using Lyte CLI",
-    "LC003": "Helper named {0} is not defined",
-    "LC004": "Action named {0} doesn't exists",
-    "LC005": "Lyte.objectUtils doesn't support {0} function",
-    "LC006": "Lyte.arrayUtils doesn't support {0} function",
-    "LC007": "Component name not specified in Lyte.Component.render",
-    "LC008": "Specified outlet {0} doesn't exists - Lyte.Component.render",
-    "LC009": "Method named {0} doesn't exists"
-});
-
+if (!window.Lyte) {
+    console.error("Lyte is not defined");
+}
 window.isIE11Lyte = false;
 window.isEdgeLyte = false;
 window.replaceWithNeeded = false;
@@ -817,14 +615,7 @@ if (navigator.userAgent.match(/rv:11/)) {
     };
 }
 if (navigator.userAgent.match('Edge')) {
-    var s = document.createElement("div");
-    s.innerHTML = "<template><div>c</div></template>";
-    if (s.querySelector("template").childNodes.length) {
-        window.isIE11Lyte = true;
-    } else {
-        window.isEdgeLyte = true;
-    }
-    s.remove();
+    window.isEdgeLyte = true;
 }
 
 if (window.isIE11Lyte || window.isEdgeLyte) {
@@ -916,10 +707,6 @@ Lyte.Component.unregisterComponent = function (componentName) {
             comp.prototype.get = noop;
             comp.prototype.set = noop;
             delete Lyte.Component.registeredComponents[componentName];
-            var template = document.querySelector("template[tag-name=" + componentName + "]");
-            if (template) {
-                template.remove();
-            }
         }
     } else {
         console.warn("Component " + componentName + " not yet registered");
@@ -938,7 +725,8 @@ function onDomContentForLyte() {
             LyteComponent.dummyLyteComponentsDiv = undefined;
         }
     }
-    var bodyEvents = ["focus", "focusin", "focusout", "resize", "scroll", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "change", "select", "submit", "keydown", "keypress", "keyup", "contextmenu"];
+    document.head.appendChild(LyteComponent.styleDiv);
+    var bodyEvents = ["focus", "focusin", "focusout", "resize", "scroll", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "contextmenu"];
     for (var _i = 0; _i < bodyEvents.length; _i++) {
         var evnt = bodyEvents[_i];
         document.body.addEventListener(evnt, globalEventHandler, true);
@@ -978,7 +766,7 @@ document.addEventListener("change", function (event) {
             callee = callee.parentNode;
         }
         if (callee && callee.tagName === "LYTE-YIELD") {
-            target._callee = callee._registerYield._callee;
+            target._callee = callee._callee._callee;
         } else {
             target._callee = callee;
         }
@@ -1001,18 +789,8 @@ var globalEventHandler = function globalEventHandler(ev) {
         toRemove = true;
         window.event = ev;
     }
-    var eventStopped = false;
     while (target.getAttribute && !target.getAttribute(evnt) && target.tagName != "BODY") {
-        if (LyteComponent.hasLyteEvents(target, evnt)) {
-            eventStopped = LyteComponent.handleLyteEvents(target, ev);
-            if (eventStopped) {
-                break;
-            }
-        }
         target = target.parentNode;
-    }
-    if (eventStopped) {
-        return;
     }
     var callee = target;
     if (!target._callee) {
@@ -1024,7 +802,7 @@ var globalEventHandler = function globalEventHandler(ev) {
             callee = callee.parentNode;
         }
         if (callee && callee.tagName === "LYTE-YIELD") {
-            target._callee = callee._registerYield._callee;
+            target._callee = callee._callee._callee;
         } else {
             target._callee = callee === target ? undefined : callee;
         }
@@ -1037,7 +815,7 @@ var globalEventHandler = function globalEventHandler(ev) {
         var cloneActObj = Lyte.deepCopyObject(actObj);
         cloneActObj.args.shift();
         LyteComponent.throwAction.call(target, target, evnt, cloneActObj, undefined, undefined, target, ev);
-    } else if (target.getAttribute && target.getAttribute(evnt)) {
+    } else if (target.getAttribute(evnt)) {
         var _actions = target._callee.constructor._actions;
         var func = target.getAttribute(evnt).split(" => ")[1];
         var _actObj = target._boundEvents[evnt];
@@ -1047,7 +825,7 @@ var globalEventHandler = function globalEventHandler(ev) {
     }
     if (target.tagName === "LABEL") {
         var input = target.querySelector("input");
-        if (input && input.getAttribute(evnt)) {
+        if (input.getAttribute(evnt)) {
             var _actions2 = target._callee.constructor._actions;
             var _func = input.getAttribute(evnt).split(" => ")[1];
             //	let actObj = target._callee.constructor.getHelper(func);
@@ -1094,9 +872,8 @@ var LyteYield = function (_HTMLElement) {
                 if (this._dynamicProperty[key].isActualNode) {
                     this._dynamicProperty[key].isActualNode._helperNodes[del](this);
                 } else {
-                    var helperNodes = node._callee.getProperty(key)._helperNodes;
-                    if (helperNodes) {
-                        helperNodes[del](this);
+                    if (node._callee.getProperty(key)._helperNodes) {
+                        node._callee.getProperty(key)._helperNodes[del](this);
                     }
                 }
             }
@@ -1208,7 +985,7 @@ var customElementPrototype = function (_elementPrototype) {
                 callee = callee.parentNode;
             }
             if (callee && callee.tagName === "LYTE-YIELD") {
-                return callee._registerYield._callee;
+                return callee._callee._callee;
             }
             return this === callee ? undefined : callee;
         }
@@ -1235,8 +1012,11 @@ var customElementPrototype = function (_elementPrototype) {
             if (this._initProperties) {
                 var initProperties = this._initProperties;
                 for (var _key3 in initProperties) {
-                    if (this.component.__data[_key3] && this.component.__data[_key3].type !== LyteComponent.getDataType(initProperties[_key3]) && (initProperties[_key3] !== undefined || this.component.__data[_key3].type === "boolean")) {
-                        this.component.data[_key3] = LyteComponent.typeCast(initProperties[_key3], this.component.__data[_key3].type);
+                    if (this.component.__data[_key3] && typeof initProperties[_key3] === "string" && this.component.__data[_key3].type !== "string") {
+                        var obj = { "newValue": initProperties[_key3], "dataType": this.component.__data[_key3].type, "attr": _key3, "tagName": this.tagName };
+                        if (LyteComponent.getProperData(obj)) {
+                            this.component.data[_key3] = obj.newValue;
+                        }
                     } else {
                         this.component.data[_key3] = initProperties[_key3];
                     }
@@ -1253,9 +1033,6 @@ var customElementPrototype = function (_elementPrototype) {
             this.callback('init');
             this.onCallBack('init');
             this.registerYields();
-            if (this.component.data.lyteUnbound) {
-                LyteComponent.unbound = true;
-            }
             var content = this.renderNodes(this.constructor._template.content, this.constructor._dynamicNodes, undefined, undefined, undefined, undefined, this.constructor._templateContent);
             return content;
         }
@@ -1362,8 +1139,8 @@ var customElementPrototype = function (_elementPrototype) {
                                 if (!dynamicN.hasAttribute(attrName)) {
                                     dynamicN.setAttribute(attrName, "{{dummy}}");
                                 }
-                                var node = this.bindNode(dynamicN.attributes.getNamedItem(attrName), toBeRemoved, helperNode, options, _attr, undefined, establishBindings);
-                                if (node !== dynamicN.attributes.getNamedItem(attrName)) {
+                                var node = this.bindNode(dynamicN.getAttributeNode(attrName), toBeRemoved, helperNode, options, _attr, undefined, establishBindings);
+                                if (node !== dynamicN.getAttributeNode(attrName)) {
                                     dynamicN._removedAttributes = dynamicN._removedAttributes || {};
                                     dynamicN._removedAttributes[attrName] = node;
                                 }
@@ -1390,13 +1167,13 @@ var customElementPrototype = function (_elementPrototype) {
                     var _returnVal = void 0;
                     switch (type) {
                         case "for":
-                            _returnVal = this.updateForHelper(dynamicN, { "type": "default" }, options.node ? options : undefined, establishBindings);
+                            _returnVal = this.updateForHelper(dynamicN, { "type": "default" }, options.node ? options : undefined);
                             break;
                         case "forIn":
-                            _returnVal = this.updateForInHelper(dynamicN, { "type": "default" }, options.node ? options : undefined, establishBindings);
+                            _returnVal = this.updateForInHelper(dynamicN, { "type": "default" }, options.node ? options : undefined);
                             break;
                         case "component":
-                            _returnVal = this.updateDynamicComponent(dynamicN, false, options.node ? options : undefined, establishBindings);
+                            _returnVal = this.updateDynamicComponent(dynamicN, false, options.node ? options : undefined);
                     }
                     if (_returnVal) {
                         updateHelpers.push(_returnVal);
@@ -1559,7 +1336,7 @@ var customElementPrototype = function (_elementPrototype) {
                 return;
             }
             var actualAttr = LyteComponent.String.toCamelCase(attr);
-            var isCustomProp = LyteComponent.customPropHandlers.indexOf(actualAttr);
+            isCustomProp = LyteComponent.customPropHandlers.indexOf(actualAttr);
             if (isCustomProp !== -1) {
                 var propValue = LyteComponent.customPropHandlers[isCustomProp];
                 var lyteProps = newValue;
@@ -1571,29 +1348,24 @@ var customElementPrototype = function (_elementPrototype) {
                             this.set(actKey, lyteProps[key]);
                         }
                     } catch (e) {
-                        Lyte.error("LC001", attr);
+                        console.error("Error while parsing " + attr);
                     }
                 }
                 return;
             }
-            if (oldValue === newValue) {
-                return;
-            }
-            var attrNode = this.attributes.getNamedItem(attr);
-            if (attrNode && attrNode.__lyteIgnore) {
-                this.attributes.getNamedItem(attr).__lyteIgnore = false;
+            if (newValue === null || oldValue === newValue) {
                 return;
             }
             var dataType = this.component.__data[actualAttr].type;
-            if (dataType !== "string") {
-                var obj = { "attr": attr, "tagName": this.tagName };
-                newValue = LyteComponent.typeCast(newValue, dataType, obj);
-                if (obj.isError) {
-                    console.warn("data type of the value provided for attribute " + attr + " of " + this.tagName + " is not valid");
-                    return;
-                }
+            var obj = { "newValue": newValue, "dataType": dataType, "attr": attr, "tagName": this.tagName };
+            if (LyteComponent.getProperData(obj)) {
+                newValue = obj.newValue;
+            } else {
+                return;
             }
+            //newValue = newValue.startsWith("boolean:")? (newValue.substring(newValue.indexOf(":") + 1) ==="true"? true: false) : newValue;
             if (this.component.data[actualAttr] !== newValue) {
+                //this.set(actualAttr, typeof newValue === "object" ? JSON.parse(newValue): newValue);
                 this.set(actualAttr, newValue);
             }
         }
@@ -1634,26 +1406,24 @@ var customElementPrototype = function (_elementPrototype) {
                             node._helpers[_i10] = [];
                         }
                     }
-                    for (var _s = 0; _s < node._forContent.length; _s++) {
-                        for (var _i11 = 0; _i11 < node._forContent[_s].length; _i11++) {
-                            node._forContent[_s][_i11].remove();
+                    for (var s = 0; s < node._forContent.length; s++) {
+                        for (var _i11 = 0; _i11 < node._forContent[s].length; _i11++) {
+                            node._forContent[s][_i11].remove();
                         }
                     }
                     var key = node.getAttribute("item");
                     if (node._items.length) {
                         var prop = node._items[0].itemProperty;
-                        for (var _i12 = 0; _i12 < node._items.length; _i12++) {
-                            var dynProp = node._items[_i12]._dynamicProperty;
-                            for (var dP in dynProp) {
-                                var property = this.getProperty(dP);
-                                if (property._helperNodes) {
-                                    property._helperNodes[del](node);
-                                }
+                        var dynProp = node._items[0]._dynamicProperty;
+                        for (var dP in dynProp) {
+                            var property = this.getProperty(dP);
+                            if (property._helperNodes) {
+                                property._helperNodes[del](node);
                             }
                         }
                         if (prop) {
-                            for (var _i13 = 0; _i13 < node._items.length; _i13++) {
-                                this.removeBindings(_defineProperty({}, key, node._items[_i13].itemProperty), _defineProperty({}, key, node._attributes.items[_i13]));
+                            for (var _i12 = 0; _i12 < node._items.length; _i12++) {
+                                this.removeBindings(_defineProperty({}, key, node._items[_i12].itemProperty), _defineProperty({}, key, node._attributes.items[_i12]));
                             }
                         }
                     }
@@ -1665,8 +1435,8 @@ var customElementPrototype = function (_elementPrototype) {
                             if (node._actualBinding._forHelpers) {
                                 node._actualBinding._forHelpers[del](node);
                             }
-                            if (node._removedAttributes && node._removedAttributes.items && !node._removedAttributes.items.helperValue && node._removedAttributes.items._multipleProperty) {
-                                node._removedAttributes.items._multipleProperty[0].actProp._forHelpers[del](node);
+                            if (node._removedAttributes && node._removedAttributes.items && node._removedAttributes.items._multipleProperty) {
+                                node._removedAttributes.items._multipleProperty.actProp._forHelpers[del](node);
                             }
                         }
                     }
@@ -1674,16 +1444,16 @@ var customElementPrototype = function (_elementPrototype) {
                 } else {
                     if (node._helpers) {
                         var keys = Object.keys(node._helpers);
-                        for (var _i14 = 0; _i14 < keys.length; _i14++) {
-                            for (var _j = 0; _j < node._helpers[keys[_i14]].length; _j++) {
-                                this.removeHelpers(node._helpers[keys[_i14]][_j]);
+                        for (var _i13 = 0; _i13 < keys.length; _i13++) {
+                            for (var _j = 0; _j < node._helpers[keys[_i13]].length; _j++) {
+                                this.removeHelpers(node._helpers[keys[_i13]][_j]);
                             }
-                            node._helpers[keys[_i14]] = [];
+                            node._helpers[keys[_i13]] = [];
                         }
                     }
                     for (var ind in node._forContent) {
-                        for (var _i15 = 0; _i15 < node._forContent[ind].length; _i15++) {
-                            node._forContent[ind][_i15].remove();
+                        for (var _i14 = 0; _i14 < node._forContent[ind].length; _i14++) {
+                            node._forContent[ind][_i14].remove();
                         }
                     }
                     var items = node._items;
@@ -1699,7 +1469,9 @@ var customElementPrototype = function (_elementPrototype) {
                             }
                         }
                         if (_prop) {
-                            this.removeBindings(_defineProperty({}, _key5, node._items[index].itemProperty), _defineProperty({}, _key5, node._attributes.object[index]));
+                            for (var _index in node._items) {
+                                this.removeBindings(_defineProperty({}, _key5, node._items[_index].itemProperty), _defineProperty({}, _key5, node._attributes.object[_index]));
+                            }
                         }
                     }
                     if (!update) {
@@ -1711,8 +1483,8 @@ var customElementPrototype = function (_elementPrototype) {
                                 node._actualBinding._forHelpers[del](node);
                             }
                         }
-                        if (node._removedAttributes.items && !node._removedAttributes.items.helperValue && node._removedAttributes.items._multipleProperty) {
-                            node._removedAttributes.items._multipleProperty[0].actProp._forHelpers[del](node);
+                        if (node._removedAttributes.items && node._removedAttributes.items._multipleProperty) {
+                            node._removedAttributes.items._multipleProperty.actProp._forHelpers[del](node);
                         }
                         if (node._propBindingObject && node._attributes.object && node._attributes.object._bindings) {
                             node._attributes.object._bindings[del](node._propBindingObject);
@@ -1728,24 +1500,23 @@ var customElementPrototype = function (_elementPrototype) {
                     node._helpers = [];
                 }
                 if (node._caseContent) {
-                    for (var _i16 = 0; _i16 < node._caseContent.length; _i16++) {
-                        node._caseContent[_i16].remove();
+                    for (var _i15 = 0; _i15 < node._caseContent.length; _i15++) {
+                        node._caseContent[_i15].remove();
                     }
                     for (var _key6 in node._dynamicProperty) {
                         if (node._dynamicProperty[_key6].isActualNode) {
                             node._dynamicProperty[_key6].isActualNode._helperNodes[del](node);
                         } else {
-                            var helperNodes = this.getProperty(_key6)._helperNodes;
-                            if (helperNodes) {
-                                helperNodes[del](node);
+                            if (this.getProperty(_key6)._helperNodes) {
+                                this.getProperty(_key6)._helperNodes[del](node);
                             }
                         }
                     }
                     node._dynamicProperty = {};
                     //node._parentIf = null;
                 } else {
-                    for (var _i17 = 0; _i17 < node._yieldContent.length; _i17++) {
-                        node._yieldContent[_i17].remove();
+                    for (var _i16 = 0; _i16 < node._yieldContent.length; _i16++) {
+                        node._yieldContent[_i16].remove();
                     }
                     node._dynamicProperty = {};
                 }
@@ -1769,12 +1540,10 @@ var customElementPrototype = function (_elementPrototype) {
             if (!toAppend) {
                 return;
             }
-            node._registerYield = toAppend;
             //ADded now
             var parentScope = toAppend._callee || node._callee._callee;
             if (!parentScope) {
                 node.appendChild(toAppend.content.cloneNode(true, "lyte"));
-                node._helpers = [];
                 return;
             }
             if (!toAppend._callee) {
@@ -1795,9 +1564,7 @@ var customElementPrototype = function (_elementPrototype) {
                 parentScope.component.data[key] = node.component.data[key];
             });
             var content = parentScope.renderNodes(toAppend.content, toAppend._dynamicNodes, node, { "node": node }, true, undefined, toAppend._templateContent);
-            if (!node.component.data.lyteUnbound) {
-                LyteComponent.establishBindings(node._properties, node.component.data);
-            }
+            LyteComponent.establishBindings(node._properties, node.component.data);
             parentScope.executeBlockHelpers(node._helpers);
             Object.keys(node._properties).forEach(function (key) {
                 parentScope.component.data[key] = contextSwitchingArray[key].value;
@@ -1805,14 +1572,14 @@ var customElementPrototype = function (_elementPrototype) {
             });
             LyteComponent.newRemoveContext(toAppend, contextSwitchArray);
             node.appendChild(content);
+            node._registerYield = toAppend;
         }
 
         // It constructs/updates the dynamicComponent creation
-        //upddc
 
     }, {
         key: "updateDynamicComponent",
-        value: function updateDynamicComponent(node, update, contextSwitchInfo, establishBindings) {
+        value: function updateDynamicComponent(node, update, contextSwitchInfo) {
             var returnVal = void 0;
             node._callee = this;
             var keepAlive = node.hasAttribute("lyte-keep-alive");
@@ -1851,9 +1618,9 @@ var customElementPrototype = function (_elementPrototype) {
             }
             if (newComponent) {
                 //          let componentData = {};
-                for (var _i18 = 0; _i18 < node.attributes.length; _i18++) {
-                    if (node.attributes[_i18].name !== "is" && node.attributes[_i18].name !== "component-name" && node.attributes[_i18].name !== "lyte-keep-alive") {
-                        component.setAttribute(node.attributes[_i18].name, node.attributes[_i18].value);
+                for (var _i17 = 0; _i17 < node.attributes.length; _i17++) {
+                    if (node.attributes[_i17].name !== "is" && node.attributes[_i17].name !== "component-name" && node.attributes[_i17].name !== "lyte-keep-alive") {
+                        component.setAttribute(node.attributes[_i17].name, node.attributes[_i17].value);
                     }
                 }
                 //          componentData = component._attributes;
@@ -1864,7 +1631,7 @@ var customElementPrototype = function (_elementPrototype) {
                         }
                     }
                 }
-                var toAppend = this.renderNodes(node.content, node._dynamicNodes, node, undefined, establishBindings, undefined, node._templateContent);
+                var toAppend = this.renderNodes(node.content, node._dynamicNodes, node, undefined, undefined, undefined, node._templateContent);
                 component.appendChild(toAppend);
             }
             if (newComponent) {
@@ -1889,13 +1656,10 @@ var customElementPrototype = function (_elementPrototype) {
 
     }, {
         key: "updateForHelper",
-        value: function updateForHelper(node, options, contextSwitchInfo, establishBindings) {
+        value: function updateForHelper(node, options, contextSwitchInfo) {
             var callee = this;
             node._callee = this;
             node._attributes = node._attributes || {};
-            if (options.type === "update" && node._currentItems === node._attributes.items) {
-                return {};
-            }
             node._contextSwitchInfo = contextSwitchInfo || node._contextSwitchInfo;
             var indexValue = node.getAttribute("index");
             if (!indexValue) {
@@ -1924,19 +1688,13 @@ var customElementPrototype = function (_elementPrototype) {
             var firstIndex = options.firstIndex;
             var secondIndex = options.secondIndex;
             var thirdIndex = options.thirdIndex;
-            var localUnbound = false;
-            var initialUnbound = LyteComponent.unbound;
-            if (node.hasAttribute("unbound")) {
-                localUnbound = true;
-                LyteComponent.unbound = true;
-            }
             if (options) {
                 switch (options.type) {
                     case "remove":
                         {
                             lastIndexForIteration = firstIndex;
-                            for (var _i19 = firstIndex, v = secondIndex; v > 0; v--, _i19++) {
-                                this.removeHelpersSpecificIndex(node, _i19);
+                            for (var _i18 = firstIndex, v = secondIndex; v > 0; v--, _i18++) {
+                                this.removeHelpersSpecificIndex(node, _i18);
                             }
                             //ln
                             /*for(let i=(firstIndex)?firstIndex-secondIndex:firstIndex;i<node._items.length;i++) {
@@ -1948,8 +1706,8 @@ var customElementPrototype = function (_elementPrototype) {
                                     }
                                 }
                             }*/
-                            for (var _i20 = firstIndex + secondIndex; _i20 < node._items.length; _i20++) {
-                                node._items[_i20]._contextSwitchInfo.itemIndex = node._items[_i20]._contextSwitchInfo.itemIndex - secondIndex;
+                            for (var _i19 = firstIndex + secondIndex; _i19 < node._items.length; _i19++) {
+                                node._items[_i19]._contextSwitchInfo.itemIndex = node._items[_i19]._contextSwitchInfo.itemIndex - secondIndex;
                             }
                             node._items.splice(firstIndex, secondIndex);
                             node._helpers.splice(firstIndex, secondIndex);
@@ -1980,8 +1738,8 @@ var customElementPrototype = function (_elementPrototype) {
                             //                          item._contextSwitchInfo.itemIndex = item._contextSwitchInfo.itemIndex + secondIndex;
                             //                      }
                             //                  }
-                            for (var _i21 = firstIndex + secondIndex; _i21 < node._items.length; _i21++) {
-                                node._items[_i21]._contextSwitchInfo.itemIndex = node._items[_i21]._contextSwitchInfo.itemIndex + secondIndex;
+                            for (var _i20 = firstIndex + secondIndex; _i20 < node._items.length; _i20++) {
+                                node._items[_i20]._contextSwitchInfo.itemIndex = node._items[_i20]._contextSwitchInfo.itemIndex + secondIndex;
                             }
                             node._forContent.splice.apply(node._forContent, [firstIndex, 0].concat(newArr1));
                         }
@@ -2009,8 +1767,8 @@ var customElementPrototype = function (_elementPrototype) {
                             //                      let forItem = node._items[i].itemProperty._forItem;
                             //                      forItem.itemIndex = forItem.itemIndex + secondIndex - 1 ;
                             //                  }
-                            for (var _i22 = firstIndex + secondIndex; _i22 < node._items.length; _i22++) {
-                                node._items[_i22]._contextSwitchInfo.itemIndex = node._items[_i22]._contextSwitchInfo.itemIndex + secondIndex - 1;
+                            for (var _i21 = firstIndex + secondIndex; _i21 < node._items.length; _i21++) {
+                                node._items[_i21]._contextSwitchInfo.itemIndex = node._items[_i21]._contextSwitchInfo.itemIndex + secondIndex - 1;
                             }
                             node._forContent.splice.apply(node._forContent, [firstIndex, 1].concat(_newArr2));
                             break;
@@ -2019,7 +1777,7 @@ var customElementPrototype = function (_elementPrototype) {
                         {
                             firstIndexForIteration = firstIndex;
                             lastIndexForIteration = secondIndex;
-                            for (var _i23 = thirdIndex, j = 0; _i23 > 0; _i23--, j++) {
+                            for (var _i22 = thirdIndex, j = 0; _i22 > 0; _i22--, j++) {
                                 this.removeHelpersSpecificIndex(node, firstIndex + j);
                             }
                             var _toAppendMain2 = document.createDocumentFragment();
@@ -2040,8 +1798,8 @@ var customElementPrototype = function (_elementPrototype) {
                             //                      let forItem = node._items[i].itemProperty._forItem;
                             //                      forItem.itemIndex = forItem.itemIndex + secondIndex - 1 ;
                             //                  }
-                            for (var _i24 = firstIndex + secondIndex; _i24 < node._items.length; _i24++) {
-                                node._items[_i24]._contextSwitchInfo.itemIndex = node._items[_i24]._contextSwitchInfo.itemIndex + secondIndex - thirdIndex;
+                            for (var _i23 = firstIndex + secondIndex; _i23 < node._items.length; _i23++) {
+                                node._items[_i23]._contextSwitchInfo.itemIndex = node._items[_i23]._contextSwitchInfo.itemIndex + secondIndex - thirdIndex;
                             }
                             node._forContent.splice.apply(node._forContent, [firstIndex, thirdIndex].concat(_newArr4));
                             break;
@@ -2051,8 +1809,8 @@ var customElementPrototype = function (_elementPrototype) {
                         {
                             var key = node.getAttribute("item");
                             //                  this.removeHelpers(node, true);
-                            for (var _i25 = 0; _i25 < node._items.length; _i25++) {
-                                this.removeHelpersSpecificIndex(node, _i25);
+                            for (var _i24 = 0; _i24 < node._items.length; _i24++) {
+                                this.removeHelpersSpecificIndex(node, _i24);
                             }
                             //                  if(node._attributes.items) {
                             //                      for(let i=0;i<node._attributes.items.length && node._items[i];i++) {
@@ -2070,7 +1828,8 @@ var customElementPrototype = function (_elementPrototype) {
                         }
                         break;
                     default:
-                        Lyte.error("Error in updateForHelper");
+                        console.error("Error in updateForHelper");
+
                 }
             }
             if (!lastNode) {
@@ -2111,13 +1870,11 @@ var customElementPrototype = function (_elementPrototype) {
                     //                  });
                     node._items[_k3]._contextSwitchInfo = optns;
                     var breakCheck = {};
-                    var toAppend = this.renderNodes(content, dynamicNodes, node, optns, establishBindings, breakCheck, node._templateContent);
+                    var toAppend = this.renderNodes(content, dynamicNodes, node, optns, undefined, breakCheck, node._templateContent);
                     node._items[_k3].itemProperty = this.getProperty(itemValue);
                     node._items[_k3].indexProperty = this.getProperty(indexValue);
                     //                  if(options.type !== "default") {
-                    if (!LyteComponent.unbound) {
-                        LyteComponent.establishBindings(_defineProperty({}, itemValue, node._items[_k3].itemProperty), _defineProperty({}, itemValue, node._attributes.items[_k3]));
-                    }
+                    LyteComponent.establishBindings(_defineProperty({}, itemValue, node._items[_k3].itemProperty), _defineProperty({}, itemValue, node._attributes.items[_k3]));
                     //                  }
                     node._forContent[_k3] = Array.from(toAppend.childNodes);
                     //Needs to revisit this and make sure it happen within renderNodes function itself;
@@ -2128,31 +1885,27 @@ var customElementPrototype = function (_elementPrototype) {
                         break;
                     }
                 }
-                if (localUnbound) {
-                    LyteComponent.unbound = initialUnbound;
-                }
                 if (options.type === "default") {
                     returnVal = { "toAppendMain": toAppendMain, "lastNode": lastNode };
                 } else {
                     lastNode.parentNode.insertBefore(toAppendMain, lastNode);
                 }
-                if (!localUnbound && node._removedAttributes && node._removedAttributes.items && !node._removedAttributes.items.helperValue && node._removedAttributes.items._multipleProperty) {
-                    LyteComponent.establishBindings({ "items": node._removedAttributes.items._multipleProperty[0].actProp }, { "items": items });
+                if (node._removedAttributes && node._removedAttributes.items && node._removedAttributes.items._multipleProperty) {
+                    LyteComponent.establishBindings({ "items": node._removedAttributes.items._multipleProperty.actProp }, { "items": items });
                 }
             }
-            for (var _i26 = lastIndexForIteration; _i26 < node._items.length; _i26++) {
+            for (var _i25 = lastIndexForIteration; _i25 < node._items.length; _i25++) {
                 //              for(let j=0;j<node._helpers[i].length;j++) {
                 //                  node._helpers[j]._contextSwitchInfo.itemIndex = i;
                 //              }
-                if (node._items[_i26].indexProperty) {
-                    LyteComponent.affectChanges(node._items[_i26].indexProperty);
+                if (node._items[_i25].indexProperty) {
+                    LyteComponent.affectChanges(node._items[_i25].indexProperty);
                 }
             }
             callee.component.data[itemValue] = initialItemValue;
             callee.component.data[indexValue] = initialIndexValue;
             callee._properties[itemValue] = initialItemProp;
             callee._properties[indexValue] = initialIndexProp;
-            node._currentItems = items;
             return returnVal;
         }
         //It constructs/updates forIn Helper.
@@ -2160,13 +1913,10 @@ var customElementPrototype = function (_elementPrototype) {
 
     }, {
         key: "updateForInHelper",
-        value: function updateForInHelper(node, options, contextSwitchInfo, establishBindings) {
+        value: function updateForInHelper(node, options, contextSwitchInfo) {
             var callee = this;
             node._callee = this;
             node._attributes = node._attributes || {};
-            if (options.type === "update" && node._currentObject === node._attributes.object) {
-                return {};
-            }
             contextSwitchInfo = contextSwitchInfo ? contextSwitchInfo : node._contextSwitchInfo;
             node._contextSwitchInfo = contextSwitchInfo;
             var key = node.getAttribute("key");
@@ -2191,12 +1941,6 @@ var customElementPrototype = function (_elementPrototype) {
             var keysArray = [];
             if (!node._items) {
                 node._items = {};
-            }
-            var localUnbound = false;
-            var initialUnbound = LyteComponent.unbound;
-            if (node.hasAttribute("unbound")) {
-                localUnbound = true;
-                LyteComponent.unbound = true;
             }
             if (options) {
                 switch (options.type) {
@@ -2235,7 +1979,7 @@ var customElementPrototype = function (_elementPrototype) {
                         }
                         break;
                     default:
-                        Lyte.error("Error in updateForHelper");
+                        console.error("Error in updateForHelper");
 
                 }
             }
@@ -2245,7 +1989,7 @@ var customElementPrototype = function (_elementPrototype) {
                 if (options.type !== "default") {
                     lastNode.parentNode.insertBefore(_toAppendMain3, lastNode);
                 } else {
-                    returnVal = { "toAppendMain": _toAppendMain3, "lastNode": lastNode };
+                    return { "toAppendMain": _toAppendMain3, "lastNode": lastNode };
                 }
             }
             if (object && options.type !== "remove") {
@@ -2260,7 +2004,7 @@ var customElementPrototype = function (_elementPrototype) {
                     callee._properties[value] = {};
                     var optns = { "itemIndex": itemKey, "itemValue": value, "keyValue": key, "type": "forIn", "node": node };
                     node._items[itemKey]._contextSwitchInfo = optns;
-                    var toAppend = this.renderNodes(content, dynamicNodes, node, optns, establishBindings, undefined, node._templateContent);
+                    var toAppend = this.renderNodes(content, dynamicNodes, node, optns, undefined, undefined, node._templateContent);
                     node._items[itemKey].itemProperty = this.getProperty(value);
                     node._propBindingObject[itemKey] = node._items[itemKey].itemProperty;
                     node._forContent[itemKey] = Array.from(toAppend.childNodes);
@@ -2269,22 +2013,17 @@ var customElementPrototype = function (_elementPrototype) {
                     toAppendMain.appendChild(toAppend);
                 }, this);
                 //              if(options.type !== "update") {
-                if (!LyteComponent.unbound) {
-                    if (!node._attributes.object._bindings) {
-                        Object.defineProperty(node._attributes.object, '_bindings', {
-                            value: new Set(),
-                            enumerable: false,
-                            writable: true,
-                            configurable: true
-                        });
-                    }
-                    node._attributes.object._bindings.add(node._propBindingObject);
-                    LyteComponent.establishBindings(node._propBindingObject, node._attributes.object);
+                if (!node._attributes.object._bindings) {
+                    Object.defineProperty(node._attributes.object, '_bindings', {
+                        value: new Set(),
+                        enumerable: false,
+                        writable: true,
+                        configurable: true
+                    });
                 }
+                node._attributes.object._bindings.add(node._propBindingObject);
+                LyteComponent.establishBindings(node._propBindingObject, node._attributes.object);
                 //              }
-                if (localUnbound) {
-                    LyteComponent.unbound = initialUnbound;
-                }
                 if (options.type !== "default") {
                     lastNode.parentNode.insertBefore(toAppendMain, lastNode);
                 } else {
@@ -2295,7 +2034,6 @@ var customElementPrototype = function (_elementPrototype) {
             callee.component.data[value] = initialValueValue;
             callee._properties[key] = initialKeyProp;
             callee._properties[value] = initialValueProp;
-            node._currentObject = object;
             return returnVal;
         }
     }, {
@@ -2398,7 +2136,7 @@ var customElementPrototype = function (_elementPrototype) {
             if (defaultContent) {
                 template = defaultContent;
             } else {
-                template = window.isIE11Lyte || window.isEdgeLyte ? {} : node.content.querySelector('[case=\'' + LyteComponent.cssEscape(dummyCaseName) + '\']');
+                template = window.isIE11Lyte || window.isEdgeLyte ? {} : node.content.querySelector('[case=\'' + dummyCaseName + '\']');
             }
             var contentArr = [];
             while (dummyScope) {
@@ -2407,7 +2145,7 @@ var customElementPrototype = function (_elementPrototype) {
                 contentArr.push(processedContent);
                 if (dummyScope.additional) {
                     if (dummyScope.additional.next) {
-                        template = window.isIE11Lyte || window.isEdgeLyte ? {} : node.content.querySelector('[case=\'' + LyteComponent.cssEscape(dummyScope.additional.next) + '\']');
+                        template = window.isIE11Lyte || window.isEdgeLyte ? {} : node.content.querySelector('[case=\'' + dummyScope.additional.next + '\']');
                         dummyScope = node._cases[dummyScope.additional.next];
                     } else {
                         template = window.isIE11Lyte || window.isEdgeLyte ? {} : node.content.querySelector('[default]');
@@ -2419,16 +2157,16 @@ var customElementPrototype = function (_elementPrototype) {
             }
             node._caseContent = [];
             var toAppendMain = document.createDocumentFragment();;
-            for (var _i27 = 0; _i27 < contentArr.length; _i27++) {
-                if (contentArr[_i27].nodeType == 11) {
+            for (var _i26 = 0; _i26 < contentArr.length; _i26++) {
+                if (contentArr[_i26].nodeType == 11) {
                     //                for(let j=0;j<contentArr[i].childNodes.length;j++) {
                     //                    node._caseContent.push(contentArr[i].childNodes[j]);
                     //                }
-                    node._caseContent = node._caseContent.concat(Array.from(contentArr[_i27].childNodes));
+                    node._caseContent = node._caseContent.concat(Array.from(contentArr[_i26].childNodes));
                 } else {
-                    node._caseContent.push(contentArr[_i27]);
+                    node._caseContent.push(contentArr[_i26]);
                 }
-                toAppendMain.append(contentArr[_i27]);
+                toAppendMain.append(contentArr[_i26]);
                 //            node.parentNode.insertBefore(contentArr[i], node);
             }
             this.executeBlockHelpers(node._helpers, node);
@@ -2456,9 +2194,9 @@ var customElementPrototype = function (_elementPrototype) {
             var property = this.constructor._properties[boundValue];
             var observers = property ? property.observer : undefined;
             if (observers) {
-                for (var _i28 = 0; _i28 < observers.length; _i28++) {
-                    if (key.indexOf('.') === -1 || observers[_i28].path === key) {
-                        this["_" + observers[_i28].functionName].apply(this);
+                for (var _i27 = 0; _i27 < observers.length; _i27++) {
+                    if (key.indexOf('.') === -1 || observers[_i27].path === key) {
+                        this["_" + observers[_i27].functionName].apply(this);
                     }
                 }
             }
@@ -2506,14 +2244,13 @@ var customElementPrototype = function (_elementPrototype) {
                     this.processHelper({ "name": helperFunc.name, "args": helperArgs }, node);
                     return;
                 } else {
-                    helperArgs = this.processArgs(this, helperFunc.args, dynamicValuesArray, undefined, node);
+                    helperArgs = this.processArgs(this, helperFunc.args, dynamicValuesArray);
                 }
                 nodeValue = this.processHelper({ "name": helperFunc.name, "args": helperArgs }, node);
                 if (helperFunc.name === "unescape") {
                     //              let test = node.replaceWith.apply(node,nodeValue.childNodes);
                     var obj = { initialNode: node, dynamicNodeValue: nodeValue };
                     node = { dynamicPositions: obj, "_callee": node._callee, helperValue: node.helperValue };
-                    nodeValue = undefined;
                     processLast.push(node);
                 }
             } else {
@@ -2529,7 +2266,7 @@ var customElementPrototype = function (_elementPrototype) {
                 //	node.ownerElement._attributeDetails[node.nodeName].bindedNode = node;
             }
             var actMultiProp = void 0;
-            if (helperFunc.name !== "unbound" && !LyteComponent.unbound) {
+            if (helperFunc.name !== "unbound") {
                 var dynamicProp = void 0;
                 if (helperNode) {
                     dynamicProp = forType ? helperNode._items[forIndex]._dynamicProperty : helperNode._dynamicProperty;
@@ -2569,9 +2306,7 @@ var customElementPrototype = function (_elementPrototype) {
                                     });
                                 }
                                 actProperty._dynamicNodes.push(node);
-                                if (_boundValue !== indexValue) {
-                                    actMultiProp = actProperty;
-                                }
+                                actMultiProp = actProperty;
                             }
                         } else {
                             if (!actProperty._dynamicNodes) {
@@ -2604,8 +2339,7 @@ var customElementPrototype = function (_elementPrototype) {
                         }
                     }
                     if (_dynamicValues.length > 1) {
-                        node._multipleProperty = node._multipleProperty || [];
-                        node._multipleProperty.push({ "dynamicProp": actMultiProp ? undefined : dynamicProp, "actProp": this.getProperty(_dynamicValues[0]), "helperNode": helperNode, "dynamicValues": _dynamicValues });
+                        node._multipleProperty = { "dynamicProp": actMultiProp ? undefined : dynamicProp, "actProp": this.getProperty(_dynamicValues[0]), "helperNode": helperNode };
                     }
                 }
             }
@@ -2630,7 +2364,7 @@ var customElementPrototype = function (_elementPrototype) {
                     parentNode._attributes = parentNode._attributes || {};
                     parentNode._attributes[node.nodeName] = nodeValue;
                     if (parentNode.nodeName === "TEMPLATE" && isHelper && nodeValue) {
-                        if (parentNode.getAttribute("is") === "for" && node.nodeName === "items" || parentNode.getAttribute("is") === "forIn" && node.nodeName === "object" && !LyteComponent.unbound) {
+                        if (parentNode.getAttribute("is") === "for" && node.nodeName === "items" || parentNode.getAttribute("is") === "forIn" && node.nodeName === "object") {
                             if (!nodeValue._bindings) {
                                 Object.defineProperty(nodeValue, '_bindings', {
                                     value: new Set(),
@@ -2676,7 +2410,7 @@ var customElementPrototype = function (_elementPrototype) {
                     }
                 if (/^(INPUT|TEXTAREA|SELECT)$/.test(parentNode.nodeName)) {
                     if (node.nodeName === "value") {
-                        parentNode.value = nodeValue === undefined ? "" : nodeValue;
+                        parentNode.value = nodeValue;
                     } else if (node.nodeName === "checked") {
                         parentNode.checked = nodeValue;
                     }
@@ -2715,12 +2449,12 @@ var customElementPrototype = function (_elementPrototype) {
             property = property._properties[arr[0]];
 
             Object.defineProperty(property, '_path', { enumerable: false, value: arr[0] });
-            for (var _i29 = 1; _i29 < arr.length; _i29++) {
-                if (!property[arr[_i29]]) {
-                    property[arr[_i29]] = {};
-                    Object.defineProperty(property[arr[_i29]], '_path', { enumerable: false, value: property._path + "." + arr[_i29] });
+            for (var _i28 = 1; _i28 < arr.length; _i28++) {
+                if (!property[arr[_i28]]) {
+                    property[arr[_i28]] = {};
+                    Object.defineProperty(property[arr[_i28]], '_path', { enumerable: false, value: property._path + "." + arr[_i28] });
                 }
-                property = property[arr[_i29]];
+                property = property[arr[_i28]];
             }
             return property;
         }
@@ -2730,54 +2464,50 @@ var customElementPrototype = function (_elementPrototype) {
         key: "updateNode",
         value: function updateNode(node, updatePath) {
             var del = "delete";
-            var multiplePropNode = [];
+            var multiplePropNode = false;
             var multipleProp = void 0;
-            if (node._multipleProperty) {
-                for (var i = 0; i < node._multipleProperty.length; i++) {
-                    if (node._multipleProperty[i] && node._multipleProperty[i].dynamicValues.lastIndexOf(updatePath) > 0) {
-                        multiplePropNode[i] = false;
-                        multipleProp = node._multipleProperty[i];
-                        var nodes = void 0;
-                        if (multipleProp.dynamicProp) {
-                            multiplePropNode[i] = multipleProp;
-                            nodes = multipleProp.dynamicProp[multipleProp.actProp._path];
-                            if (nodes) {
-                                var index = nodes.indexOf(node);
-                                nodes.splice(index, 1);
-                            }
-                            var helperNode = multipleProp.helperNode;
-                            if (nodes.length === 0) {
-                                if (helperNode.getAttribute("is") === "if") {
-                                    multipleProp.actProp._helperNodes[del](helperNode);
-                                    delete multipleProp.dynamicProp[multipleProp.actProp._path];
-                                } else {
-                                    delete multipleProp.dynamicProp[multipleProp.actProp._path];
-                                    if (helperNode._items) {
-                                        var removeHelper = true;
-                                        for (var _i30 = 0; _i30 < helperNode._items.length; _i30++) {
-                                            if (helperNode._items[_i30]._dynamicProperty && helperNode._items[_i30]._dynamicProperty[multipleProp.actProp._path]) {
-                                                removeHelper = false;
-                                                break;
-                                            }
-                                        }
-                                        if (removeHelper) {
-                                            multipleProp.actProp._helperNodes[del](helperNode);
-                                            //console.log('for helper is removed');
-                                        }
+            if (node._multipleProperty && updatePath !== node._multipleProperty.actProp._path) {
+                multiplePropNode = false;
+                multipleProp = node._multipleProperty;
+                var nodes = void 0;
+                if (multipleProp.dynamicProp) {
+                    multiplePropNode = multipleProp;
+                    nodes = multipleProp.dynamicProp[multipleProp.actProp._path];
+                    if (nodes) {
+                        var index = nodes.indexOf(node);
+                        nodes.splice(index, 1);
+                    }
+                    var helperNode = multipleProp.helperNode;
+                    if (nodes.length === 0) {
+                        if (helperNode.getAttribute("is") === "if") {
+                            multipleProp.actProp._helperNodes[del](helperNode);
+                            delete multipleProp.dynamicProp[multipleProp.actProp._path];
+                        } else {
+                            delete multipleProp.dynamicProp[multipleProp.actProp._path];
+                            if (helperNode._items) {
+                                var removeHelper = true;
+                                for (var _i29 = 0; _i29 < helperNode._items.length; _i29++) {
+                                    if (helperNode._items[_i29]._dynamicProperty && helperNode._items[_i29]._dynamicProperty[multipleProp.actProp._path]) {
+                                        removeHelper = false;
+                                        break;
                                     }
+                                }
+                                if (removeHelper) {
+                                    multipleProp.actProp._helperNodes[del](helperNode);
+                                    //console.log('for helper is removed');
                                 }
                             }
                         }
-                        if (!multiplePropNode[i]) {
-                            multiplePropNode[i] = "dynamicNodes";
-                            nodes = multipleProp.actProp._dynamicNodes;
-                            if (nodes) {
-                                var _index = nodes.indexOf(node);
-                                nodes.splice(_index, 1);
-                                if (!nodes.length) {
-                                    delete multipleProp.actProp._dynamicNodes;
-                                }
-                            }
+                    }
+                }
+                if (!multiplePropNode) {
+                    multiplePropNode = "dynamicNodes";
+                    nodes = multipleProp.actProp._dynamicNodes;
+                    if (nodes) {
+                        var _index2 = nodes.indexOf(node);
+                        nodes.splice(_index2, 1);
+                        if (!nodes.length) {
+                            delete multipleProp.actProp._dynamicNodes;
                         }
                     }
                 }
@@ -2798,11 +2528,11 @@ var customElementPrototype = function (_elementPrototype) {
                 LyteComponent.changeContext(contextSwitchInfo.node, contextSwitchArray, contextSwitchInfo, true);
             }
             var nodeValue = void 0;
-            var dynamicValues = [];
             if (node.helperValue) {
                 nodeValue = node.helperValue;
                 var helperFunc = nodeValue;
-                var helperRetVal = this.processHelper({ name: helperFunc.name, args: this.processArgs(this, helperFunc.args, dynamicValues) }, node);
+                var dynamicValues = [];
+                var helperRetVal = this.processHelper({ name: helperFunc.name, args: this.processArgs(this, helperFunc.args) }, node);
                 nodeValue = helperRetVal;
                 if (helperFunc.name === "unescape") {
                     var oldDynamicPosition = node.dynamicPositions;
@@ -2823,7 +2553,6 @@ var customElementPrototype = function (_elementPrototype) {
                     oldStartingNode.replaceWith.apply(oldStartingNode, nodeValue.childNodes);
                     var obj = { startingNode: startingNode, length: childLen };
                     node.dynamicPositions = obj;
-                    nodeValue = undefined;
                 }
             } else {
                 var _boundValue2 = node.syntaxValue;
@@ -2832,48 +2561,39 @@ var customElementPrototype = function (_elementPrototype) {
                     path = _boundValue2;
                     _boundValue2 = _boundValue2.substring(0, _boundValue2.indexOf('.'));
                 }
-                var value = path ? LyteComponent.get(this.component.data, path, dynamicValues) : this.component.data[_boundValue2];
-                nodeValue = !(typeof value === "undefined" ? "undefined" : _typeof(value)) === "boolean" && !(typeof value === "undefined" ? "undefined" : _typeof(value)) === "number" ? value ? value : "" : value;
-            }
-            if (!(dynamicValues[0] instanceof Array)) {
-                dynamicValues = [dynamicValues];
-            }
-
-            if (multiplePropNode) {
-                for (var i = 0; i < multiplePropNode.length; i++) {
-                    if (multiplePropNode[i]) {
-                        var _multipleProp = node._multipleProperty[i];
-                        var prop = this.getProperty(dynamicValues[i][0]);
-                        var totalProp = this.getProperty(dynamicValues[i][0].substring(0, dynamicValues[i][0].indexOf('.')));
-                        var _value = this.getData(dynamicValues[i][0].substring(0, dynamicValues[i][0].indexOf('.')));
-                        if (multiplePropNode[i] === "dynamicNodes") {
-                            if (!prop._dynamicNodes) {
-                                Object.defineProperty(prop, '_dynamicNodes', {
-                                    value: [],
-                                    enumerable: false,
-                                    writable: true,
-                                    configurable: true
-                                });
-                            }
-                            prop._dynamicNodes.push(node);
-                        } else {
-                            if (!prop._helperNodes) {
-                                Object.defineProperty(prop, '_helperNodes', {
-                                    value: new Set(),
-                                    writable: true,
-                                    enumerable: false,
-                                    configurable: true
-                                });
-                            }
-                            prop._helperNodes.add(_multipleProp.helperNode);
-                            var dynamicProp = _multipleProp.dynamicProp;
-                            dynamicProp[prop._path] ? dynamicProp[prop._path].push(node) : (dynamicProp[prop._path] = []).push(node);
+                var _dynamicValues2 = [];
+                var value = path ? LyteComponent.get(this.component.data, path, _dynamicValues2) : this.component.data[_boundValue2];
+                if (multiplePropNode) {
+                    var prop = this.getProperty(_dynamicValues2[0]);
+                    var totalProp = this.getProperty(_dynamicValues2[0].substring(0, _dynamicValues2[0].indexOf('.')));
+                    var _value = this.getData(_dynamicValues2[0].substring(0, _dynamicValues2[0].indexOf('.')));
+                    if (multiplePropNode === "dynamicNodes") {
+                        if (!prop._dynamicNodes) {
+                            Object.defineProperty(prop, '_dynamicNodes', {
+                                value: [],
+                                enumerable: false,
+                                writable: true,
+                                configurable: true
+                            });
                         }
-                        LyteComponent.establishBindings(totalProp, _value);
-                        node._multipleProperty[i].actProp = prop;
-                        node._multipleProperty[i].dynamicValues = dynamicValues[i];
+                        prop._dynamicNodes.push(node);
+                    } else {
+                        if (!prop._helperNodes) {
+                            Object.defineProperty(prop, '_helperNodes', {
+                                value: new Set(),
+                                writable: true,
+                                enumerable: false,
+                                configurable: true
+                            });
+                        }
+                        prop._helperNodes.add(multipleProp.helperNode);
+                        var dynamicProp = multipleProp.dynamicProp;
+                        dynamicProp[prop._path] ? dynamicProp[prop._path].push(node) : (dynamicProp[prop._path] = []).push(node);
                     }
+                    LyteComponent.establishBindings(totalProp, _value);
+                    node._multipleProperty.actProp = prop;
                 }
+                nodeValue = !(typeof value === "undefined" ? "undefined" : _typeof(value)) === "boolean" && !(typeof value === "undefined" ? "undefined" : _typeof(value)) === "number" ? value ? value : "" : value;
             }
 
             if (node.nodeType === 2) {
@@ -2888,51 +2608,48 @@ var customElementPrototype = function (_elementPrototype) {
                     } else {
                         parentNodes.push(pN._renderedComponent[pN.getAttribute("component-name")]);
                     }
+                } else {
+                    parentNodes.push(pN);
                 }
-                parentNodes.push(pN);
-                for (var _i31 = 0; _i31 < parentNodes.length; _i31++) {
-                    var parentNode = parentNodes[_i31];
+                for (var _i30 = 0; _i30 < parentNodes.length; _i30++) {
+                    var parentNode = parentNodes[_i30];
                     if (parentNode.set) {
-                        parentNode.set(LyteComponent.String.toCamelCase(node.nodeName), nodeValue, true);
+                        parentNode.set(LyteComponent.String.toCamelCase(node.nodeName), nodeValue);
                     } else {
                         parentNode._initProperties = parentNode._initProperties || {};
                         parentNode._initProperties[LyteComponent.String.toCamelCase(node.nodeName)] = nodeValue;
                     }
+
                     if (parentNode.tagName === "LYTE-YIELD" && parentNode.component.data && node.nodeName && parentNode.component.data[node.nodeName] !== nodeValue /*parentNode.getAttribute("is") === "insertYield"*/) {
                             LyteComponent.set(parentNode.component.data, LyteComponent.String.toCamelCase(node.nodeName), nodeValue, undefined, parentNode);
                         }
                     parentNode._attributes = parentNode._attributes || {};
                     //!== "string"
                     if (LyteComponent.isCustomElement(parentNode, true) && typeof nodeValue !== "string" && typeof nodeValue !== "undefined") {
-                        if (node.ownerElement.nodeName === "TEMPLATE") {
-                            if (node.helperValue) {
-                                if (node.ownerElement.getAttribute("is") === "for" && node.nodeName === "items" || node.ownerElement.getAttribute("is") === "forIn" && node.nodeName === "object") {
-                                    var oldValue = node.ownerElement._attributes[node.nodeName];
-                                    var newValue = nodeValue;
-                                    LyteComponent.removeSelectedBindingDeep(node.ownerElement._actualBinding, oldValue);
-                                    if (newValue) {
-                                        if (!newValue._bindings) {
-                                            Object.defineProperty(newValue, '_bindings', {
-                                                enumerable: false,
-                                                writable: true,
-                                                value: new Set(),
-                                                configurable: true
-                                            });
-                                        }
-                                        newValue._bindings.add(node.ownerElement._actualBinding);
-                                        LyteComponent.establishBindings(node.ownerElement._actualBinding, newValue);
+                        if (node.ownerElement.nodeName === "TEMPLATE" && node.helperValue) {
+                            if (node.ownerElement.getAttribute("is") === "for" && node.nodeName === "items" || node.ownerElement.getAttribute("is") === "forIn" && node.nodeName === "object") {
+                                var oldValue = node.ownerElement._attributes[node.nodeName];
+                                var newValue = nodeValue;
+                                LyteComponent.removeSelectedBindingDeep(node.ownerElement._actualBinding, oldValue);
+                                if (newValue) {
+                                    if (!newValue._bindings) {
+                                        Object.defineProperty(newValue, '_bindings', {
+                                            enumerable: false,
+                                            writable: true,
+                                            value: new Set(),
+                                            configurable: true
+                                        });
                                     }
-                                    if (node.nodeName === "object") {
-                                        LyteComponent.removeSelectedBindingDeep(node.ownerElement._propBindingObject, oldValue);
-                                    }
-                                    //console.log("old Value ", oldValue, " new Value ", newValue);
+                                    newValue._bindings.add(node.ownerElement._actualBinding);
+                                    LyteComponent.establishBindings(node.ownerElement._actualBinding, newValue);
                                 }
+                                if (node.nodeName === "object") {
+                                    LyteComponent.removeSelectedBindingDeep(node.ownerElement._propBindingObject, oldValue);
+                                }
+                                //console.log("old Value ", oldValue, " new Value ", newValue);
                             }
-                            parentNode.removeAttribute(node.nodeName);
-                        } else {
-                            //Needs revisiting
-                            //parentNode.removeAttribute(node.nodeName);
                         }
+                        parentNode.removeAttribute(node.nodeName);
                     } else {
                         if (typeof nodeValue === "boolean") {
                             parentNode._attributes = parentNode._attributes || {};
@@ -2955,7 +2672,7 @@ var customElementPrototype = function (_elementPrototype) {
                     parentNode._attributes[node.nodeName] = nodeValue;
                     if (/^(INPUT|TEXTAREA|SELECT)$/.test(parentNode.nodeName)) {
                         if (node.nodeName === "value") {
-                            parentNode.value = nodeValue === undefined ? "" : nodeValue;
+                            parentNode.value = nodeValue;
                         } else if (node.nodeName === "checked") {
                             parentNode.checked = nodeValue;
                         }
@@ -2976,9 +2693,7 @@ var customElementPrototype = function (_elementPrototype) {
                             this.updateSwitchHelper("switch", parentNode, undefined, true, true);
                             break;
                         case "component":
-                            if (node.nodeName === "component-name") {
-                                this.updateDynamicComponent(parentNode, "update");
-                            }
+                            this.updateDynamicComponent(parentNode, "update");
                             break;
                         default:
                     }
@@ -3030,10 +2745,10 @@ var customElementPrototype = function (_elementPrototype) {
                 var endIndex = options[0] === "M" ? forContent.length : breakIndex + 1;
                 for (var j = breakIndex; j < endIndex; j++) {
                     var currentForContent = forContent[j];
-                    for (var _i32 = 0; _i32 < currentForContent.length; _i32++) {
-                        currentForContent[_i32].remove();
-                        if (currentForContent[_i32]._forContent || currentForContent[_i32]._caseContent) {
-                            this.removeHelpers(currentForContent[_i32]);
+                    for (var _i31 = 0; _i31 < currentForContent.length; _i31++) {
+                        currentForContent[_i31].remove();
+                        if (currentForContent[_i31]._forContent || currentForContent[_i31]._caseContent) {
+                            this.removeHelpers(currentForContent[_i31]);
                         }
                     }
                     forContent[j] = [];
@@ -3068,24 +2783,28 @@ var customElementPrototype = function (_elementPrototype) {
                 j = void 0;
             dynamicValues = dynamicValues || [];
             args = Array.isArray(args) ? Array.from(args) : args;
-            for (var _i33 = 0; _i33 < args.length; _i33++) {
-                if (!this.isEmptyString(args[_i33])) {
-                    if (args[_i33].startsWith("'") && args[_i33].endsWith("'")) {
-                        args[_i33] = args[_i33].substr(1, args[_i33].length - 2);
+            for (var _i32 = 0; _i32 < args.length; _i32++) {
+                if (!this.isEmptyString(args[_i32])) {
+                    if (args[_i32].startsWith("'") && args[_i32].endsWith("'")) {
+                        args[_i32] = args[_i32].substr(1, args[_i32].length - 2);
                     } else {
-                        args[_i33] = args[_i33].trim();
+                        args[_i32] = args[_i32].trim();
                         var dynamicVals = [];
-                        if (args[_i33] === "event" && event) {
-                            args[_i33] = event;
-                        } else if (args[_i33] === "this" && node) {
-                            args[_i33] = node.nodeType === 2 ? node.ownerElement : node;
+                        if (event) {
+                            if (args[_i32] === "event") {
+                                args[_i32] = event;
+                            } else if (args[_i32] === "this") {
+                                args[_i32] = node;
+                            } else {
+                                args[_i32] = LyteComponent.get(scope.component.data, args[_i32], dynamicVals);
+                            }
                         } else {
-                            args[_i33] = LyteComponent.get(scope.component.data, args[_i33], dynamicVals);
+                            args[_i32] = LyteComponent.get(scope.component.data, args[_i32], dynamicVals);
                         }
                         dynamicValues.push(dynamicVals);
                     }
-                } else if (args[_i33] && args[_i33].type) {
-                    this.internalHelpers(scope, args, _i33, dynamicValues, event, node);
+                } else if (args[_i32] && args[_i32].type) {
+                    this.internalHelpers(scope, args, _i32, dynamicValues, event, node);
                 }
             }
             return args;
@@ -3109,7 +2828,7 @@ var customElementPrototype = function (_elementPrototype) {
                 args.push(node.ownerElement);
             }
             if (!Lyte.Component.registeredHelpers[helperFunc.name]) {
-                Lyte.error("LC003", helperFunc.name);
+                console.error("helper ", helperFunc.name, " is not defined");
                 return;
             }
             return Lyte.Component.registeredHelpers[helperFunc.name].apply(this, args.concat(helperFunc.args));
@@ -3130,8 +2849,8 @@ var customElementPrototype = function (_elementPrototype) {
         key: "getArgValues",
         value: function getArgValues(argNames, properties) {
             var argValueArray = [];
-            for (var _i34 = 0; _i34 < argNames.length; _i34++) {
-                argValueArray.push(properties[argNames[_i34]].value);
+            for (var _i33 = 0; _i33 < argNames.length; _i33++) {
+                argValueArray.push(properties[argNames[_i33]].value);
             }
             return argValueArray;
         }
@@ -3140,7 +2859,7 @@ var customElementPrototype = function (_elementPrototype) {
         value: function createEventListeners(node, actionType, actObj) {
             var self = this;
             node._callee = this;
-            if (!/^(focus|focusin|focusout|resize|scroll|click|dblclick|mousedown|mouseup|mousemove|mouseover|mouseout|change|select|submit|keydown|keypress|keyup|contextmenu)$/.test(actionType)) {
+            if (!/^(focus|focusin|focusout|resize|scroll|click|dblclick|mousedown|mouseup|mousemove|mouseover|mouseout|mouseenter|mouseleave|change|select|submit|keydown|keypress|keyup|contextmenu)$/.test(actionType)) {
                 var infoAttr = actionType.substr(2);
                 var infoAttrVal = node.getAttribute(infoAttr);
                 var evntListener = function evntListener(event) {
@@ -3173,13 +2892,8 @@ var customElementPrototype = function (_elementPrototype) {
         value: function registerYields() {
             this._yields = {};
             var yields = this.querySelectorAll('template[is=registerYield],template[is=yield]');
-            for (var _i35 = 0; _i35 < yields.length; _i35++) {
-                var parentYield = void 0;
-                if (yields[_i35].hasAttribute("from-parent") && this._callee && (parentYield = this._callee._yields[yields[_i35].getAttribute("yield-name")])) {
-                    this._yields[yields[_i35].getAttribute("yield-name")] = parentYield;
-                } else {
-                    this._yields[yields[_i35].getAttribute("yield-name")] = yields[_i35];
-                }
+            for (var _i34 = 0; _i34 < yields.length; _i34++) {
+                this._yields[yields[_i34].getAttribute("yield-name")] = yields[_i34];
             }
         }
     }, {
@@ -3216,7 +2930,7 @@ var customElementPrototype = function (_elementPrototype) {
                                 this.setAttribute(templateAttributes.attr[key].name, attr.staticValue);
                             } else {
                                 this.setAttribute(templateAttributes.attr[key].name, "{{dummy}}");
-                                this.bindNode(this.attributes.getNamedItem(templateAttributes.attr[key].name), [], undefined, {}, templateAttributes.attr[key], undefined, undefined, true);
+                                this.bindNode(this.getAttributeNode(templateAttributes.attr[key].name), [], undefined, {}, templateAttributes.attr[key], undefined, undefined, true);
                             }
                         }
                     }
@@ -3232,20 +2946,20 @@ var customElementPrototype = function (_elementPrototype) {
             }
             this._toRegEvnts = {};
             var content = this.afterConnected();
-            if (!LyteComponent.unbound) {
-                LyteComponent.establishObserverBindings.call(this, this.constructor._observers);
-                //this.establishObserverBindings();
-                Object.defineProperty(this.component, '_bindings', {
-                    enumerable: false,
-                    writable: true,
-                    configurable: true,
-                    value: new Set()
-                });
-                this.component._bindings.add(this._properties);
-                LyteComponent.establishBindings(this._properties, this.component.data);
-            }
-            LyteComponent.unbound = false;
+            LyteComponent.establishObserverBindings.call(this, this.constructor._observers);
+            //this.establishObserverBindings();
+            Object.defineProperty(this.component, '_bindings', {
+                enumerable: false,
+                writable: true,
+                configurable: true,
+                value: new Set()
+            });
+            this.component._bindings.add(this._properties);
+            LyteComponent.establishBindings(this._properties, this.component.data);
             this.appendChild(content);
+            if (this.tagName == "CRM-STAGEBOARD" || this.tagName === "TEST-COMPONENT5") {
+                console.timeEnd(this.tagName);
+            }
             this.setAttribute("lyte-rendered", "");
             var customEvent = new CustomEvent("onReady");
             this.dispatchEvent(customEvent);
@@ -3257,11 +2971,11 @@ var customElementPrototype = function (_elementPrototype) {
         value: function onCallBack(name) {
             var callbacks = this.constructor._callBacks[name];
             if (callbacks) {
-                for (var _i36 = 0; _i36 < callbacks.length; _i36++) {
+                for (var _i35 = 0; _i35 < callbacks.length; _i35++) {
                     try {
-                        callbacks[_i36].value.call(this.component);
+                        callbacks[_i35].value.call(this.component);
                     } catch (e) {
-                        Lyte.error(e);
+                        console.error(e);
                     }
                 }
             }
@@ -3270,16 +2984,11 @@ var customElementPrototype = function (_elementPrototype) {
         key: "callback",
         value: function callback(name) {
             var func = this.component[name];
-            var args;
             if (func) {
-                if (arguments.length > 1) {
-                    args = Array.from(arguments);
-                    args.splice(0, 1);
-                }
                 try {
-                    func.apply(this.component, args || []);
+                    func.apply(this.component);
                 } catch (e) {
-                    Lyte.error(e);
+                    console.error(e);
                 }
             }
         }
@@ -3287,8 +2996,8 @@ var customElementPrototype = function (_elementPrototype) {
         key: "establishObserverBindings",
         value: function establishObserverBindings() {
             var observers = this.constructor._observers;
-            for (var _i37 = 0; _i37 < observers.length; _i37++) {
-                var props = observers[_i37].properties;
+            for (var _i36 = 0; _i36 < observers.length; _i36++) {
+                var props = observers[_i36].properties;
                 for (var j = 0; j < props.length; j++) {
                     var actProp = void 0;
                     var isArrayObserver = false;
@@ -3306,7 +3015,7 @@ var customElementPrototype = function (_elementPrototype) {
                             configurable: true
                         });
                     }
-                    actProp._observers.add({ callee: this, observer: observers[_i37], isArrayObserver: isArrayObserver });
+                    actProp._observers.add({ callee: this, observer: observers[_i36], isArrayObserver: isArrayObserver });
                 }
             }
         }
@@ -3314,17 +3023,17 @@ var customElementPrototype = function (_elementPrototype) {
         key: "removeBindings",
         value: function removeBindings(properties, actualData) {
             var del = "delete";
-            for (var _i38 in properties) {
-                var actData = actualData[_i38];
+            for (var _i37 in properties) {
+                var actData = actualData[_i37];
                 if (actData && actData._bindings) {
-                    actData._bindings[del](properties[_i38]);
+                    actData._bindings[del](properties[_i37]);
                     //Error while trying to delete _bindings from actData when actData is of type Array
                     /*  if(!actData._bindings.size) {
                         delete actData._bindings;
                     } */
                 }
-                if (_typeof(properties[_i38]) === "object" && actData) {
-                    this.removeBindings(properties[_i38], actData);
+                if (_typeof(properties[_i37]) === "object" && actData) {
+                    this.removeBindings(properties[_i37], actData);
                 }
             }
         }
@@ -3345,9 +3054,6 @@ var customElementPrototype = function (_elementPrototype) {
             var self = this;
             //setTimeout added to delay setting component to null until the LyteYield’s disconnectedCallbacks have been called. 
             setTimeout(function () {
-                if (!self.component) {
-                    return;
-                }
                 self.component.$node = null;
                 self.component.__data = null;
                 self.component.data.__component__ = null;
@@ -3360,9 +3066,9 @@ var customElementPrototype = function (_elementPrototype) {
     }], [{
         key: "getArrayIndex",
         value: function getArrayIndex(array, value) {
-            for (var _i39 = 0; _i39 < array.length; _i39++) {
-                if (array[_i39] === value) {
-                    return _i39;
+            for (var _i38 = 0; _i38 < array.length; _i38++) {
+                if (array[_i38] === value) {
+                    return _i38;
                 };
             }
         }
@@ -3382,11 +3088,11 @@ var customElementPrototype = function (_elementPrototype) {
                     }
                 }
             }
-            for (var _i40 = 0; _i40 < position.length; _i40++) {
-                for (var j = content.childNodes.length - 1; j > position[_i40]; j--) {
+            for (var _i39 = 0; _i39 < position.length; _i39++) {
+                for (var j = content.childNodes.length - 1; j > position[_i39]; j--) {
                     content.childNodes[j].remove();
                 }
-                content = content.childNodes[position[_i40]];
+                content = content.childNodes[position[_i39]];
             }
             return dummyContent;
         }
@@ -3395,8 +3101,8 @@ var customElementPrototype = function (_elementPrototype) {
         value: function updateValue(property, path, value) {
             var pathVals = path.split('.');
             var context = property;
-            for (var _i41 = 0; _i41 < pathVals.length - 1; _i41++) {
-                context = context[pathVals[_i41]];
+            for (var _i40 = 0; _i40 < pathVals.length - 1; _i40++) {
+                context = context[pathVals[_i40]];
             }
             context[pathVals[i]] = value;
         }
@@ -3407,7 +3113,7 @@ var customElementPrototype = function (_elementPrototype) {
             //           let childNodes = template.childNodes;
             var frag = document.createDocumentFragment();
             var len = childNodes.length;
-            for (var _i42 = 0; _i42 < len; _i42++) {
+            for (var _i41 = 0; _i41 < len; _i41++) {
                 frag.appendChild(childNodes[0]);
             }
             return frag;
@@ -3421,7 +3127,7 @@ var customElementPrototype = function (_elementPrototype) {
             var childNodes = template.childNodes;
             var frag = document.createDocumentFragment();
             var len = childNodes.length;
-            for (var _i43 = 0; _i43 < len; _i43++) {
+            for (var _i42 = 0; _i42 < len; _i42++) {
                 frag.appendChild(childNodes[0]);
             }
             return frag;
@@ -3430,7 +3136,7 @@ var customElementPrototype = function (_elementPrototype) {
         key: "_registerComponent",
         value: function _registerComponent(a, b) {
             var componentsDiv = LyteComponent.lyteComponentsDiv;
-            var styleDiv = Lyte.$.assetsDiv;
+            var styleDiv = LyteComponent.styleDiv;
             if (this._template && typeof this._template === "string") {
                 this._template.replace(/\\'/g, "'");
                 var div = document.createElement("div");
@@ -3469,33 +3175,29 @@ var customElementPrototype = function (_elementPrototype) {
             this.splitTextNodes(s);
             //This is used to find the dynamicNodes and helper nodes for the given component. 
             if (!this._dynamicNodes) {
-                if (Lyte.Compile.getDynamicNodes) {
-                    this._dynamicNodes = Lyte.Compile.getDynamicNodes(a).dynamicNodes;
-                } else {
-                    Lyte.error("LC002", a);
-                }
-            }
-            if (this._dynamicNodes) {
+                console.error("Component " + a + " is not compiled. Please compile using Lyte CLI. ");
+            } else {
                 doCompile(s, this._dynamicNodes, a);
                 if (window.isEdgeLyte) {
                     this._templateContent = this._template.outerHTML;
                 } else if (window.isIE11Lyte) {
                     this._templateContent = s.outerHTML;
                 }
-                this._templateAttributes = this._templateAttributes || { type: "attr", "attr": {}, position: [] };
-                var ta = [this._templateAttributes];
-                doCompile(this._template, ta, a);
-                this._templateAttributes = ta[0];
-                if (this._templateAttributes && this._templateAttributes.attr) {
-                    var attributesT = this._template.attributes;
-                    try {
-                        for (var _i44 = 0; _i44 < attributesT.length; _i44++) {
-                            if (!this._templateAttributes.attr[attributesT[_i44].name] && attributesT[_i44].name !== "tag-name" && attributesT[_i44].name !== "use-strict") {
-                                this._templateAttributes.attr[attributesT[_i44].name] = { "name": attributesT[_i44].name, "staticValue": attributesT[_i44].value };
+                if (this._templateAttributes) {
+                    var ta = [this._templateAttributes];
+                    doCompile(this._template, ta, a);
+                    this._templateAttributes = ta[0];
+                    if (this._templateAttributes && this._templateAttributes.attr) {
+                        var attributesT = this._template.attributes;
+                        try {
+                            for (var _i43 = 0; _i43 < attributesT.length; _i43++) {
+                                if (!this._templateAttributes.attr[attributesT[_i43].name] && attributesT[_i43].name !== "tag-name" && attributesT[_i43].name !== "use-strict") {
+                                    this._templateAttributes.attr[attributesT[_i43].name] = { "name": attributesT[_i43].name, "staticValue": attributesT[_i43].value };
+                                }
                             }
+                        } catch (e) {
+                            console.error("Error with templateAttributes. ");
                         }
-                    } catch (e) {
-                        Lyte.error("Error with templateAttributes. ");
                     }
                 }
             }
@@ -3506,8 +3208,8 @@ var customElementPrototype = function (_elementPrototype) {
         key: "splitTextNodes",
         value: function splitTextNodes(node) {
             if (node && node.childNodes && node.childNodes.length) {
-                for (var _i45 = node.childNodes.length - 1; _i45 >= 0; _i45--) {
-                    this.splitTextNodes(node.childNodes[_i45]);
+                for (var _i44 = node.childNodes.length - 1; _i44 >= 0; _i44--) {
+                    this.splitTextNodes(node.childNodes[_i44]);
                 }
             }
             if (node.tagName === "TEMPLATE" && !window.isIE11Lyte) {
@@ -3521,9 +3223,9 @@ var customElementPrototype = function (_elementPrototype) {
                         return;
                     }
                     var newNodeArray = [];
-                    for (var _i46 = 0; _i46 < mustacheValues.length; _i46++) {
-                        var mustacheStartIndex = nodeValue.indexOf(mustacheValues[_i46]);
-                        var mustacheEndIndex = mustacheStartIndex + mustacheValues[_i46].length;
+                    for (var _i45 = 0; _i45 < mustacheValues.length; _i45++) {
+                        var mustacheStartIndex = nodeValue.indexOf(mustacheValues[_i45]);
+                        var mustacheEndIndex = mustacheStartIndex + mustacheValues[_i45].length;
                         if (mustacheStartIndex) {
                             newNodeArray.push(document.createTextNode(nodeValue.substring(0, mustacheStartIndex)));
                         }
@@ -3535,8 +3237,8 @@ var customElementPrototype = function (_elementPrototype) {
                     }
                     //Fix for IE Edge issue with higher versions where node.replaceWith is not working when the parent is a doc fragment.
                     if (window.replaceWithNeeded && node.parentNode.nodeName === "#document-fragment") {
-                        for (var _i47 = 0; _i47 < newNodeArray.length; _i47++) {
-                            node.parentNode.insertBefore(newNodeArray[_i47], node);
+                        for (var _i46 = 0; _i46 < newNodeArray.length; _i46++) {
+                            node.parentNode.insertBefore(newNodeArray[_i46], node);
                         }
                         node.remove();
                     } else {
@@ -3549,8 +3251,8 @@ var customElementPrototype = function (_elementPrototype) {
         key: "observedAttributes",
         get: function get() {
             var newArr = [];
-            for (var _i48 = 0; _i48 < this._observedAttributes.length; _i48++) {
-                newArr[_i48] = LyteComponent.String.dasherize(this._observedAttributes[_i48]);
+            for (var _i47 = 0; _i47 < this._observedAttributes.length; _i47++) {
+                newArr[_i47] = LyteComponent.String.dasherize(this._observedAttributes[_i47]);
             }
 
             LyteComponent.customPropHandlers.forEach(function (item, index) {
@@ -3583,8 +3285,8 @@ var LyteComponent = {
         var evt = self._actions ? self._actions[eventName] : undefined;
         var customArgs = [];
         if (arguments.length > 1) {
-            for (var _i49 = 1; _i49 < arguments.length; _i49++) {
-                customArgs.push(arguments[_i49]);
+            for (var _i48 = 1; _i48 < arguments.length; _i48++) {
+                customArgs.push(arguments[_i48]);
             }
         }
         //wait for release
@@ -3644,7 +3346,7 @@ var LyteComponent = {
                     var parent = node.parentNode;
                     var val = actionsObj[actObj.name].apply(this.component, args);
                     hasHandled = true;
-                    if (val !== false && !event.cancelBubble) {
+                    if (val !== false) {
                         if (actObj.from && node.getAttribute(event.type) && node._boundEvents && node._boundEvents[event.type]) {
                             var actions = node._callee.constructor._actions;
                             var _actObj3 = node._boundEvents[event.type];
@@ -3652,28 +3354,14 @@ var LyteComponent = {
                             cloneActObj.args.shift();
                             LyteComponent.throwAction.call(node._callee, node._callee, event.type, cloneActObj, undefined, undefined, node, event, hasHandled);
                         } else {
-                            if (LyteComponent.hasLyteEvents(node, eventName)) {
-                                var eventStopped = LyteComponent.handleLyteEvents(node, event);
-                                val = eventStopped ? false : true;
-                            }
-                            if (val === false) {
-                                return;
-                            }
                             if (LyteComponent.isCustomElement(node)) {
                                 scope = parent;
                             }
                             if (parent) {
-                                var _eventStopped = void 0;
                                 while (parent && !parent.getAttribute(eventName) && parent.tagName != "BODY") {
-                                    if (LyteComponent.hasLyteEvents(parent, eventName)) {
-                                        _eventStopped = LyteComponent.handleLyteEvents(parent, event);
-                                        if (_eventStopped) {
-                                            break;
-                                        }
-                                    }
                                     parent = parent.parentNode;
                                 }
-                                if (_eventStopped || !parent || parent.tagName === "BODY") {
+                                if (!parent || parent.tagName === "BODY") {
                                     return;
                                 }
                                 if (!parent._callee) {
@@ -3700,7 +3388,7 @@ var LyteComponent = {
                     hasHandled = true;
                 }
             } else {
-                Lyte.error("LC004", actObj.name);
+                console.error("Action named " + actObj.name + " doesn't exist");
             }
         } else if (isCustom) {
             var eventsObj = actionsObj[eventName] || actionsObj[LyteComponent.String.toCamelCase(eventName)] || actionsObj[LyteComponent.String.dasherize(eventName)];
@@ -3724,12 +3412,12 @@ var LyteComponent = {
     "isCustomElement": function isCustomElement(node, isTemplate) {
         return node.tagName === "TEMPLATE" && isTemplate || node.nodeName && node.nodeName.indexOf('-') !== -1 && (Lyte.Component.registeredComponents[node.localName] || node.tagName === "LYTE-YIELD");
     },
-    "componentSet": function componentSet(key, value, forceExecute, fromParent) {
+    "componentSet": function componentSet(key, value, forceExecute) {
         if (!forceExecute && this.get(key) === value) {
             return;
         }
         //temporary fix
-        LyteComponent.set(this.data, key, value, undefined, fromParent);
+        LyteComponent.set(this.data, key, value, undefined, this.$node);
     },
     "componentGet": function componentGet(key) {
         return key ? LyteComponent.get(this.data, key) : this.data;
@@ -3737,8 +3425,8 @@ var LyteComponent = {
     "nodeGet": function nodeGet(key) {
         return key ? this.component.get(key) : this.component.data;
     },
-    "nodeSet": function nodeSet(key, value, fromParent) {
-        this.component.set(key, value, undefined, fromParent);
+    "nodeSet": function nodeSet(key, value) {
+        this.component.set(key, value);
     },
     "registerComponent": function registerComponent(componentName, definition, options) {
         if (Lyte.Component.registeredComponents[componentName]) {
@@ -3786,24 +3474,12 @@ var LyteComponent = {
         Component.prototype.setMethods = LyteComponent.componentSetMethods;
         customCrmComponent._mixins = options.mixins;
         var mixinslen = mixinsToBeUsed.length;
-
-        var actionsFromMixin = {};
-        var methodsFromMixin = {};
-        var newDefinition = {};
-        for (var _i50 = 0; _i50 < mixinslen; _i50++) {
-            for (var item in mixinsToBeUsed[_i50]) {
-                if (item === "actions") {
-                    Object.assign(actionsFromMixin, mixinsToBeUsed[_i50][item]);
-                } else if (item === "methods") {
-                    Object.assign(methodsFromMixin, mixinsToBeUsed[_i50][item]);
-                } else {
-                    //Component.prototype[item] = mixinsToBeUsed[i][item];    
-                    newDefinition[item] = mixinsToBeUsed[_i50][item];
-                }
+        for (var _i49 = 0; _i49 < mixinslen; _i49++) {
+            for (var item in mixinsToBeUsed[_i49]) {
+                Component.prototype[item] = mixinsToBeUsed[_i49][item];
             }
         }
-        definition = Object.assign(newDefinition, definition);
-        customCrmComponent._actions = Object.assign({}, actionsFromMixin, definition.actions);
+        customCrmComponent._actions = definition.actions ? definition.actions : {};
         customCrmComponent._template = definition._template;
         delete definition._template;
         customCrmComponent._dynamicNodes = definition._dynamicNodes;
@@ -3814,7 +3490,7 @@ var LyteComponent = {
         customCrmComponent._observers = [];
         //            let properties = definition.data ? definition.data : {};
         var properties = definition.data ? definition.data : undefined;
-        var methods = Object.assign({}, methodsFromMixin, definition.methods);
+        var methods = definition.methods ? definition.methods : {};
         //            customCrmComponent._observedAttributes = Object.keys(properties);
         customCrmComponent._observedAttributes = definition._observedAttributes || [];
         customCrmComponent._observedMethodAttributes = definition._observedMethodAttributes || {};
@@ -3863,78 +3539,17 @@ var LyteComponent = {
     "registerMixin": function registerMixin(name, mixin) {
         Lyte.Mixin.register.call(Lyte, name, mixin);
     },
-    "typeCast": function typeCast(value, dataType, obj) {
-        if (value === null) {
-            if (dataType !== "boolean") {
-                return undefined;
-            } else {
-                return false;
-            }
-        }
-        try {
-            switch (dataType) {
-                case "string":
-                    return (typeof value === "undefined" ? "undefined" : _typeof(value)) === "object" ? JSON.stringify(value) : value.toString();
-                    break;
-                case "number":
-                    {
-                        var val = +value;
-                        if (isNaN(val)) {
-                            throw "TypeCast exception";
-                        }
-                        return val;
-                    }
-                    break;
-                case "array":
-                case "object":
-                    return JSON.parse(value);
-                    break;
-                case "boolean":
-                    return !value && value !== "" || value === "false" ? false : true;
-                    break;
-                default:
-                    return value;
-            }
-        } catch (e) {
-            if (obj) {
-                obj.isError = true;
-            }
-            return value;
-        }
-    },
-    "getDataType": function getDataType(value) {
-        var type = typeof value === "undefined" ? "undefined" : _typeof(value);
-        if (type === "object") {
-            if (value instanceof Array) {
-                return "array";
-            }
-        }
-        return type;
-    },
-    "update": function update(object, property, value, fromStore, oldValue, setterScope, actualProperty, fromParent) {
+    "update": function update(object, property, value, fromStore, oldValue, setterScope, actualProperty) {
         var fromComponent = object.__component__;
-        var updateAttr = true;
         if (!oldValue) {
             oldValue = object[property];
             if (!object.hasOwnProperty(property) && !(object instanceof Array)) {
                 LyteComponent.objectFunctions(object, "add", property, value, true);
             }
             if (fromComponent && fromComponent.tagName !== "LYTE-YIELD") {
-                var dataType = void 0,
-                    dataDef = fromComponent.component.__data[property];
-                if (dataDef && (dataType = dataDef.type)) {
-                    updateAttr = !dataDef.hideAttr;
-                    if (dataType !== LyteComponent.getDataType(value) && (value !== undefined || dataType === "boolean")) {
-                        value = LyteComponent.typeCast(value, dataType);
-                    }
-                }
-                if (value === oldValue) {
-                    return;
-                }
                 var error = Lyte.validate(object, property, value, fromComponent.component);
                 if (error) {
                     LyteComponent.set(fromComponent.component.data.errors, property, error);
-                    fromComponent.callback("onError", property, error);
                     return;
                 } else {
                     if (fromComponent.component.data.errors[property]) {
@@ -3947,24 +3562,10 @@ var LyteComponent = {
             }
         }
         var toBeExecuted = fromComponent ? true : false;
-        var dasherizedAttr = LyteComponent.String.dasherize(property);
-        if (fromComponent && actualProperty && (typeof value === "string" && fromComponent.getAttribute(dasherizedAttr) !== value || fromComponent.hasAttribute(dasherizedAttr))) {
-            if ((!LyteComponent.customPropRegex.exec(property) || fromComponent.hasAttribute(dasherizedAttr)) && updateAttr) {
-                if ((typeof value === "undefined" ? "undefined" : _typeof(value)) === "object") {
-                    var jsonString = JSON.stringify(value);
-                    fromComponent.attributes.getNamedItem(dasherizedAttr).__lyteIgnore = true;
-                    fromComponent.setAttribute(dasherizedAttr, jsonString);
-                } else {
-                    var attributeString = LyteComponent.typeCast(value, "string");
-                    if (fromComponent.getAttribute(dasherizedAttr) !== attributeString) {
-                        var detAttr = fromComponent.attributes.getNamedItem(dasherizedAttr);
-                        if (detAttr) {
-                            detAttr.__lyteIgnore = true;
-                        }
-                        attributeString = attributeString || "";
-                        fromComponent.setAttribute(dasherizedAttr, attributeString);
-                    }
-                }
+        if (fromComponent && actualProperty && typeof value === "string" && fromComponent.getAttribute(LyteComponent.String.dasherize(property)) !== value) {
+            var dasherizedAttr = LyteComponent.String.dasherize(property);
+            if (!LyteComponent.customPropRegex.exec(property) || fromComponent.hasAttribute(dasherizedAttr)) {
+                fromComponent.setAttribute(LyteComponent.String.dasherize(property), value);
             }
         }
         if (value && typeof value !== "string" && typeof value !== "boolean" && typeof value !== "number") {
@@ -4003,8 +3604,8 @@ var LyteComponent = {
                     //To change only the bindings present in the object and not all the bindings present in the oldValue.
                     if (object._bindings) {
                         var oldbind = object._bindings.toArrayLyte();
-                        for (var _i51 = 0; _i51 < oldbind.length; _i51++) {
-                            var _item = oldbind[_i51][property];
+                        for (var _i50 = 0; _i50 < oldbind.length; _i50++) {
+                            var _item = oldbind[_i50][property];
                             if (_item) {
                                 this.removeSelectedBindingDeep(_item, oldValue);
                                 value._bindings.add(_item);
@@ -4036,8 +3637,8 @@ var LyteComponent = {
                         });
                     }
                     var objbind = object._bindings.toArrayLyte();
-                    for (var _i52 = 0; _i52 < objbind.length; _i52++) {
-                        var _item2 = objbind[_i52];
+                    for (var _i51 = 0; _i51 < objbind.length; _i51++) {
+                        var _item2 = objbind[_i51];
                         if (_item2[property]) {
                             value._bindings.add(_item2[property]);
                             this.establishBindings(_item2[property], value);
@@ -4052,8 +3653,8 @@ var LyteComponent = {
             if (oldValue && (typeof oldValue === "undefined" ? "undefined" : _typeof(oldValue)) === "object" && oldValue._bindings) {
                 //newValue is string and oldValue is object 
                 var _objbind = object._bindings.toArrayLyte();
-                for (var _i53 = 0; _i53 < _objbind.length; _i53++) {
-                    var _item3 = _objbind[_i53];
+                for (var _i52 = 0; _i52 < _objbind.length; _i52++) {
+                    var _item3 = _objbind[_i52];
                     if (_item3[property]) {
                         //oldValue._bindings.delete(item[property]);
                         //if(oldValue._bindings.size === 0) {
@@ -4077,15 +3678,15 @@ var LyteComponent = {
             //when newValue and oldValue , both are string, no need to change bindings. 
             if (object._bindings) {
                 var _objbind2 = object._bindings.toArrayLyte();
-                for (var _i54 = 0; _i54 < _objbind2.length; _i54++) {
-                    var _item4 = _objbind2[_i54];
+                for (var _i53 = 0; _i53 < _objbind2.length; _i53++) {
+                    var _item4 = _objbind2[_i53];
                     if (_item4[property]) {
                         this.affectChanges(_item4[property], undefined, oldValue, setterScope, object[property]);
                     }
                 }
             }
         }
-        if (toBeExecuted && !fromParent && fromComponent._attributeDetails && fromComponent._callee) {
+        if (toBeExecuted && fromComponent._attributeDetails && fromComponent._callee) {
             //let syntaxValue = fromComponent.getAttributeNode(property).syntaxValue;
             var attrDetail = fromComponent._attributeDetails[LyteComponent.String.dasherize(property)];
             var syntaxValue = void 0;
@@ -4109,7 +3710,7 @@ var LyteComponent = {
                 }
                 //self.setData(this._lbind,this.value);
                 if (exec) {
-                    LyteComponent.set(obj.context, obj.lastKey, value);
+                    LyteComponent.set(obj.context, obj.lastKey, value, undefined, fromComponent._callee);
                 }
                 if (contextSwitchArray) {
                     LyteComponent.removeContext(fromComponent._contextSwitchInfo.node, contextSwitchArray, fromComponent._contextSwitchInfo);
@@ -4117,7 +3718,7 @@ var LyteComponent = {
             }
         }
     },
-    "set": function set(object, property, value, fromStore, fromParent) {
+    "set": function set(object, property, value, fromStore) {
         if (typeof property === "string" && object[property] === value) {
             return;
         }
@@ -4149,23 +3750,18 @@ var LyteComponent = {
                 if (record.$.isError) {
                     return record;
                 }
-                for (var _i55 = 0; _i55 < oldValues.length; _i55++) {
-                    LyteComponent.update(object, oldValues[_i55].key, object[oldValues[_i55].key], fromStore, oldValues[_i55].oldValue === undefined ? null : oldValues[_i55].oldValue, setterScope, actualProperty, fromParent);
+                for (var _i54 = 0; _i54 < oldValues.length; _i54++) {
+                    LyteComponent.update(object, oldValues[_i54].key, object[oldValues[_i54].key], fromStore, oldValues[_i54].oldValue === undefined ? null : oldValues[_i54].oldValue, setterScope, actualProperty);
                 }
             } else {
                 //object[property] =  value;
                 for (var _key9 in property) {
-                    LyteComponent.update(object, _key9, property[_key9], fromStore, undefined, setterScope, actualProperty, fromParent);
+                    LyteComponent.update(object, _key9, property[_key9], fromStore, undefined, setterScope, actualProperty);
                 }
             }
         } else {
             if (Lyte.isRecord(object) && !fromStore) {
                 var old = object[property];
-                var dataType = object.$.model.fieldList[property];
-                dataType = dataType ? dataType.type : undefined;
-                if (dataType && (value !== undefined || dataType === "boolean") && dataType !== LyteComponent.getDataType(value)) {
-                    value = LyteComponent.typeCast(value, dataType);
-                }
                 var _record = store.$.setData(object.$, property, value);
                 if (_record.$.isError) {
                     return _record;
@@ -4173,13 +3769,13 @@ var LyteComponent = {
                 //Commented because update will happend when "set" is called from setData of store. 
                 //LyteComponent.update(object,property,value,fromStore,(old === undefined) ? null : old,setterScope , actualProperty);    
             } else {
-                LyteComponent.update(object, property, value, fromStore, undefined, setterScope, actualProperty, fromParent);
+                LyteComponent.update(object, property, value, fromStore, undefined, setterScope, actualProperty);
             }
         }
     },
     "newAddContext": function newAddContext(node, contextSwitchArray) {
         var isYield = node.tagName === "LYTE-YIELD";
-        if (node._contextSwitchInfo && (!isYield || node._contextSwitchInfo.node.tagName !== "LYTE-YIELD")) {
+        if (node._contextSwitchInfo) {
             LyteComponent.changeContext(node._contextSwitchInfo.node, contextSwitchArray, node._contextSwitchInfo, isYield);
         } else if (isYield && node._callee._contextSwitchInfo) {
             LyteComponent.changeContext(node._callee._contextSwitchInfo.node, contextSwitchArray, node._callee._contextSwitchInfo, true);
@@ -4187,7 +3783,7 @@ var LyteComponent = {
     },
     "newRemoveContext": function newRemoveContext(node, contextSwitchArray) {
         var isYield = node.tagName === "LYTE-YIELD";
-        if (node._contextSwitchInfo && (!isYield || node._contextSwitchInfo.node.tagName !== "LYTE-YIELD")) {
+        if (node._contextSwitchInfo) {
             LyteComponent.removeContext(node._contextSwitchInfo.node, contextSwitchArray, node._contextSwitchInfo, isYield);
         } else if (isYield && node._callee._contextSwitchInfo) {
             LyteComponent.removeContext(node._callee._contextSwitchInfo.node, contextSwitchArray, node._callee._contextSwitchInfo, true);
@@ -4197,8 +3793,7 @@ var LyteComponent = {
         if (!contextSwitchInfo) {
             return;
         }
-        var isYield = node.tagName === "LYTE-YIELD";
-        if (node._contextSwitchInfo && (!isYield || node._contextSwitchInfo.node.tagName !== "LYTE-YIELD")) {
+        if (node._contextSwitchInfo) {
             LyteComponent.changeContext(node._contextSwitchInfo.node, contextSwitchArray, node._contextSwitchInfo, node.tagName === "LYTE-YIELD" || proceedFurther);
         } else if ((node.tagName === "LYTE-YIELD" || proceedFurther) && node._callee && node._callee._contextSwitchInfo) {
             LyteComponent.changeContext(node._callee._contextSwitchInfo.node, contextSwitchArray, node._callee._contextSwitchInfo);
@@ -4234,7 +3829,7 @@ var LyteComponent = {
         } else {
             //handling for yield
             var _dummyObject = {};
-            var _callee = node._registerYield._callee;
+            var _callee = node._callee._callee;
             Object.keys(contextSwitchInfo.node._properties).forEach(function (key) {
                 _dummyObject[key] = {};
                 _dummyObject[key].value = _callee.component.data[key];
@@ -4249,8 +3844,7 @@ var LyteComponent = {
         if (!contextSwitchInfo) {
             return;
         }
-        var isYield = node.tagName === "LYTE-YIELD";
-        if (node._contextSwitchInfo && (!isYield || node._contextSwitchInfo.node.tagName !== "LYTE-YIELD")) {
+        if (node._contextSwitchInfo) {
             LyteComponent.removeContext(node._contextSwitchInfo.node, contextSwitchArray, node._contextSwitchInfo, node.tagName === "LYTE-YIELD" || proceedFurther);
         } else if ((node.tagName === "LYTE-YIELD" || proceedFurther) && node._callee && node._callee._contextSwitchInfo) {
             LyteComponent.removeContext(node._callee._contextSwitchInfo.node, contextSwitchArray, node._callee._contextSwitchInfo);
@@ -4279,7 +3873,7 @@ var LyteComponent = {
             callee._properties[itemValue] = removedObject.initialItemProp;
             callee._properties[indexValue] = removedObject.initialIndexProp;
         } else {
-            var _callee2 = node._registerYield._callee;
+            var _callee2 = node._callee._callee;
             var _removedObject = contextSwitchArray.shift();
             Object.keys(contextSwitchInfo.node._properties).forEach(function (key) {
                 _callee2.component.data[key] = _removedObject[key].value;
@@ -4301,7 +3895,7 @@ var LyteComponent = {
         options.type = functionName;
         options.property = property;
         if (!/^(add|delete)$/.test(functionName)) {
-            Lyte.error("LC005", functionName);
+            console.error("No such function exists in objectFunctions");
             return;
         }
         var bindings = object._bindings;
@@ -4310,8 +3904,8 @@ var LyteComponent = {
         }
         if (bindings) {
             var bind = bindings.toArrayLyte();
-            for (var _i56 = 0; _i56 < bind.length; _i56++) {
-                var binding = bind[_i56];
+            for (var _i55 = 0; _i55 < bind.length; _i55++) {
+                var binding = bind[_i55];
                 var forHelpers = binding._forHelpers;
                 if (forHelpers) {
                     var helperBind = forHelpers.toArrayLyte();
@@ -4343,7 +3937,6 @@ var LyteComponent = {
             console.warn(functionName + " operation cannot be performed on empty array");
             return;
         }
-        var commArgs = arguments[2];
         switch (functionName) {
             case "replaceAt":
                 {
@@ -4364,19 +3957,16 @@ var LyteComponent = {
                     //remove binding from previous object
                     if (array._bindings) {
                         var objbind = array._bindings.toArrayLyte();
-                        for (var _i57 = 0; _i57 < objbind.length; _i57++) {
-                            var item = objbind[_i57];
+                        for (var _i56 = 0; _i56 < objbind.length; _i56++) {
+                            var item = objbind[_i56];
                             if (item._forHelpers) {
                                 var helperbind = item._forHelpers.toArrayLyte();
                                 for (var _j4 = 0; _j4 < helperbind.length; _j4++) {
                                     var helper = helperbind[_j4];
-                                    if (helper.hasAttribute("unbound")) {
-                                        continue;
-                                    }
                                     var finalIndex = index + deletedItems.length;
                                     var itemValue = helper.getAttribute("item");
-                                    for (var _i58 = index, _j5 = 0; _i58 < finalIndex; _i58++, _j5++) {
-                                        LyteComponent.removeSelectedBindingDeep(_defineProperty({}, itemValue, helper._items[_i58].itemProperty), _defineProperty({}, itemValue, deletedItems[_j5]));
+                                    for (var _i57 = index, _j5 = 0; _i57 < finalIndex; _i57++, _j5++) {
+                                        LyteComponent.removeSelectedBindingDeep(_defineProperty({}, itemValue, helper._items[_i57].itemProperty), _defineProperty({}, itemValue, deletedItems[_j5]));
                                     }
                                     var contextSwitchArray = [];
                                     LyteComponent.newAddContext(helper, contextSwitchArray);
@@ -4428,8 +4018,8 @@ var LyteComponent = {
                 break;
             case "splice":
                 {
-                    var _index2 = parseInt(arguments[2]);
-                    if (_index2 > array.length) {
+                    var _index3 = parseInt(arguments[2]);
+                    if (_index3 > array.length) {
                         console.warn("index provided for replaceAt is greater than array length");
                         return [];
                     }
@@ -4439,26 +4029,23 @@ var LyteComponent = {
                     if (!(_args instanceof Array)) {
                         _args = [_args];
                     }
-                    var _deletedItems = array.splice.apply(array, [_index2, toBeDeleted].concat(_args));
-                    var _options = { "firstIndex": _index2, "secondIndex": _args.length, "thirdIndex": toBeDeleted, "type": "splice" };
+                    var _deletedItems = array.splice.apply(array, [_index3, toBeDeleted].concat(_args));
+                    var _options = { "firstIndex": _index3, "secondIndex": _args.length, "thirdIndex": toBeDeleted, "type": "splice" };
                     //All references updated by now
 
                     //remove binding from previous object
                     if (array._bindings) {
                         var _objbind3 = array._bindings.toArrayLyte();
-                        for (var _i59 = 0; _i59 < _objbind3.length; _i59++) {
-                            var _item5 = _objbind3[_i59];
+                        for (var _i58 = 0; _i58 < _objbind3.length; _i58++) {
+                            var _item5 = _objbind3[_i58];
                             if (_item5._forHelpers) {
                                 var _helperbind = _item5._forHelpers.toArrayLyte();
                                 for (var _j6 = 0; _j6 < _helperbind.length; _j6++) {
                                     var _helper = _helperbind[_j6];
-                                    if (_helper.hasAttribute("unbound")) {
-                                        continue;
-                                    }
-                                    var _finalIndex = _index2 + _deletedItems.length;
+                                    var _finalIndex = _index3 + _deletedItems.length;
                                     var _itemValue = _helper.getAttribute("item");
-                                    for (var _i60 = _index2, _j7 = 0; _i60 < _finalIndex; _i60++, _j7++) {
-                                        LyteComponent.removeSelectedBindingDeep(_defineProperty({}, _itemValue, _helper._items[_i60].itemProperty), _defineProperty({}, _itemValue, _deletedItems[_j7]));
+                                    for (var _i59 = _index3, _j7 = 0; _i59 < _finalIndex; _i59++, _j7++) {
+                                        LyteComponent.removeSelectedBindingDeep(_defineProperty({}, _itemValue, _helper._items[_i59].itemProperty), _defineProperty({}, _itemValue, _deletedItems[_j7]));
                                     }
                                     var _contextSwitchArray = [];
                                     LyteComponent.newAddContext(_helper, _contextSwitchArray);
@@ -4504,7 +4091,7 @@ var LyteComponent = {
                             }
                         }
                     }
-                    LyteComponent.callArrayObservers(array, { type: 'array', index: _index2, insertedItems: _args, removedItems: _deletedItems });
+                    LyteComponent.callArrayObservers(array, { type: 'array', index: _index3, insertedItems: _args, removedItems: _deletedItems });
                     return _deletedItems;
                 }
                 break;
@@ -4527,29 +4114,26 @@ var LyteComponent = {
             case "removeAt":
             case "remove":
                 {
-                    var _index3 = parseInt(arguments[2]);
-                    if (_index3 > array.length) {
+                    var _index4 = parseInt(arguments[2]);
+                    if (_index4 > array.length) {
                         console.warn("index provided for removeAt is greater than array length");
                         return [];
                     }
                     var length = arguments[3] ? parseInt(arguments[3]) : 1;
-                    var _options2 = { "firstIndex": _index3, "secondIndex": length, "type": "remove" };
-                    var _deletedItems2 = array.splice(_index3, length);
+                    var _options2 = { "firstIndex": _index4, "secondIndex": length, "type": "remove" };
+                    var _deletedItems2 = array.splice(_index4, length);
                     if (array._bindings) {
                         var _objbind4 = array._bindings.toArrayLyte();
-                        for (var _i61 = 0; _i61 < _objbind4.length; _i61++) {
-                            var _item7 = _objbind4[_i61];
+                        for (var _i60 = 0; _i60 < _objbind4.length; _i60++) {
+                            var _item7 = _objbind4[_i60];
                             if (_item7._forHelpers) {
                                 var _helperbind2 = _item7._forHelpers.toArrayLyte();
                                 for (var _j8 = 0; _j8 < _helperbind2.length; _j8++) {
                                     var _helper2 = _helperbind2[_j8];
-                                    if (_helper2.hasAttribute("unbound")) {
-                                        continue;
-                                    }
-                                    var _finalIndex2 = _index3 + _deletedItems2.length;
+                                    var _finalIndex2 = _index4 + _deletedItems2.length;
                                     var _itemValue2 = _helper2.getAttribute("item");
-                                    for (var _i62 = _index3, _j9 = 0; _i62 < _finalIndex2; _i62++, _j9++) {
-                                        LyteComponent.removeSelectedBindingDeep(_defineProperty({}, _itemValue2, _helper2._items[_i62].itemProperty), _defineProperty({}, _itemValue2, _deletedItems2[_j9]));
+                                    for (var _i61 = _index4, _j9 = 0; _i61 < _finalIndex2; _i61++, _j9++) {
+                                        LyteComponent.removeSelectedBindingDeep(_defineProperty({}, _itemValue2, _helper2._items[_i61].itemProperty), _defineProperty({}, _itemValue2, _deletedItems2[_j9]));
                                     }
                                     var _contextSwitchArray2 = [];
                                     LyteComponent.newAddContext(_helper2, _contextSwitchArray2);
@@ -4595,24 +4179,9 @@ var LyteComponent = {
                             }
                         }
                     }
-                    LyteComponent.callArrayObservers(array, { type: "array", removedItems: _deletedItems2, index: _index3 });
+                    LyteComponent.callArrayObservers(array, { type: "array", removedItems: _deletedItems2, index: _index4 });
                     return _deletedItems2;
                 }
-                break;
-            case "removeObject":
-                commArgs = [commArgs];
-            case "removeObjects":
-                if (!(commArgs instanceof Array)) {
-                    commArgs = [commArgs];
-                }
-                for (var i = 0; i < commArgs.length; i++) {
-                    var inde = array.indexOf(commArgs[i]);
-                    if (inde !== -1) {
-                        LyteComponent.arrayFunctions(array, 'removeAt', inde);
-                    }
-                }
-                //Lyte.arrayUtils(array, 'removeObject', actObj);
-                //Lyte.arrayUtils(array, 'removeObjects', []);
                 break;
             case "unshift":
             case "unshiftObject":
@@ -4628,29 +4197,26 @@ var LyteComponent = {
                 break;
             case "insertAt":
                 {
-                    var _index4 = parseInt(arguments[2]);
+                    var _index5 = parseInt(arguments[2]);
                     //let args = Array.prototype.slice.call(arguments, 3);
                     var _args2 = arguments[3];
                     var len = _args2.length;
                     if (!(_args2 instanceof Array)) {
                         _args2 = [_args2];
                     }
-                    for (var _i63 = _index4; _i63 > array.length; _i63--) {
+                    for (var _i62 = _index5; _i62 > array.length; _i62--) {
                         _args2.unshift(undefined);
-                        _index4--;
+                        _index5--;
                     }
-                    var _options3 = { "firstIndex": _index4, "secondIndex": _args2.length, "type": "insert" };
-                    array.splice.apply(array, [_index4, 0].concat(_args2));
+                    var _options3 = { "firstIndex": _index5, "secondIndex": _args2.length, "type": "insert" };
+                    array.splice.apply(array, [_index5, 0].concat(_args2));
                     if (array._bindings) {
                         var arrbind = array._bindings.toArrayLyte();
-                        for (var _i64 = 0; _i64 < arrbind.length; _i64++) {
-                            var _item9 = arrbind[_i64];
+                        for (var _i63 = 0; _i63 < arrbind.length; _i63++) {
+                            var _item9 = arrbind[_i63];
                             if (_item9._forHelpers) {
                                 var forbind = _item9._forHelpers.toArrayLyte();
                                 for (var _j10 = 0; _j10 < forbind.length; _j10++) {
-                                    if (forbind[_j10].hasAttribute("unbound")) {
-                                        continue;
-                                    }
                                     var _helper3 = forbind[_j10];
                                     var _contextSwitchArray3 = [];
                                     LyteComponent.newAddContext(_helper3, _contextSwitchArray3);
@@ -4689,8 +4255,7 @@ var LyteComponent = {
                             }
                         }
                     }
-                    var position = parseInt(arguments[2]);
-                    LyteComponent.callArrayObservers(array, { type: "array", insertedItems: !(arguments[3] instanceof Array) ? [arguments[3]] : arguments[0].slice(position, position + len), index: position });
+                    LyteComponent.callArrayObservers(array, { type: "array", insertedItems: !(arguments[3] instanceof Array) ? [arguments[3]] : arguments[0].slice(parseInt(arguments[2]), len + 1), index: parseInt(arguments[2]) });
                 }
                 break;
             case "concat":
@@ -4698,16 +4263,16 @@ var LyteComponent = {
                 LyteComponent.arrayFunctions(array, 'insertAt', array.length, arguments[2]);
                 break;
             default:
-                Lyte.error("LC006", functionName);
+                console.error("array Function " + functionName + " doesn't exist");
                 return;
         }
     },
     "callArrayObservers": function callArrayObservers(array, args) {
         if (array._bindings) {
             var objbind = array._bindings.toArrayLyte();
-            for (var _i65 = 0; _i65 < objbind.length; _i65++) {
-                var binding = objbind[_i65];
-                var path = objbind[_i65]._path;
+            for (var _i64 = 0; _i64 < objbind.length; _i64++) {
+                var binding = objbind[_i64];
+                var path = objbind[_i64]._path;
                 if (binding._observers) {
                     var obsbind = binding._observers.toArrayLyte();
                     for (var j = 0; j < obsbind.length; j++) {
@@ -4728,8 +4293,8 @@ var LyteComponent = {
     },
     "establishUpdateBindings": function establishUpdateBindings(bindings, property, actualData) {
         var objbind = bindings.toArrayLyte();
-        for (var _i66 = 0; _i66 < objbind.length; _i66++) {
-            var item = objbind[_i66];
+        for (var _i65 = 0; _i65 < objbind.length; _i65++) {
+            var item = objbind[_i65];
             if (item[property]) {
                 if (!actualData._bindings) {
                     Object.defineProperty(actualData, "_bindings", {
@@ -4752,8 +4317,8 @@ var LyteComponent = {
         var props = propName.split('.');
         var currentProp = node.getProperty(props[0]);
         var currentValue = actualData[props[0]];
-        for (var _i67 = 0; _i67 < props.length; _i67++) {
-            if (!currentValue || (typeof currentValue === "undefined" ? "undefined" : _typeof(currentValue)) !== "object") {
+        for (var _i66 = 0; _i66 < props.length; _i66++) {
+            if ((typeof currentValue === "undefined" ? "undefined" : _typeof(currentValue)) !== "object") {
                 break;
             }
             if (!currentValue._bindings) {
@@ -4765,16 +4330,16 @@ var LyteComponent = {
                 });
             }
             currentValue._bindings.add(currentProp);
-            currentProp = currentProp[props[_i67 + 1]];
-            currentValue = currentValue[props[_i67 + 1]];
+            currentProp = currentProp[props[_i66 + 1]];
+            currentValue = currentValue[props[_i66 + 1]];
         }
     },
     "establishBindings": function establishBindings(properties, actualData) {
         if (properties._helperNodes) {
             var path = properties._path;
             var arr = properties._helperNodes.toArrayLyte();
-            for (var _s2 = 0; _s2 < arr.length; _s2++) {
-                var nodes = arr[_s2]._dynamicProperty ? arr[_s2]._dynamicProperty[path] : undefined;
+            for (var s = 0; s < arr.length; s++) {
+                var nodes = arr[s]._dynamicProperty ? arr[s]._dynamicProperty[path] : undefined;
                 if (nodes) {
                     for (var j = 0; j < nodes.length; j++) {
                         var node = nodes[j];
@@ -4782,12 +4347,12 @@ var LyteComponent = {
                         if (helper && helper.tagName === "TEMPLATE" && helper.getAttribute("is") === "for") {
                             if (helper._items) {
                                 var item = helper.getAttribute("item");
-                                for (var _i68 = 0; _i68 < helper._items.length; _i68++) {
-                                    var _data = actualData[_i68];
+                                for (var _i67 = 0; _i67 < helper._items.length; _i67++) {
+                                    var _data = actualData[_i67];
                                     var _item11 = helper.getAttribute("item");
                                     if (_data) {
-                                        if (_typeof(helper._items[_i68]) === "object") {
-                                            this.establishBindings(helper._items[_i68].itemProperty, _defineProperty({}, _item11, _data));
+                                        if (_typeof(helper._items[_i67]) === "object") {
+                                            this.establishBindings(helper._items[_i67].itemProperty, _defineProperty({}, _item11, _data));
                                         }
                                     }
                                 }
@@ -4797,8 +4362,8 @@ var LyteComponent = {
                 }
             }
         }
-        for (var _i69 in properties) {
-            var actData = actualData[_i69];
+        for (var _i68 in properties) {
+            var actData = actualData[_i68];
             if (!actData || typeof actData === "string" || typeof actData === "number" || typeof actData === "boolean") {
                 if (!actualData._bindings) {
                     Object.defineProperty(actualData, "_bindings", {
@@ -4818,9 +4383,9 @@ var LyteComponent = {
                         configurable: true
                     });
                 }
-                actData._bindings.add(properties[_i69]);
-                if (_typeof(properties[_i69]) === "object") {
-                    this.establishBindings(properties[_i69], actData);
+                actData._bindings.add(properties[_i68]);
+                if (_typeof(properties[_i68]) === "object") {
+                    this.establishBindings(properties[_i68], actData);
                 }
             }
         }
@@ -4836,28 +4401,28 @@ var LyteComponent = {
                 delete actualData._bindings;
             }
         }
-        for (var _i70 in binding) {
-            var actData = actualData[_i70];
+        for (var _i69 in binding) {
+            var actData = actualData[_i69];
             if (actData && actData._bindings) {
-                actData._bindings[del](binding[_i70]);
+                actData._bindings[del](binding[_i69]);
                 if (!actData._bindings.size) {
-                    delete actData._bindings;
+                    delete actualData._bindings;
                 }
             }
-            if (_typeof(binding[_i70]) === "object" && actData) {
-                this.removeSelectedBindingDeep(binding[_i70], actData);
+            if (_typeof(binding[_i69]) === "object" && actData) {
+                this.removeSelectedBindingDeep(binding[_i69], actData);
             }
         }
         if (binding._forHelpers) {
             var objbind = binding._forHelpers.toArrayLyte();
-            for (var _i71 = 0; _i71 < objbind.length; _i71++) {
-                var fH = objbind[_i71];
+            for (var _i70 = 0; _i70 < objbind.length; _i70++) {
+                var fH = objbind[_i70];
                 if (fH.getAttribute("is") === "for") {
                     var item = fH.getAttribute("item");
                     var items = fH._attributes.items;
                     var itemCases = fH._items;
-                    for (var _i72 = 0; _i72 < itemCases.length; _i72++) {
-                        this.removeSelectedBindingDeep(itemCases[_i72].itemProperty, items[_i72]);
+                    for (var _i71 = 0; _i71 < itemCases.length; _i71++) {
+                        this.removeSelectedBindingDeep(itemCases[_i71].itemProperty, items[_i71]);
                     }
                 } else {
                     if (fH._propBindingObject) {
@@ -4889,37 +4454,37 @@ var LyteComponent = {
     },
     "affectChanges": function affectChanges(item, contextAlreadySwitched, oldValue, setterScope, newValue) {
         if (item._dynamicNodes) {
-            for (var _i73 = 0; _i73 < item._dynamicNodes.length; _i73++) {
-                item._dynamicNodes[_i73]._callee.updateNode(item._dynamicNodes[_i73], item._path);
+            for (var _i72 = 0; _i72 < item._dynamicNodes.length; _i72++) {
+                item._dynamicNodes[_i72]._callee.updateNode(item._dynamicNodes[_i72], item._path);
             }
         }
         var propPath = item._path;
         if (item._helperNodes) {
             var nodes = [],
                 itemHelperNodes = item._helperNodes.toArrayLyte();
-            for (var _s3 = 0; _s3 < itemHelperNodes.length; _s3++) {
-                if (!item._helperNodes.has(itemHelperNodes[_s3])) {
+            for (var s = 0; s < itemHelperNodes.length; s++) {
+                if (!item._helperNodes.has(itemHelperNodes[s])) {
                     continue;
                 }
-                if (itemHelperNodes[_s3].getAttribute("is") === "for" && itemHelperNodes[_s3]._items) {
+                if (itemHelperNodes[s].getAttribute("is") === "for" && itemHelperNodes[s]._items) {
                     var innerContextSwitchArray = [];
-                    LyteComponent.newAddContext(itemHelperNodes[_s3], innerContextSwitchArray);
-                    var indexValue = itemHelperNodes[_s3].getAttribute("index");
-                    var itemValue = itemHelperNodes[_s3].getAttribute("item");
-                    var callee = itemHelperNodes[_s3]._callee;
+                    LyteComponent.newAddContext(itemHelperNodes[s], innerContextSwitchArray);
+                    var indexValue = itemHelperNodes[s].getAttribute("index");
+                    var itemValue = itemHelperNodes[s].getAttribute("item");
+                    var callee = itemHelperNodes[s]._callee;
                     var initialItemValue = callee.component.data[itemValue];
                     var initialIndexValue = callee.component.data[indexValue];
                     var initialItemProp = callee._properties[itemValue];
                     var initialIndexProp = callee._properties[indexValue];
-                    var items = itemHelperNodes[_s3]._attributes.items;
-                    for (var _i74 = 0; _i74 < itemHelperNodes[_s3]._items.length; _i74++) {
-                        callee.component.data[itemValue] = items[_i74];
-                        callee.component.data[indexValue] = _i74;
-                        callee._properties[itemValue] = itemHelperNodes[_s3]._items[_i74].itemProperty;
-                        if (itemHelperNodes[_s3]._items[_i74]._dynamicProperty[propPath]) {
-                            nodes = itemHelperNodes[_s3]._items[_i74]._dynamicProperty[propPath];
-                            for (var _i75 = 0; _i75 < nodes.length; _i75++) {
-                                nodes[_i75]._callee.updateNode(nodes[_i75], propPath);
+                    var items = itemHelperNodes[s]._attributes.items;
+                    for (var _i73 = 0; _i73 < itemHelperNodes[s]._items.length; _i73++) {
+                        callee.component.data[itemValue] = items[_i73];
+                        callee.component.data[indexValue] = _i73;
+                        callee._properties[itemValue] = itemHelperNodes[s]._items[_i73].itemProperty;
+                        if (itemHelperNodes[s]._items[_i73]._dynamicProperty[propPath]) {
+                            nodes = itemHelperNodes[s]._items[_i73]._dynamicProperty[propPath];
+                            for (var _i74 = 0; _i74 < nodes.length; _i74++) {
+                                nodes[_i74]._callee.updateNode(nodes[_i74], propPath);
                             }
                         }
                     }
@@ -4927,26 +4492,26 @@ var LyteComponent = {
                     callee.component.data[indexValue] = initialIndexValue;
                     callee._properties[itemValue] = initialItemProp;
                     callee._properties[indexValue] = initialIndexProp;
-                    LyteComponent.newRemoveContext(itemHelperNodes[_s3], innerContextSwitchArray);
-                } else if (itemHelperNodes[_s3].getAttribute("is") === "forIn" && itemHelperNodes[_s3]._items) {
+                    LyteComponent.newRemoveContext(itemHelperNodes[s], innerContextSwitchArray);
+                } else if (itemHelperNodes[s].getAttribute("is") === "forIn" && itemHelperNodes[s]._items) {
                     var _innerContextSwitchArray = [];
-                    LyteComponent.newAddContext(itemHelperNodes[_s3], _innerContextSwitchArray);
-                    var _indexValue = itemHelperNodes[_s3].getAttribute("key");
-                    var _itemValue3 = itemHelperNodes[_s3].getAttribute("value");
-                    var _callee3 = itemHelperNodes[_s3]._callee;
+                    LyteComponent.newAddContext(itemHelperNodes[s], _innerContextSwitchArray);
+                    var _indexValue = itemHelperNodes[s].getAttribute("key");
+                    var _itemValue3 = itemHelperNodes[s].getAttribute("value");
+                    var _callee3 = itemHelperNodes[s]._callee;
                     var _initialItemValue = _callee3.component.data[_itemValue3];
                     var _initialIndexValue = _callee3.component.data[_indexValue];
                     var _initialItemProp = _callee3._properties[_itemValue3];
                     var _initialIndexProp = _callee3._properties[_indexValue];
-                    var object = itemHelperNodes[_s3]._attributes.object;
-                    for (var key in itemHelperNodes[_s3]._items) {
+                    var object = itemHelperNodes[s]._attributes.object;
+                    for (var key in itemHelperNodes[s]._items) {
                         _callee3.component.data[_itemValue3] = object[key];
                         _callee3.component.data[_indexValue] = key;
-                        _callee3._properties[_itemValue3] = itemHelperNodes[_s3]._items[key].itemProperty;
-                        if (itemHelperNodes[_s3]._items[key]._dynamicProperty[propPath]) {
-                            nodes = itemHelperNodes[_s3]._items[key]._dynamicProperty[propPath];
-                            for (var _i76 = 0; _i76 < nodes.length; _i76++) {
-                                nodes[_i76]._callee.updateNode(nodes[_i76], propPath);
+                        _callee3._properties[_itemValue3] = itemHelperNodes[s]._items[key].itemProperty;
+                        if (itemHelperNodes[s]._items[key]._dynamicProperty[propPath]) {
+                            nodes = itemHelperNodes[s]._items[key]._dynamicProperty[propPath];
+                            for (var _i75 = 0; _i75 < nodes.length; _i75++) {
+                                nodes[_i75]._callee.updateNode(nodes[_i75], propPath);
                             }
                         }
                     }
@@ -4954,22 +4519,22 @@ var LyteComponent = {
                     _callee3.component.data[_indexValue] = _initialIndexValue;
                     _callee3._properties[_itemValue3] = _initialItemProp;
                     _callee3._properties[_indexValue] = _initialIndexProp;
-                    LyteComponent.newRemoveContext(itemHelperNodes[_s3], _innerContextSwitchArray);
+                    LyteComponent.newRemoveContext(itemHelperNodes[s], _innerContextSwitchArray);
                 } else {
-                    nodes = itemHelperNodes[_s3]._dynamicProperty[item._path] || [];
+                    nodes = itemHelperNodes[s]._dynamicProperty[item._path] || [];
                     var contextSwitchArray = [];
-                    LyteComponent.newAddContext(itemHelperNodes[_s3], contextSwitchArray);
-                    for (var _i77 = 0; _i77 < nodes.length; _i77++) {
-                        nodes[_i77]._callee.updateNode(nodes[_i77], item._path);
+                    LyteComponent.newAddContext(itemHelperNodes[s], contextSwitchArray);
+                    for (var _i76 = 0; _i76 < nodes.length; _i76++) {
+                        nodes[_i76]._callee.updateNode(nodes[_i76], item._path);
                     }
-                    LyteComponent.newRemoveContext(itemHelperNodes[_s3], contextSwitchArray);
+                    LyteComponent.newRemoveContext(itemHelperNodes[s], contextSwitchArray);
                 }
             }
         }
         if (item._observers) {
             var objbind = item._observers.toArrayLyte();
-            for (var _i78 = 0; _i78 < objbind.length; _i78++) {
-                var observer = objbind[_i78];
+            for (var _i77 = 0; _i77 < objbind.length; _i77++) {
+                var observer = objbind[_i77];
                 observer.observer.value.call(observer.callee && observer.callee.component ? observer.callee.component : setterScope ? setterScope : window, { type: "change", oldValue: oldValue, newValue: newValue, item: item._path });
             }
         }
@@ -4992,7 +4557,7 @@ var LyteComponent = {
                 if (context === undefined) {
                     return undefined;
                 }
-                var inner = LyteComponent.getDynamicData.call(self, self.component.data, item);
+                var inner = self.getDynamicData.call(self, self.component.data, item);
                 if (inner === undefined) {
                     return undefined;
                 }
@@ -5018,8 +4583,8 @@ var LyteComponent = {
             for (var k = 0; k < locArr.length; k++) {
                 context = context[locArr[k]];
             }
-            for (var _i79 = 1; _i79 < arr.length; _i79++) {
-                var locVal = arr[_i79];
+            for (var _i78 = 1; _i78 < arr.length; _i78++) {
+                var locVal = arr[_i78];
                 //this is context switching
                 if (locVal.startsWith(".")) {
                     //direct context switching
@@ -5136,7 +4701,7 @@ var LyteComponent = {
         if (componentName) {
             var component = document.createElement(componentName);
         } else {
-            Lyte.error("LC007");
+            console.error("Component name not specified");
             return;
         }
         if (data) {
@@ -5146,9 +4711,8 @@ var LyteComponent = {
             var actOutlet = document.querySelector(outlet);
             if (actOutlet) {
                 actOutlet.appendChild(component);
-                component._callee = component.getCallee(actOutlet);
             } else {
-                Lyte.error("LC008", outlet);
+                console.warn("Specified outlet doesn't exist");
             }
         }
         return component;
@@ -5197,7 +4761,7 @@ var LyteComponent = {
         var args = Array.prototype.slice.call(arguments, 1);
         var methodName = LyteComponent.String.toCamelCase(arguments[0]);
         if (!this.methods[methodName]) {
-            Lyte.error("LC009", methodName);
+            console.error(methodName + " method not found");
             return;
         }
         return this.methods[methodName].apply(this, args);
@@ -5208,8 +4772,8 @@ var LyteComponent = {
         if (fromStore) {
             scope = fromStore;
         }
-        for (var _i80 = 0; _i80 < observers.length; _i80++) {
-            var props = observers[_i80].properties;
+        for (var _i79 = 0; _i79 < observers.length; _i79++) {
+            var props = observers[_i79].properties;
             for (var j = 0; j < props.length; j++) {
                 var actProp = void 0;
                 var isArrayObserver = false;
@@ -5227,7 +4791,7 @@ var LyteComponent = {
                         configurable: true
                     });
                 }
-                actProp._observers.add({ callee: scope, observer: observers[_i80], isArrayObserver: isArrayObserver });
+                actProp._observers.add({ callee: scope, observer: observers[_i79], isArrayObserver: isArrayObserver });
             }
         }
     },
@@ -5248,12 +4812,12 @@ var LyteComponent = {
         }
 
         Object.defineProperty(property, '_path', { enumerable: false, value: arr[0] });
-        for (var _i81 = 1; _i81 < arr.length; _i81++) {
-            if (!property[arr[_i81]]) {
-                property[arr[_i81]] = {};
-                Object.defineProperty(property[arr[_i81]], '_path', { enumerable: false, value: property._path + "." + arr[_i81] });
+        for (var _i80 = 1; _i80 < arr.length; _i80++) {
+            if (!property[arr[_i80]]) {
+                property[arr[_i80]] = {};
+                Object.defineProperty(property[arr[_i80]], '_path', { enumerable: false, value: property._path + "." + arr[_i80] });
             }
-            property = property[arr[_i81]];
+            property = property[arr[_i80]];
         }
         return property;
     },
@@ -5308,18 +4872,12 @@ var LyteComponent = {
         }
         obj.newValue = newValue;
         return true;
-    },
-    "cssEscape": function cssEscape(string) {
-        if (string) {
-            return string.replace(/['"]/g, "\\$&");
-        } else {
-            return string;
-        }
     }
 
 };
 Lyte.Component.render = LyteComponent.render;
 LyteComponent.lyteComponentsDiv = document.createElement("div");
+LyteComponent.styleDiv = document.createElement("div");
 LyteComponent.lyteComponentsDiv.setAttribute("id", "lyte-components-div");
 LyteComponent.dummyLyteComponentsDiv = document.createElement("div");
 LyteComponent.dummyLyteComponentsDiv.setAttribute("id", "dummy-lyte-components-div");
@@ -5394,9 +4952,9 @@ function getHelperArgs(str) {
         args = [],
         from = 0;
     var lastPushed = void 0;
-    for (var _i82 = 0; _i82 < str.length; _i82++) {
-        if (!stack.length && str.charAt(_i82) === ",") {
-            var _toPush2 = str.substr(from, _i82 - from);
+    for (var _i81 = 0; _i81 < str.length; _i81++) {
+        if (!stack.length && str.charAt(_i81) === ",") {
+            var _toPush2 = str.substr(from, _i81 - from);
             _toPush2 = _toPush2.trim();
             if (_toPush2 && _toPush2.startsWith("\"") && _toPush2.endsWith("\"")) {
                 _toPush2 = _toPush2.slice(1, -1);
@@ -5404,30 +4962,30 @@ function getHelperArgs(str) {
             }
             _toPush2 = getHelperArgValue(_toPush2);
             args.push(_toPush2);
-            from = _i82 + 1;
-        } else if (str.charAt(_i82) === "(") {
+            from = _i81 + 1;
+        } else if (str.charAt(_i81) === "(") {
             if (lastPushed != "'" || lastPushed != "\"") {
-                stack.push(str.charAt(_i82));
-                lastPushed = str.charAt(_i82);
+                stack.push(str.charAt(_i81));
+                lastPushed = str.charAt(_i81);
             }
-        } else if (str.charAt(_i82) === ")") {
+        } else if (str.charAt(_i81) === ")") {
             if (stack[stack.length - 1] === "(") {
                 stack.pop();
             }
-        } else if (str.charAt(_i82) === "'" && str.charAt(_i82 - 1) !== "\\") {
+        } else if (str.charAt(_i81) === "'" && str.charAt(_i81 - 1) !== "\\") {
             if (stack[stack.length - 1] === "'") {
                 stack.pop();
             } else if (stack[stack.length - 1] !== "\"") {
-                stack.push(str.charAt(_i82));
-                lastPushed = str.charAt(_i82);
+                stack.push(str.charAt(_i81));
+                lastPushed = str.charAt(_i81);
             }
-        } else if (str.charAt(_i82) === "\"" && str.charAt(_i82 - 1) !== "\\") {
+        } else if (str.charAt(_i81) === "\"" && str.charAt(_i81 - 1) !== "\\") {
             if (stack[stack.length - 1] === "\"") {
                 stack.pop();
                 //              str.replaceAt(i, "'");
             } else if (stack[stack.length - 1] !== "'") {
-                stack.push(str.charAt(_i82));
-                lastPushed = str.charAt(_i82);
+                stack.push(str.charAt(_i81));
+                lastPushed = str.charAt(_i81);
                 //              str.replaceAt(i, "'");
             }
         }
@@ -5505,9 +5063,9 @@ function doCompile(dynamicN, dynamicNodes, componentName) {
                         toBeAdded = [];
                     var node = dynN;
                     var attr = info.attr = info.attr || {};
-                    for (var _i83 = 0; _i83 < node.attributes.length; _i83++) {
-                        if (node.attributes[_i83].nodeValue.indexOf("{{") !== -1) {
-                            var val = node.attributes[_i83].nodeValue;
+                    for (var _i82 = 0; _i82 < node.attributes.length; _i82++) {
+                        if (node.attributes[_i82].nodeValue.indexOf("{{") !== -1) {
+                            var val = node.attributes[_i82].nodeValue;
                             var actValue = this.getMustache(val),
                                 actObj = void 0;
                             if (actValue) {
@@ -5515,24 +5073,24 @@ function doCompile(dynamicN, dynamicNodes, componentName) {
                             } else if (/{{.*}}/.test(val) && !/\\{{.*}}/.test(val)) {
                                 actObj = this.splitMixedText(val);
                             }
-                            if (actObj && (actObj.name === "action" || actObj.name === "method") && /^(onfocus|onfocusin|onfocusout|onresize|onscroll|onclick|ondblclick|onmousedown|onmouseup|onmousemove|onmouseover|onmouseout|onchange|onselect|onsubmit|onkeydown|onkeypress|onkeyup|oncontextmenu)$/.test(node.attributes[_i83].name)) {
-                                attr[node.attributes[_i83].name.substr(2)] = { name: node.attributes[_i83].name.substr(2), helperInfo: actObj, globalEvent: true };
+                            if (actObj && (actObj.name === "action" || actObj.name === "method") && /^(onfocus|onfocusin|onfocusout|onresize|onscroll|onclick|ondblclick|onmousedown|onmouseup|onmousemove|onmouseover|onmouseout|onmouseenter|onmouseleave|onchange|onselect|onsubmit|onkeydown|onkeypress|onkeyup|oncontextmenu)$/.test(node.attributes[_i82].name)) {
+                                attr[node.attributes[_i82].name.substr(2)] = { name: node.attributes[_i82].name.substr(2), helperInfo: actObj, globalEvent: true };
                                 var actArgs = deepCopyObject(actObj.args);
                                 var actName = actArgs.splice(0, 1)[0];
                                 actName = actName.startsWith("'") ? actName.replace(/'/g, '') : actName;
                                 var actString = this.getArgString(actName, actArgs);
-                                node.setAttribute(node.attributes[_i83].name.substr(2), componentName + " => " + actString);
-                                toBeRemoved.push(node.attributes[_i83].name);
+                                node.setAttribute(node.attributes[_i82].name.substr(2), componentName + " => " + actString);
+                                toBeRemoved.push(node.attributes[_i82].name);
                             } else {
                                 if (actObj || actValue) {
                                     var attrToPush = {};
-                                    if (node.attributes[_i83].name.startsWith("lbind:")) {
-                                        toBeRemoved.push(node.attributes[_i83].name);
-                                        toBeAdded.push({ "name": node.attributes[_i83].name.substring(6), "value": node.attributes[_i83].nodeValue });
+                                    if (node.attributes[_i82].name.startsWith("lbind:")) {
+                                        toBeRemoved.push(node.attributes[_i82].name);
+                                        toBeAdded.push({ "name": node.attributes[_i82].name.substring(6), "value": node.attributes[_i82].nodeValue });
                                         attrToPush.isLbind = true;
-                                        attrToPush.name = node.attributes[_i83].name.substring(6);
+                                        attrToPush.name = node.attributes[_i82].name.substring(6);
                                     } else {
-                                        attrToPush.name = node.attributes[_i83].name;
+                                        attrToPush.name = node.attributes[_i82].name;
                                     }
                                     if (actObj) {
                                         if (actObj.name === "lbind") {
@@ -5553,13 +5111,13 @@ function doCompile(dynamicN, dynamicNodes, componentName) {
                         }
                     }
                     if (toBeRemoved.length) {
-                        for (var _i84 = 0; _i84 < toBeRemoved.length; _i84++) {
-                            node.removeAttribute(toBeRemoved[_i84]);
+                        for (var _i83 = 0; _i83 < toBeRemoved.length; _i83++) {
+                            node.removeAttribute(toBeRemoved[_i83]);
                         }
                     }
                     if (toBeAdded.length) {
-                        for (var _i85 = 0; _i85 < toBeAdded.length; _i85++) {
-                            node.setAttribute(toBeAdded[_i85].name, toBeAdded[_i85].value);
+                        for (var _i84 = 0; _i84 < toBeAdded.length; _i84++) {
+                            node.setAttribute(toBeAdded[_i84].name, toBeAdded[_i84].value);
                         }
                     }
                 }
@@ -5605,7 +5163,7 @@ function doCompile(dynamicN, dynamicNodes, componentName) {
                         }
                     } else {
                         for (var _key15 in info.cases) {
-                            doCompile(dynN.content.querySelector("[case='" + LyteComponent.cssEscape(_key15) + "']").content, info.cases[_key15].dynamicNodes, componentName);
+                            doCompile(dynN.content.querySelector("[case='" + _key15 + "']").content, info.cases[_key15].dynamicNodes, componentName);
                         }
                         if (info[def].dynamicNodes) {
                             doCompile(dynN.content.querySelector("[default]").content, info[def].dynamicNodes, componentName);
@@ -5717,9 +5275,9 @@ function deepCopyObject(obj) {
 
 function getArgString(name, array) {
     var retString = void 0;
-    for (var _i86 = 0; _i86 < array.length; _i86++) {
-        if (_typeof(array[_i86]) === "object") {
-            array[_i86] = this.getArgString(array[_i86].value.name, array[_i86].value.args);
+    for (var _i85 = 0; _i85 < array.length; _i85++) {
+        if (_typeof(array[_i85]) === "object") {
+            array[_i85] = this.getArgString(array[_i85].value.name, array[_i85].value.args);
         }
     }
     if (name) {
@@ -5945,52 +5503,3 @@ Lyte.Component.register("lyte-event-listener", {
 });
 
 Lyte.Component.registerCustomPropHandler("ltProp");
-
-LyteComponent.addLyteEventListener = function (element, eventName, func, context) {
-    element._lyteEvents = element._lyteEvents || {};
-    element._lyteEvents[eventName] = element._lyteEvents[eventName] || [];
-    var ind = element._lyteEvents[eventName].push({ "func": func, "fromEventListener": true, "context": context });
-    return eventName + "-" + ind;
-};
-
-LyteComponent.removeLyteEventListener = function (element, listenerId) {
-    if (!listenerId) {
-        Lyte.error("No listenerId provided");
-        return;
-    }
-    var split = listenerId.split('-');
-    var eventName = split[0];
-    var index = parseInt(split[1]);
-    if (!element._lyteEvents || !element._lyteEvents[split[0]] || isNaN(index)) {
-        Lyte.error("Invalid listenerId / listener is not available");
-        return;
-    }
-    element._lyteEvents[split[0]][split[1] - 1] = {};
-};
-
-LyteComponent.hasLyteEvents = function (element, eventName) {
-    if (element._lyteEvents && element._lyteEvents[eventName]) {
-        return true;
-    } else {
-        return false;
-    }
-};
-
-LyteComponent.handleLyteEvents = function (element, event) {
-    var funcs = element._lyteEvents[event.type];
-    var ret;
-    var eventStopped;
-    for (var i = 0; i < funcs.length; i++) {
-        if (funcs[i].func) {
-            ret = funcs[i].func.call(funcs[i].context ? funcs[i].context : window, event);
-            if (ret === false || event.cancelBubble) {
-                eventStopped = true;
-                break;
-            }
-        }
-    }
-    if (eventStopped) {
-        event.stopPropagation();
-    }
-    return eventStopped;
-};

@@ -11,7 +11,7 @@
 
 
             <div class="col s12">
-                <select class="browser-default" (change)="onChange($event.target.value)">
+                <select class="browser-default" onchange="{{action('optionselect',this)}}">
                     <option selected disabled value="">Day's</option>
                     <option value='60'>60</option>
                     <option value='70'>70</option>
@@ -128,6 +128,18 @@
 
         </div>
 
+    <div class="col l8 m8 s12">
+        <ul class="collection with-header" id="list" style="display: none">
+            <li class="collection-header"><h4>traditional</h4></li>
+            <%data.traditional.forEach(function(item){%>
+            <li class="collection-item"><div>{{item.name}}</div></li>
+            <%})%>
+            <li class="collection-header"><h4>advanced</h4></li>
+            <%data.advanced.forEach(function(item){%>
+            <li class="collection-item"><div>{{item.name}}</div></li>
+            <%})%>
+        </ul>
+    </div>
 
 
 </template>

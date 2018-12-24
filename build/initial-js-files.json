@@ -1,0 +1,62 @@
+{
+	"javascript/custom-elements-es5-adapter.js": [
+		"bower_components/lyte/custom-elements-es5-adapter.js"
+	],
+    "javascript/lyte.js": [
+    	"bower_components/lyte-dom/lyte-dom.js",
+        "bower_components/lyte/polyfill-bundle.js",
+        "bower_components/lyte/lyte-es5.js",
+        "bower_components/lyte-ui-component/components/helpers/helpers.js",
+        "bower_components/lyte-ui-component/components/lyte-wormhole.js",
+        "bower_components/lyte-ui-component/components/lyte-menu.js",
+        "bower_components/lyte-ui-component/components/lyte-dropdown.js",
+        "bower_components/lyte-ui-component/components/lyte-button.js",
+        "bower_components/lyte-ui-component/components/lyte-autocomplete.js",
+        "bower_components/lyte-ui-component/components/lyte-input.js",
+        "bower_components/lyte-ui-component/components/lyte-popover.js",
+        "bower_components/lyte-ui-component/components/lyte-modal.js",
+        "bower_components/lyte-ui-component/components/lyte-calendar.js",
+        "bower_components/lyte-ui-component/components/lyte-search.js",
+        "bower_components/lyte-ui-component/components/lyte-table.js",
+        "bower_components/lyte-ui-component/components/lyte-modal.js",
+		"bower_components/lyte-ui-component/components/lyte-colorpicker.js",
+        "bower_components/lyte-ui-component/components/lyte-checkbox.js",
+        "bower_components/lyte-ui-component/components/lyte-messagebox.js",
+        "bower_components/lyte-ui-component/components/lyte-dragdrop.js",
+        "bower_components/lyte-ui-component/components/lyte-radiobutton.js",
+        "bower_components/lyte-ui-component/components/lyte-tooltip.js",
+        "bower_components/lyte-ui-component/components/lyte-messagebox.js",
+        "bower_components/lyte-ui-component/plugins/lyte-scrollbar.js",
+        "bower_components/lyte-ui-component/plugins/lyte-sortable.js",
+        "bower_components/lyte-ui-component/plugins/lyte-search.js",
+		"bower_components/lyte-ui-component/I18n/en_US.js",
+        "bower_components/crux-components/components/helpers/helper.js",
+        "bower_components/crux-components/mixins/crux-user-utils.js",
+        "bower_components/crux-components/components/crux-user-dropdown.js",
+        "bower_components/crux-components/components/crux-user-lookup.js",
+        "bower_components/crux-components/mixins/crux-criteria-conditions.js",
+        "bower_components/crux-components/components/crux-criteria-editor-view-header.js",
+        "bower_components/crux-components/components/crux-criteria-editor-header.js",
+        "bower_components/crux-components/components/crux-criteria-editor.js",
+        "bower_components/crux-components/I18n/crux_en_US.js",
+        "bower_components/crux-components/components/elements/crux-date-time-component.js",
+        "bower_components/crux-components/components/elements/crux-boolean-component.js",
+        "bower_components/crux-components/components/elements/crux-date-component.js",
+    	"bower_components/crux-components/components/elements/crux-number-component.js",
+    	"bower_components/crux-components/components/elements/crux-text-component.js",
+    	"bower_components/crux-components/components/elements/crux-picklist-component.js",
+    	"bower_components/crux-components/components/elements/crux-user-component.js",
+    	"bower_components/crux-components/components/elements/crux-user-dropdown.js",
+    	"bower_components/crux-components/components/elements/crux-tag-component.js",
+    	"bower_components/crux-components/components/elements/crux-layout-component.js"
+    ],
+    "javascript/crm-lyte-rp-initial.js": [
+      "data-store/models/loginauth/usermodel.js",
+      "data-store/models/params/crop-params.js",
+      "data-store/adapters/user.js"
+
+    ],
+    "javascript/crm-lyte-initial.js": [
+		"router.js"
+    ]
+}

@@ -11,3 +11,4 @@ copying file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/index.h
 copying file /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/router.js => /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/router.js
 
 Copying the consolidated files to /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/app.js
+Copying the consolidated files to /Users/vignesh-pt2299/Documents/collegeProject/CreativeCrop/docs/app.js

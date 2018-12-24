@@ -1,5 +1,0 @@
-.lyteListViewPop lyte-popover-content > lyte-menu-item {
-	transition-property: transform;
-	transition-duration: 0.3s;
-	transform: translateY(0px);
-}

@@ -1,0 +1,10 @@
+{
+	"css/lyte.css":[
+		"bower_components/lyte-ui-component/components/styles/lyte-ui-components.css",
+	    "bower_components/crux-components/components/styles/crux-user-lookup.css",
+		"bower_components/crux-components/components/styles/crux-user-dropdown.css",
+		"bower_components/crux-components/components/styles/crux-criteria-editor-header.css",
+		"bower_components/crux-components/components/styles/crux-criteria-editor.css"
+    ]
+    
+}

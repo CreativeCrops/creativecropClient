@@ -4,6 +4,7 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/bower_components/lyte-unit-test" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/dist/bower_components/lyte-unit-test" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/dist/docs/bower_components/lyte-unit-test" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/docs/bower_components/lyte-unit-test" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/docs/dist/bower_components/lyte-unit-test" vcs="Git" />
   </component>

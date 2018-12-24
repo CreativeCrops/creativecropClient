@@ -1,6 +1,5 @@
     LyteComponent.needDummyComponentsDiv = true;
-    Lyte.Compile = {};
-    Lyte.Compile.getArgString = function(name, array) {
+    function getArgString(name, array) {
         var retString;
         for(var i=0;i<array.length;i++) {
             if(typeof array[i] === "object") {
@@ -15,7 +14,7 @@
         return retString;
     }
 
-    Lyte.Compile.getDynamicNodes = function(fileName,resolve, templateToRender) {
+    function getDynamicNodes(fileName,resolve, templateToRender) {
         var returnValue;
         var success = true,
             missingComp,
@@ -43,7 +42,7 @@
                 s = comp.content;                
             }
             if(s) {
-                Lyte.Compile.splitTextNodes(s);  
+                splitTextNodes(s);  
                 var dynamicNodes = [];
                 var strict = comp.getAttribute("use-strict");
                 if(strict != null){
@@ -55,8 +54,8 @@
                     }                 
                 }
                 var d = [];
-                Lyte.Compile.newGetDeepNodes(fileName, comp, d, [], undefined, true );
-                Lyte.Compile.processTemplate(s,dynamicNodes,fileName,comp.getAttribute("use-strict") !== null,errors,warnings);
+                newGetDeepNodes(fileName, comp, d, [], undefined, true );
+                processTemplate(s,dynamicNodes,fileName,comp.getAttribute("use-strict") !== null,errors,warnings);
                 if(errors.length){
                     returnValue = {componentName: fileName, errors:errors, warnings:warnings};
                     if(debug){
@@ -88,14 +87,14 @@
             }
             return returnValue;
     }
-    Lyte.Compile.splitTextNodes = function(node) {
+    function splitTextNodes(node) {
         if(node && node.childNodes && node.childNodes.length) {
             for(var i=node.childNodes.length-1;i>=0;i--) {
-                Lyte.Compile.splitTextNodes(node.childNodes[i]);
+                splitTextNodes(node.childNodes[i]);
             }
         }
         if(node.tagName === "TEMPLATE") {
-            Lyte.Compile.splitTextNodes((node.content)?node.content:Lyte.Compile.createDocFragment(node));
+            splitTextNodes((node.content)?node.content:createDocFragment(node));
         }
         if(node.nodeType === node.TEXT_NODE) {
             var nodeValue = node.nodeValue;
@@ -126,7 +125,7 @@
     //The template will contain the dynamicNodes. 
     //For template contains - _forTemplate, which will contain the content and _dynamicNodes
     //If template contains - _trueCase, _falseCase, which will contain the content and _dynamicNodes.
-    Lyte.Compile.processTemplate = function(node, deepNodes, componentName,strict,errors,warnings){
+    function processTemplate(node, deepNodes, componentName,strict,errors,warnings){
         var isBreak = node.querySelector('template[is=break]');
         if(isBreak) {
             this.getTrimmedContent(node, undefined, isBreak);
@@ -168,7 +167,7 @@
     }
     //This method is the place where the deepNodes and helperNodes gets updated with the 
     //Values of the positions of dynamicNodes and helperNodes. 
-    Lyte.Compile.newGetDeepNodes = function(componentName,node, deepNodes, deepN, is,strict,errors,warnings) {
+    function newGetDeepNodes(componentName,node, deepNodes, deepN, is,strict,errors,warnings) {
         var toBePushed;
         if(node.nodeType == 8){
             deepN.pop();
@@ -328,7 +327,7 @@
                     if( actObj && (actObj.name === "action" || actObj.name === "method") && /^(onfocus|onfocusin|onfocusout|onresize|onscroll|onclick|ondblclick|onmousedown|onmouseup|onmousemove|onmouseover|onmouseout|onmouseenter|onmouseleave|onchange|onselect|onsubmit|onkeydown|onkeypress|onkeyup|oncontextmenu)$/.test(node.attributes[i].name)){
                             add = true;
                             attr[node.attributes[i].name.substr(2)] = {name:node.attributes[i].name.substr(2),helperInfo: actObj, globalEvent: true};
-                            var actArgs = Lyte.Compile.deepCopyObject(actObj.args);
+                            var actArgs = deepCopyObject(actObj.args);
                             var actName = actArgs.splice(0,1)[0];
                             actName = actName.startsWith("'")? actName.replace(/'/g,''):  actName;
                             var actString = this.getArgString(actName, actArgs);
@@ -427,7 +426,7 @@
         deepN.pop();
     }
 
-    Lyte.Compile.getArrayIndex = function(array,value) {
+    function getArrayIndex(array,value) {
         for(var i=0;i<array.length;i++) {
             if(array[i] === value) {
                 return i
@@ -435,7 +434,7 @@
         }
     }
 
-    Lyte.Compile.getTrimmedContent = function(content, position, node) {
+    function getTrimmedContent(content, position, node) {
         var dummyContent = content;
         if(node) {
             position = [];
@@ -458,7 +457,7 @@
         return dummyContent;
     }
 
-    Lyte.Compile.createDocFragment = function(template){
+    function createDocFragment(template){
         var childNodes = template.cloneNode(true).childNodes;
         var frag = document.createDocumentFragment();
         var len = childNodes.length;
@@ -468,7 +467,7 @@
         return frag;
     }
 
-    Lyte.Compile.splitMixedText = function(str){
+    function splitMixedText(str){
         var stack=[], start=0, helper = { name:"concat", args: []};
         for(var i=0;i<str.length;i++){
           var j = i;
@@ -498,7 +497,7 @@
         return helper;
     }
 
-    Lyte.Compile.syntaxCheck = function(value){
+    function syntaxCheck(value){
         var stack = [],lastAdded;
         for(var i=0;i<value.length;i++){
             if(value[i] === "'"){
@@ -528,7 +527,7 @@
         return true;
     }
 
-    Lyte.Compile.getMustacheNew = function(value){
+    function getMustacheNew(value){
         value=(value && typeof value === "string") ? value.trim() : value;
         if(/^{{(?=[\s]*[\w-_]+)/.test(value)){
             var arr = value.match(/{{[a-zA-Z0-9_.\[\]\(\)]*(?![\\])}}/g);
@@ -538,7 +537,7 @@
             if(!this.syntaxCheck(value)){
                 return false;
             }
-            if(!(/{{[^}]*?(?:(?:('|")[^\1]*?\1)[^}]*?)*}}$/.test(value))){ //'
+            if(!(/{{[^}]*?(?:(?:('|")[^\1]*?\1)[^}]*?)*}}$/.test(value))){
                 return undefined;
             }
             var dynamic = value.match(/[\w!@#\$%\^\&*\)\(+=.,_-]+[\s]*[(]{0,1}(?:"([^"]|\\")*?"|'([^']|\\')*?'|[\w\s!@#\$%\^\&*\)\(\[\]+=.,_-]*?)*?[)]{0,1}[\s]*(?=}})/g);
@@ -554,7 +553,7 @@
         return undefined;
     }
  
-    Lyte.Compile.getHelperArgs = function(str){
+    function getHelperArgs(str){
         var stack = [], args = [] , from=0;
         var lastPushed; 
         for(var i=0; i<str.length; i++){
@@ -565,7 +564,7 @@
                     toPush = toPush.slice(1,-1);
                     toPush = "'" + toPush + "'";
                 }
-                toPush = Lyte.Compile.getHelperArgValue(toPush);
+                toPush = getHelperArgValue(toPush);
                 args.push(toPush);
                 from = i + 1;
             }
@@ -611,7 +610,7 @@
             toPush = "'" + toPush + "'";
         }
         try{
-            toPush = Lyte.Compile.getHelperArgValue(toPush);
+            toPush = getHelperArgValue(toPush);
         }
         catch(err){
             return false;
@@ -620,7 +619,7 @@
         return args;
     }
  
-    Lyte.Compile.getHelperArgValue = function(argValue) {
+    function getHelperArgValue(argValue) {
         switch(argValue) {
             case "undefined" : 
                 return undefined
@@ -637,7 +636,7 @@
                     return argValue;
                 }
                 else if(/\([\w\s,')(]*/.test(argValue)) {
-                    var arg = Lyte.Compile.getHelper(argValue);
+                    var arg = getHelper(argValue);
                     if(arg === false){
                         throw new Error(argValue);
                     }
@@ -650,11 +649,11 @@
         }
     }
  
-    Lyte.Compile.getHelperInfo = function(dynamicValue, helperValue){
+    function getHelperInfo(dynamicValue, helperValue){
         var helperFunc = {};
         helperFunc.name = dynamicValue.substr(0,helperValue.index).replace(/\s/g,'');
         helperValue = (helperValue) ? helperValue[0].trim() : helperValue;
-        var args = Lyte.Compile.getHelperArgs(helperValue.substr(1,helperValue.length-2));
+        var args = getHelperArgs(helperValue.substr(1,helperValue.length-2));
         if(args === false){
             return false;
         }
@@ -662,14 +661,14 @@
         return helperFunc;
     }
     
-    Lyte.Compile.getHelper = function(dynamicValue){
+    function getHelper(dynamicValue){
         var helperValue = /\((?:[^\)]*|(?:(?:"(?:[^"\\]|\\.)*?")|(?:'([^'\\]|\\.)*?')|[\w\s!@#$%^&*)([\]+=.,_-]*?)*?)\)$/.exec(dynamicValue);
         if(helperValue){
-            return Lyte.Compile.getHelperInfo(dynamicValue,helperValue);
+            return getHelperInfo(dynamicValue,helperValue);
         }
         return undefined;
     }
-    Lyte.Compile.getDynamicValue = function(value){    
+    function getDynamicValue(value){    
         var result = [],ref = result,arr = [],data = "",strStack = [],arrayStack = [],refStack = [],strLast,str;
         for(var i=0;i<value.length;i++){
             if(value[i] === "."){
@@ -753,7 +752,7 @@
         }
         return result;
     }
-    Lyte.Compile.deepCopyObject = function( obj )  {
+    function deepCopyObject( obj )  {
         var current, copies = [{source : obj, target : Object.create(Object.getPrototypeOf(obj))}], keys, propertyIndex, descriptor, nextSource, indexOf, sourceReferences = [obj];
         var cloneObject = copies[0].target, targetReferences = [cloneObject];
         while(current = copies.shift()){
@@ -805,8 +804,8 @@ Lyte.Component.compileDynamicTemplate = function(actualComponent, templateToRend
     }
     var templateToRenderAct = document.createElement("template");
     templateToRenderAct.content.appendChild(templateToRender);
-    var dynamicNodes = Lyte.Compile.getDynamicNodes(actualComponent.tagName, undefined, templateToRenderAct);
-    var returnVal = actualComponent.renderNodes(templateToRenderAct.content, dynamicNodes.dynamicNodes, undefined, {}, true, {}, templateToRenderAct.outerHTML)
+    var dynamicNodes = getDynamicNodes(actualComponent.tagName, undefined, templateToRenderAct);
+    var returnVal = actualComponent.renderNodes(templateToRenderAct.content, dynamicNodes.dynamicNodes, undefined, {}, true, {})
     return returnVal;
     
 }
@@ -825,11 +824,5 @@ Lyte.Component.doDomProcessing = function(func, scope) {
 }
 
 Lyte.Component.getComponentTemplate = function(componentName) {
-    var temp = LyteComponent.dummyLyteComponentsDiv.querySelector("template[tag-name='" + componentName + "']");
-    if(temp) {
-        return temp.content;
-    } else {
-        console.error("No such component is registered");
-        return;
-    }
+    return LyteComponent.dummyLyteComponentsDiv.querySelector("template[tag-name='" + componentName + "']").content;
 }

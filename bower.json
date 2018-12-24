@@ -5,10 +5,6 @@
   "homepage": "",
   "private": true,
   "dependencies": {
-    "lyte" : "http://build/zoho/lyte/milestones/v2/LYTE_V2_BETA_2/Lyte.zip",
-    "lyte-ui-component":"http://build/zoho/lyte_ui_component/milestones/V1_0_0/LYTE_UI_COMPONENTS_V1_0_6/Lyte_ui_component.zip",
-    "lyte-dom":"http://build/zoho/lyte_dom/milestones/master/LYTE_DOM_V1/Lyte_Dom.zip",
-    "crux-components":"http://build/zoho/crux_components/milestones/master/CRUX_COMPONENTS_M1/crux_components_lyte.zip",
-      "materialize":"https://github.com/Dogfalo/materialize"
+
    }
 }

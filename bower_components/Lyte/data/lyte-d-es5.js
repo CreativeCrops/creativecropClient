@@ -87,63 +87,17 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-Lyte = {
-  version: "2.0.0",
-  $: {},
-  registeredMixins: {},
-  Mixin: {},
-  debug: false,
-  performance: false,
-  toBeRegistered: []
-};
-
+Lyte = {};
+Lyte.version = "1.0.6";
+Lyte.registeredMixins = {};
+Lyte.Mixin = {};
+Lyte.debug = false;
+Lyte.performance = false;
+Lyte.toBeRegistered = [];
 var consoleTime = [];
-
-(function assetsDivCreation() {
-  Lyte.$.assetsDiv = document.createElement("div");
-  Lyte.$.assetsDiv.setAttribute("id", "lyteAssetsDiv");
-  document.head.appendChild(Lyte.$.assetsDiv);
-})();
-
-Lyte.registerErrorCodes = function (obj) {
-  Object.assign(Lyte.errorCodes, obj);
-};
-
-Lyte.getErrorMessage = function (code) {
-  var args = Array.from(arguments).slice(1);
-  if (Lyte.errorCodes[code]) {
-    return Lyte.errorCodes[code].replace(/{(\d+)}/g, function (t, i) {
-      return args[i];
-    });
-  } else {
-    return code;
-  }
-};
-
-Lyte.error = function () {
-  var errorObj = arguments[0].stack || Error(Lyte.getErrorMessage.apply(Lyte, arguments));
-  if (Lyte.onerror) {
-    Lyte.onerror.call(this, errorObj);
-  }
-  Lyte.triggerEvent("error", errorObj);
-  console.error.call(console, errorObj);
-};
-
-Lyte.warn = function () {
-  var errorObj = arguments[0].stack || Error(Lyte.getErrorMessage.apply(Lyte, arguments));
-  console.warn.call(console, errorObj);
-};
 
 Lyte.Mixin.register = function (name, mixin) {
   Lyte.registeredMixins[name] = mixin;
-};
-
-Lyte.Mixin.exists = function (name) {
-  if (!Lyte.registeredMixins[name]) {
-    Lyte.error('Mixin used before being registered.');
-    return false;
-  }
-  return true;
 };
 
 Lyte.log = function (text, color) {
@@ -179,156 +133,42 @@ Lyte.isComponent = function (object) {
   return false;
 };
 
-/* --------- lyte router v2 changes starts---- */
-var reqFiles = {};
-
 Lyte.injectResources = function (files, every, completed) {
-  var successFiles = [],
-      errorFiles = [];
-  every = every || function () {};
-  completed = completed || function () {};
-  return new Promise(function (resolve) {
-    processRequirements(files, resolve);
-  }).then(function () {
-    completed(successFiles, errorFiles);
-  });
-
-  function processRequirements(files, resolve) {
-    if (!files) {
-      resolve();
-    } else {
-      if (!Array.isArray(files)) {
-        files = [files];
+  if (files) {
+    files = Array.isArray(files) ? files : [files];
+    var filesLoaded = -files.length;
+    files.forEach(function (file) {
+      var tag,
+          fileSplit = file.split('.'),
+          type = fileSplit[fileSplit.length - 1],
+          tags = { js: 'script', css: 'link' };
+      tag = document.createElement(tags[type]);
+      if (fileSplit.length == 1) {
+        console.error('Type of file is not specified in injectResources.');
+        return;
       }
-      if (!files.length) {
-        resolve();
-      }
-      var len = -files.length;
-      files.forEach(function (file) {
-        if (typeof file == "string") {
-          requestFile(file, Lyte.injectResources.availableTags[file], function () {
-            loaded();
-          });
-        } else if (Array.isArray(file)) {
-          new Promise(function (r) {
-            processRequirements(file, r);
-          }).then(function () {
-            loaded();
-          });
-        } else {
-          new Promise(function (r) {
-            processRequirements(file.parent, r);
-          }).then(function () {
-            new Promise(function (r1) {
-              processRequirements(file.child, r1);
-            }).then(function () {
-              loaded();
-            });
-          });
-        }
-      });
-    }
-
-    function loaded() {
-      len++;
-      if (len == 0) {
-        resolve();
-      }
-    }
-
-    function requestFile(file, cached, resolve) {
-      if (reqFiles[file]) {
-        reqFiles[file].push(resolve);
+      if (type == 'css') {
+        tag.setAttribute('href', file);
+        tag.setAttribute('type', "text/css");
+        tag.setAttribute('rel', "stylesheet");
       } else {
-        reqFiles[file] = [resolve];
-        if (cached && cached.event.type != "error") {
-          if (Lyte.removeFromCache.arr.indexOf(file) != -1) {
-            Lyte.removeFromCache.arr.splice(Lyte.removeFromCache.arr.indexOf(file), 1);
-          }
-          fileLoaded.call(cached.tag, cached.event, true);
-          resolve();
-        } else {
-          makeRequest(file, function (event) {
-            reqFiles[file].forEach(function (resolve) {
-              resolve();
-            });
-            fileLoaded.call(this, event);
-            every.call(this, event);
-          });
+        tag.setAttribute('src', file);
+      }
+      tag.onerror = tag.onload = function (event) {
+        filesLoaded++;
+        if (every) {
+          every.call(this, event);
         }
-      }
-    }
-
-    function fileLoaded(event, cached) {
-      var file = this.getAttribute('src') || this.getAttribute('href');
-      delete reqFiles[file];
-      if (!cached) {
-        if (Lyte.injectResources.availableTags[file]) {
-          Lyte.injectResources.availableTags[file].tag.remove();
+        if (completed && filesLoaded == 0) {
+          completed();
         }
-        this.onerror = this.onload = undefined;
-        Lyte.injectResources.availableTags[file] = { tag: this, event: { type: event.type } };
-      }
-    }
-  }
-
-  function makeRequest(file, callBack) {
-    var tag,
-        fileSplit = file.split('.'),
-        type = fileSplit[fileSplit.length - 1],
-        tags = { js: 'script', css: 'link' };
-    tag = document.createElement(tags[type]);
-    if (fileSplit.length == 1) {
-      Lyte.error('Type of file is not specified in injectResources.');
-      return;
-    }
-    if (type == 'css') {
-      tag.setAttribute('href', file);
-      tag.setAttribute('type', "text/css");
-      tag.setAttribute('rel', "stylesheet");
-    } else {
-      tag.setAttribute('src', file);
-    }
-    tag.onerror = tag.onload = function (event) {
-      if (event.type == "error") {
-        errorFiles.push(event);
-      } else {
-        successFiles.push(event);
-      }
-      if (callBack) {
-        callBack.call(this, event);
-      }
-    };
-    document.getElementById("lyteAssetsDiv").appendChild(tag);
-  };
-};
-
-Lyte.injectResources.availableTags = [];
-
-Lyte.removeFromCache = function (arr) {
-  Lyte.removeFromCache.assign(arr);
-  if (Lyte.removeFromCache.arr.length) {
-    Lyte.removeFromCache.arr.forEach(function (file) {
-      if (Lyte.injectResources.availableTags[file]) {
-        Lyte.injectResources.availableTags[file].tag.remove();
-        delete Lyte.injectResources.availableTags[file];
-      }
+      };
+      document.head.appendChild(tag);
     });
-    Lyte.removeFromCache.arr = [];
   }
 };
 
-Lyte.removeFromCache.arr = [];
-
-Lyte.removeFromCache.assign = function (arr) {
-  arr = arr == "*" ? Object.keys(Lyte.injectResources.availableTags) : Array.isArray(arr) ? arr : [arr];
-  Lyte.removeFromCache.arr = Lyte.removeFromCache.arr.concat(arr);
-  return;
-};
-
-/* --------- lyte router v2 changes ends ---- */
-
-Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
+Lyte.checkProperty = function (property, dataVal, key, fieldVal, record) {
   var exts = "extends";
   switch (property) {
     case "type":
@@ -340,19 +180,12 @@ Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
         } else if (Lyte.Transform[fieldVal][exts] != (typeof dataVal === "undefined" ? "undefined" : _typeof(dataVal))) {
           return { code: "ERR03", message: Lyte.errorCodes.ERR03, expected: fieldVal };
         }
-      } else if (dataVal !== undefined) {
-        if (Array.isArray(dataVal)) {
-          if (fieldVal != "array") {
-            return { code: "ERR03", message: Lyte.errorCodes.ERR03, expected: fieldVal };
-          }
-        } else if (fieldVal != (typeof dataVal === "undefined" ? "undefined" : _typeof(dataVal))) {
+      } else if (Array.isArray(dataVal)) {
+        if (fieldVal != "array") {
           return { code: "ERR03", message: Lyte.errorCodes.ERR03, expected: fieldVal };
         }
-      }
-      break;
-    case "mandatory":
-      if (dataVal == undefined || dataVal == null || dataVal == "") {
-        return { code: "ERR02", message: Lyte.errorCodes.ERR02 };
+      } else if (fieldVal != (typeof dataVal === "undefined" ? "undefined" : _typeof(dataVal))) {
+        return { code: "ERR03", message: Lyte.errorCodes.ERR03, expected: fieldVal };
       }
       break;
     case "maximum":
@@ -367,18 +200,18 @@ Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
       break;
     case "maxLength":
     case "maxItems":
-      if (dataVal && dataVal.length > fieldVal) {
+      if (dataVal.length > fieldVal) {
         return { code: "ERR06", message: Lyte.errorCodes.ERR06, expected: fieldVal };
       }
       break;
     case "minLength":
     case "minItems":
-      if (dataVal && dataVal.length < fieldVal) {
+      if (dataVal.length < fieldVal) {
         return { code: "ERR07", message: Lyte.errorCodes.ERR07, expected: fieldVal };
       }
       break;
     case "pattern":
-      if (dataVal && typeof dataVal == "string" && !new RegExp(fieldVal).test(dataVal)) {
+      if (typeof dataVal == "string" && !new RegExp(fieldVal).test(dataVal)) {
         return { code: "ERR08", message: Lyte.errorCodes.ERR08, expected: fieldVal };
       }
       break;
@@ -409,7 +242,7 @@ Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
         if (!resp) {
           return { code: "ERR10", message: Lyte.errorCodes.ERR10, expected: fieldVal };
         }
-      } else if (dataVal && dataVal != fieldVal) {
+      } else if (dataVal != fieldVal) {
         return { code: "ERR10", message: Lyte.errorCodes.ERR10, expected: fieldVal };
       }
       break;
@@ -453,16 +286,14 @@ Lyte.checkProperty = function (property, dataVal, key, fieldVal, record, type) {
 Lyte.types = ["string", "object", "number", "boolean", "array"];
 
 Lyte.attr = function (type, opts) {
-  var obj = {};
-  obj.type = type;
   if (opts == undefined) {
     opts = {};
   }
   if (this.types.indexOf(type) == -1 && !Lyte.Transform.hasOwnProperty(type)) {
     throw new Error("Not a valid field type - " + type);
   }
-  Object.assign(obj, opts);
-  return obj;
+  opts.type = type;
+  return opts;
 };
 
 Lyte.defineRelation = function (name, type, opts) {
@@ -504,7 +335,7 @@ Lyte.registerValidator = function (customValidatorName, func) {
 };
 
 Lyte.patterns = {
-  email: /^([A-Za-z0-9._%\-'+/]+@[A-Za-z0-9.-]+\.[a-zA-Z]{2,22})$/,
+  email: /([A-Za-z0-9._%\-'+/]+@[A-Za-z0-9.-]+\.[a-zA-Z]{2,22})$|[\s]+/,
   url: /(^(ht|f)tp(s?):\/\/[0-9a-zA-Z][-.\w]*(:[0-9])*(\/?)([a-zA-Z0-9\-.?,:'/\\+=&amp;%$#_[\]@!()*;~]*)?$)/,
   ampm: /^(AM|PM|am|pm)$/,
   hour: /^(0?[0-9]|1[0-9]|2[0-4])$/,
@@ -519,9 +350,8 @@ Lyte.patterns = {
 Lyte.validate = function (object, key, value, component) {
   var definition = component.__data[key];
   var isError = false;
-  var type = definition ? definition.type : undefined;
   for (var defKey in definition) {
-    isError = Lyte.checkProperty(defKey, value, key, definition[defKey], object, type);
+    isError = Lyte.checkProperty(defKey, value, key, definition[defKey], object);
     if (isError !== true) {
       return isError;
     }
@@ -539,7 +369,7 @@ Lyte.errorCodes = {
   ERR08: "String does not match the specified pattern", ERR09: "Values in array are not unique", ERR10: "Value is not equal to the specified constant", ERR11: "Model of related field is not defined",
   ERR12: "Model of backward relation is not defined", ERR13: "Record not found", ERR14: "Model does not match the related field model", ERR15: "Error in creating a record as a relation",
   ERR16: "Record with primary key already exists", ERR17: "Value cannot be changed because record has been deleted", ERR18: "Action not defined", ERR19: "Model not defined",
-  ERR20: "Key not specified", ERR21: "'belongsTo' relationship expects a single object/id", ERR22: "Type not specified for polymorphic relation", ERR23: "Primary Key value not present", ERR24: "Error while relating record", ERR25: "Backward relation not present"
+  ERR20: "Key not specified", ERR21: "'belongsTo' relationship expects a single object/id", ERR22: "Type not specified for polymorphic relation", ERR23: "Primary Key value not present", ERR24: "Error while relating record"
 };
 
 Lyte.registeredGlobalEvents = {};
@@ -570,7 +400,7 @@ Lyte.triggerEvent = function () {
 
 Lyte.addEventListener = function (eventName, func) {
   if (typeof func !== "function") {
-    Lyte.error("Second parameter to LyteComponent.addGlobalEventListener() must be a function");
+    console.error("Second parameter to LyteComponent.addGlobalEventListener() must be a function");
     return;
   }
   var s = this.registeredGlobalEvents[eventName];
@@ -583,22 +413,21 @@ Lyte.addEventListener = function (eventName, func) {
 
 Lyte.removeEventListener = function (id) {
   if (!id) {
-    Lyte.error("listener unique id not specified");
+    console.error("listener unique id not specified");
     return;
   }
   var globalId = id.split("-");
   var s = this.registeredGlobalEvents[globalId[0]];
   if (!s || !s.listeners[globalId[1]]) {
-    Lyte.error("No such listener registered");
+    console.error("No such listener registered");
     return;
   }
   s.listeners[globalId[1]] = null;
 };
 
 Lyte.deepCopyObject = function (obj) {
-  var targetVal = Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
   var current,
-      copies = [{ source: obj, target: targetVal }],
+      copies = [{ source: obj, target: Object.create(Object.getPrototypeOf(obj)) }],
       keys,
       propertyIndex,
       descriptor,
@@ -616,7 +445,7 @@ Lyte.deepCopyObject = function (obj) {
         continue;
       }
       nextSource = descriptor.value;
-      descriptor.value = Array.isArray(nextSource) ? [] : nextSource instanceof Set ? new Set() : Object.create(Object.getPrototypeOf(nextSource));
+      descriptor.value = Array.isArray(nextSource) ? [] : Object.create(Object.getPrototypeOf(nextSource));
       indexOf = sourceReferences.indexOf(nextSource);
       if (indexOf != -1) {
         descriptor.value = targetReferences[indexOf];
@@ -633,14 +462,10 @@ Lyte.deepCopyObject = function (obj) {
 };
 
 Lyte.resolvePromises = function (promises) {
-  if (typeof promises != "string") {
-    if (Array.isArray(promises)) {
-      return promiseArray(promises);
-    } else if ((typeof promises === "undefined" ? "undefined" : _typeof(promises)) == "object") {
-      return promiseHash(promises);
-    }
-  } else {
-    return promises;
+  if (Array.isArray(promises)) {
+    return promiseArray(promises);
+  } else if ((typeof promises === "undefined" ? "undefined" : _typeof(promises)) == "object") {
+    return promiseHash(promises);
   }
 
   function promiseHash(promiseObj) {
@@ -648,11 +473,8 @@ Lyte.resolvePromises = function (promises) {
         promises = [],
         promiseKeys = Object.keys(promiseObj);
     promiseKeys.forEach(function (key) {
-      var value = promiseObj[key];
-      if (value instanceof Promise) {
-        actPromKeys.push(key);
-        promises.push(value);
-      }
+      actPromKeys.push(key);
+      promises.push(promiseObj[key]);
     });
     if (!promises.length) {
       return promiseObj;
@@ -660,17 +482,13 @@ Lyte.resolvePromises = function (promises) {
       var obj = {},
           promise = new Promise(function (resolve, reject) {
         Promise.all(promises).then(function (data) {
-          promiseKeys.forEach(function (promiseKey) {
-            if (actPromKeys.indexOf(promiseKey) != -1) {
-              obj[promiseKey] = data[actPromKeys.indexOf(promiseKey)];
-            } else {
-              obj[promiseKey] = promiseObj[promiseKey];
-            }
+          data.forEach(function (dataVal, index) {
+            obj[actPromKeys[index]] = dataVal;
           });
           resolve(obj);
         }, function (err) {
           reject(err);
-          Lyte.error(err);
+          console.error(err);
         });
       });
       return promise;
@@ -678,18 +496,7 @@ Lyte.resolvePromises = function (promises) {
   }
 
   function promiseArray(promiseArray) {
-    var array = [],
-        hasPromise = false;
-    promiseArray.every(function (item, i) {
-      if (item instanceof Promise) {
-        hasPromise = true;
-        return false;
-      }
-      return true;
-    });
-    if (!hasPromise) {
-      return promiseArray;
-    }
+    var array = [];
     var promise = new Promise(function (resolve, reject) {
       Promise.all(promiseArray).then(function (data) {
         promiseArray.forEach(function (key, index) {
@@ -698,7 +505,7 @@ Lyte.resolvePromises = function (promises) {
         resolve(array);
       }, function (err) {
         reject(err);
-        Lyte.error(err);
+        console.error(err);
       });
     });
     return promise;
@@ -782,20 +589,9 @@ if (document.readyState === "complete" || document.readyState === "interactive")
   document.addEventListener("DOMContentLoaded", function (e) {
     domContentLoaded1();
   }, true);
-};//$Id$
-Lyte.registerErrorCodes({
-	LD01: "Primary key value might be missing in the response data that is received, {0}",
-	LD02: "{0} not present, {0}",
-	LD03: "Cannot set the error {0} for {1}",
-	LD04: "No such record to merge, {0}",
-	LD05: "Model( {0} ) of related property - {1} not found in model - {2}",
-	LD06: "Backward relation not present in {0} for the property {1} in model( {2} )",
-	LD07: "{0} type not handled in handleArrayOperations",
-	LD08: "{0} {1} will be deprecated from next version {2}",
-	LD09: "deserializeKey cannot be processed for payload with more than two keys. Please use payloadKey callback instead or try modifying the same in normalizeResponse callback"
-});
+}//$Id$
 var $Record = function $Record(){
-	Object.assign(this, {inIDB : false, isModified : false, isNew : false, isDeleted : false, isError : false, events : [], validatedOnCreate : true, error : {}});
+	Object.assign(this, {isModified : false, isNew : false, isDeleted : false, isError : false, events : [], validatedOnCreate : true, error : {}});
 }
 /* Record Constructor
 Steps Done: 
@@ -831,7 +627,7 @@ var Record = function Record(modelName,data){
 		isDirty: {
 			enumerable:false,
 			value: function value(){
-				var result = [];
+                var result = [];
 				if(this.record.$.isModified){
 					return true;
 				}
@@ -841,15 +637,17 @@ var Record = function Record(modelName,data){
 					for(var j=0;j<rel_model.length;j++){
 						var rel = rel_model[j];
 						if(rel.opts && rel.opts.serialize && rel.opts.serialize === "record"){
-							var key = rel.relKey;
+                            var key = rel.relKey;
 							var type = rel.relType;
 							var records = this.record[key];
 							if(type === "belongsTo" && records && records.$ && records.$.isModified){
+//								return true;
 								result.push(key);
                             }
-							else if(type === "hasMany" && records){
+							else if(type === "hasMany"){
 								for(var k=0;k<records.length;k++){
 									if(records[k] && records[k].$ && records[k].$.isModified){
+//										return true;
                                         result.push(key);
                                     }
 								}
@@ -862,25 +660,8 @@ var Record = function Record(modelName,data){
 				}
 				return false;
 			}
-		},
-		undoStack : {
-			enumerable : false,
-			value : [],
-			writable : true
-		},
-		redoStack : {
-			enumerable : false,
-			value : [],
-			writable : true
 		}
 	});
-	var parent = store.$.saveParent;
-	if(parent && this !== parent){
-		Object.defineProperty(this.$,"parent",{
-			value: parent,
-			enumerable:false
-		})
-	}
     var fields = model.fieldList, record = {}, errorObj = new error1();
     for(var field in fields){
         var fieldKeys = fields[field];
@@ -1008,16 +789,15 @@ Object.defineProperties($Record.prototype,{
 				var index = store.$.getIndex(model._deleted, pK, this.get(pK));
 				store.$.rollBackDelete(model, index);
 			}
-			else if(this.isNew){
-				store.$.rollBackNew(model, this.record, pK);
-			}			
 			else if(this.isModified){
 				this.rollBackAttributes(this.getDirtyAttributes());
 			}
+			else if(this.isNew){
+				store.$.rollBackNew(model, this.record, pK);
+			}
             else if(this.isError){
                 store.$.clearRecordError(this);
-			}
-			store.$.removeOnSave(this.model._name, this.record[pK]);
+            }
 		}
 	},
 	deleteRecord : {
@@ -1029,9 +809,9 @@ Object.defineProperties($Record.prototype,{
 	},
 	destroyRecord : {
 		enumerable:false,
-		value:function value(customData,qP){
+		value:function value(customData){
 			this.deleteRecord();
-			return this.save(customData,qP,"destroyRecord");
+			return this.save(customData,"destroyRecord");
 		}				
 	},
     addEventListener : {
@@ -1054,39 +834,38 @@ Object.defineProperties($Record.prototype,{
 	},
 	triggerAction: {
 		enumerable : false,
-		value : function value(actionName,customData,qP){
+		value : function value(actionName,customData){
 			var model = this.model, actions = model.actions, action = (actions) ? actions[actionName] : undefined;
 			if(action){
-				return store.adapter.$.handleAction(actionName, model, this.record,customData,qP);
+				return store.adapter.$.handleAction(actionName, model, this.record,customData);
 			}
 			return Promise.reject({code : "ERR18", message : Lyte.errorCodes.ERR18, data : actionName});
  		}
 	},
 	save: {
 		enumerable : false,
-		value : function value(customData,qP,options,destroy){
-			var model = this.model, record = this.record, dirty = this.isDirty(), validateOnSave = options && options.validateOnSave;
+		value : function value(customData,destroy){
+			var model = this.model, record = this.record, dirty = this.isDirty();
             if(this.isDeleted){
 				if(!this.isNew){
-					return store.adapter.$.del(model._name, record, true,destroy,customData,qP);
+					return store.adapter.$.del(model._name, record, true,destroy,customData);
 				}
 				store.adapter.$.handleResponse(undefined, record, record, undefined, undefined, model);
 			}
 			else if(this.isNew){
-				var fields = model.fieldList, err = this;
+				var fields = model.fieldList, err = new error1();
 				for(var field in fields){
 					var val = record[field], fieldKeys = fields[field];
-					if(fieldKeys.type == "relation"){
-						continue;
-					}
-					if(!this.validatedOnCreate || validateOnSave){
-						if(fieldKeys.mandatory && (val == null || val == undefined || val === "" || (Array.isArray(val) && val.length == 0) )){
-                                store.$.setRecordError(err,field,{code : "ERR02", message : Lyte.errorCodes.ERR02});
+					if(!this.validatedOnCreate){
+						if(val == null || val == undefined || val == "" || val.length == 0){
+							if(fieldKeys.mandatory){
+                                store.$.setError(err,field,{code : "ERR02", message : Lyte.errorCodes.ERR02});
 								//err[field] = {code : "ERR02", message : Lyte.errorCodes.ERR02};
+							}
 						}
 						else{
 							for(var property in fieldKeys){
-								var resp = Lyte.checkProperty(property, record[field], field, fieldKeys[property]);
+								var resp = store.$.checkProperty(property, record[field], field, fieldKeys[property]);
 								if(resp != true){
 									store.$.setError(err,field,resp);
                                     //err[field] = resp;
@@ -1099,40 +878,13 @@ Object.defineProperties($Record.prototype,{
 						record[field] = Lyte.Transform[fieldKeys.type].serialize(record[field]);
 					}
 				}
-				if(err && err.isError && Object.keys(err.error).length > 0){
-					return Promise.reject(err.record);
+				if(Object.keys(err).length > 0){
+					return Promise.reject(err);
 				}
-				return store.adapter.$.create(model._name, record, true ,customData,qP);
+				return store.adapter.$.create(model._name, record, true ,customData);
 			}
 			else if(this.isModified || (dirty && dirty.length) ){
 				var data = {};
-				if(options && validateOnSave){
-					for(var field in fields){
-						var val = record[field], fieldKeys = fields[field];
-						if(fieldKeys.type == "relation"){
-							continue;	
-						}
-						if(fieldKeys.mandatory && (val == null || val == undefined || val === "" || (Array.isArray(val) && val.length == 0))){
-								store.$.setRecordError(record.$, field , {code : "ERR02", message : Lyte.errorCodes.ERR02});
-								//err[field] = {code : "ERR02", message : Lyte.errorCodes.ERR02};
-						}
-						else{
-							for(var property in fieldKeys){
-								var resp = Lyte.checkProperty(property, record[field], field, fieldKeys[property]);
-								if(resp != true){
-									store.$.setError(err,field,resp);
-									//err[field] = resp;
-									break;
-								}
-							}							
-						}							
-					}
-				}
-				if(options && !options.ignoreError){
-					if(record && record.$ && record.$.isError){
-						return Promise.reject(record.$.error);
-					}
-				}
 				for(var field in this._attributes){
 					if(Lyte.Transform[model.fieldList[field].type] && Lyte.Transform[model.fieldList[field].type].serialize){
 						data[field] = Lyte.Transform[model.fieldList[field].type].serialize(record[field]);
@@ -1146,7 +898,7 @@ Object.defineProperties($Record.prototype,{
 				}
 				var pK = model._primaryKey;
 				data[pK] = record.$.get(pK);
-				return store.adapter.$.put(model._name, data, record, true, customData,qP);
+				return store.adapter.$.put(model._name, data, record, true, customData);
 			}
 			return Promise.resolve();
 		}
@@ -1201,98 +953,95 @@ Object.defineProperties($Record.prototype,{
 	},
     toJSON:{
         enumerable:false,
-        value: function(idb){
-            return Object.assign({}, store.$.toJSON(this.model._name, this.record, idb? "idb" : true));
+        value: function(){
+            return Object.assign({},store.$.toJSON(this.model._name,this.record,true));
         }
-	},
-	undo:{
-		enumerable:false,
-		value: function(){
-			var obj = this.undoStack.pop(),undo, redoObj = {};
-			if(obj){
-				for(var key in obj){
-					var undo = obj[key];
-					if(undo._type == "update"){
-						if(undo.val){
-							store.$.setData(this,key,undo.val,redoObj)
-						}else if(undo.records){
-							store.$.setData(this,key,undo.records,redoObj)	
-						}
-					}
-					else if(undo._type == "propAdd"){
-						if(typeof LyteComponent != "undefined"){
-							redoObj[key] = {type:"propDelete", val:this.record[key]};
-							LyteComponent.objectFunction(this.record, "delete", key);
-						}
-						else{
-							delete this.record[key];
-						}
-					}
-					else if(undo._type == "added"){
-						this.record.$.get(key).remove(undo.records,undefined,redoObj);
-					}
-					else if(undo._type == "removed"){
-						store.$.rollBackRecordsArray([undo], this.record, this.model, this.model.fieldList[key])
-						undo._type = "added";
-						redoObj[key] = undo;
-					}
-				}
-				this.redoStack.push(redoObj);				
-			}
-		}
-	},
-	redo:{
-		enumerable:false,
-		value:function(){
-			var obj = this.redoStack.pop(),redo, undoObj = {};
-			if(obj){
-				for(var key in obj){
-					var redo = obj[key];
-					if(redo._type == "update"){
-						if(redo.val){
-							store.$.setData(this,key,redo.val,undoObj)
-						}else if(redo.records){
-							store.$.setData(this,key,redo.records,undoObj)	
-						}
-					}
-					else if(redo._type == "propDelete"){
-						undoObj[key] = {type:"propAdd"}
-						store.$.setData(this,key,redo.val,undoObj);
-					}
-					else if(redo._type == "added"){
-						this.record.$.get(key).remove(redo.records,undefined,undoObj);
-					}
-					else if(redo._type == "removed"){
-						store.$.rollBackRecordsArray([redo], this.record, this.model, this.model.fieldList[key])
-						redo._type = "added";
-						undoObj[key] = redo;
-					}
-	
-				}
-				this.undoStack.push(undoObj);
-			}
-		}	
-	}
+    }
 });
 
 /* Model Object Constructor 
 */
 var Model = function Model(name,fields){
-	Object.assign(this, {_name : name, _primaryKey : "id", fieldList : {id : {type : "string", primaryKey : true, defined : false}}, relations : {}, _properties : {}, data : [], dirty : [], _deleted : [],
+	Object.assign(this, {_name : name, _primaryKey : "id", fieldList : {id : {type : "string", primaryKey : true}}, relations : {}, _properties : {}, data : [], dirty : [], _deleted : [],
 		events : {}});
 	var obs = [];
 	for(var key in fields){
-		store.$.registerField(this,key,fields[key],obs);
+		var field = fields[key];
+		if(field.type == "observer"){
+			obs.push(field);
+		}
+		else if(field.type == "callBack"){
+			if(field.observes){
+				obs.push(field.observes);
+			}
+			var props = field.properties;
+			for(var i=0;i<props.length;i++){
+				if(props[i] === "didLoad" || props[i] === "init"){
+					if(!this.didLoad){
+						this.didLoad = [];
+					}
+					this.didLoad.push(field.value);	
+				}
+                else if(props[i] === "add" || props[i] === "change"){
+					this.on(props[i],field.value);
+				}
+			}
+			if(key == "didLoad"){
+				if(!this.didLoad){
+					this.didLoad = [];
+				}
+				this.didLoad.push(field.value);
+			}
+		}
+		else if(key == "didLoad"){
+			if(!this.didLoad){
+				this.didLoad = [];
+			}
+			this.didLoad.push(field);
+		}
+		else if(Object.keys(field).length){
+			if(field.primaryKey){
+				delete this.fieldList.id;
+				this._primaryKey = key;
+			}
+			this.fieldList[key] = fields[key];				
+		}
+		if(field.type === "relation"){
+			field.relKey = key;
+			if(!this.relations[field.relatedTo]){
+				this.relations[field.relatedTo] = [];
+			}
+			this.relations[field.relatedTo].push(this.fieldList[key]);
+		}
 	}
 	if(typeof LyteComponent != "undefined"){
 		LyteComponent.establishObserverBindings(obs,true,this._properties);
 	}
-	store.$.defineArrayUtils(this.data);
-	store.$.defineUtilsFor(this.data,this);
+//	for(var key in observers){
+//		this.fieldList[key].observers = observers[key];
+//	}
+	Object.defineProperties(this.data, {
+		model : {
+			enumerable : false,
+			value : this
+		}, 
+		filterBy : {
+			enumerable : false,
+			value : store.$.filterBy
+		},
+		sortBy : {
+			enumerable : false,
+			value : store.$.sortBy
+		},
+		mapBy : {
+			enumerable : false,
+			value : store.$.mapBy
+		}
+	});
 	Object.defineProperty(this,"extends", {
 		enumerable: false,
 		value: store.$.extendModel
-	});
+	})
 }
 Model.prototype.addEventListener = function(type, func){
     return store.$.eventListeners.add(this,type,func);
@@ -1306,351 +1055,9 @@ Model.prototype.emit = function(type, args){
 Model.prototype.on = function(type,func){
     return this.addEventListener(type,func);
 }
-
 var store={
 	model : {},
 	$:{ 
-		request: {},
-		toRelate : {},
-		idbQueue:[],
-		idbQ: {},
-		idbQ2: {},
-		checkWithQp:function(arr, data){
-			var ind = -1;
-			arr = arr || [];
-			arr.forEach(function(item, index){
-				var qp1 = item.qP || {};
-				var qp2 = data.qP || {};
-				if(qp1 == qp2){
-					ind =  index;
-					return;
-				}
-				var qp1L = Object.keys(qp1).length;
-				var qp2L = Object.keys(qp2).length, i=0;
-				if(qp1L != qp2L){
-					return;
-				}        
-				for(var key in qp1){
-					if(qp1[key] == qp2[key]){
-						i++;
-					}
-				}
-				if(i == qp1L){
-					ind = index;
-					return;
-				}
-			});
-			return ind;
-		},
-		// requestHandling:function(type, modelName, reqType, key, urlObj){
-		// 	var req = store.$.request;
-		// 	var q = req[modelName] = req[modelName] || {};
-		// 	switch(reqType){
-		// 		case "findRecord":{
-		// 			var reqQ = q[reqType] = q[reqType] || {};
-		// 			if(reqQ.hasOwnProperty(key)){
-		// 				if(type == "add"){
-		// 					return -1;
-		// 				}
-		// 				else{
-		// 					delete reqQ[key];
-		// 					return;
-		// 				}
-		// 			}
-		// 			reqQ[key] = {qP: urlObj.qP}
-		// 			break;
-		// 		}
-		// 		case "findAll":{
-		// 			var reqQ = q[reqType] = q[reqType] || [];
-		// 			var ret = this.checkWithQp(reqQ, {qP:urlObj.qP});
-		// 			if(ret != -1){
-		// 				if(type == "add"){
-		// 					return -1;
-		// 				}
-		// 				else{
-		// 					reqQ.splice(ret,1);
-		// 					return;
-		// 				}
-		// 			}
-		// 			reqQ.push({qP:urlObj.qP});
-		// 			break;
-		// 		}
-		// 	}
-		// },		
-		handleCachedResponse:function(batch,resp){
-			var cached = store.$.cachedBatch = store.$.cachedBatch || {}
-			var arr = cached[batch] || [], count = 0;
-			arr.forEach(function(item,index){
-				resp.splice((item.ind+count++),0,item.data);
-			});
-			delete cached[batch];
-			return resp;
-		},
-		addToCachedBatch:function(data){
-			var curr = store.$.currentBatch;
-			var cached = store.$.cachedBatch = store.$.cachedBatch || {};
-			var cachedB = cached[curr] = cached[curr] || [];
-			var arr = store.$.batch[curr] || [];
-			var ind = arr.length;
-			cachedB.push({ind:ind, data:data});
-		},
-		establishToRelated:function(record, relArr){
-			console.time("establishToRelated");
-			var bModel = record.$.model, rel = {};
-			relArr.forEach(function(item, index){
-				var rec = store.peekRecord(item.model, item.pkVal);
-				if(rec){
-					var fModel = rec.$.model;
-					store.$.getRelations(fModel, item.key, bModel, rel);
-					store.$.establishLink(rel.forward, rel.backward, rec, record);
-				}
-			});
-			console.timeEnd("establishToRelated");
-		},
-		checkObjAndAddToArr:function(arr, obj, keys){
-			var len = keys.length, res = -1;
-			arr.forEach(function(item, index){
-				var i=0;
-				for(var key in keys){
-					if(item[key] == obj[key]){
-						i++;
-					}	
-				}
-				if(i == len){
-					res = index;
-					return;
-				}
-			});
-			if(res == -1){
-				arr.push(obj);
-			}
-			return res;
-		},
-		addToRelate:function(modelName, data, rel, key){
-			var relMod = rel.forward.relatedTo;
-			var toRelMod = store.$.toRelate[relMod] = store.$.toRelate[relMod] || {};
-			var toRel = toRelMod[key] = toRelMod[key] || [];
-			var pkVal = data[data.$.model._primaryKey];
-			var obj = {model : modelName, pkVal : pkVal, key : rel.forward.relKey};
-			this.checkObjAndAddToArr(toRel, obj, ["record","key"]);
-		},
-		addOnSave:function(modelName,record,attr,field,pK,relPk){
-			store.$.onSave = store.$.onSave || {};
-			var saveMod = store.$.onSave[modelName] = store.$.onSave[modelName] || {};
-			var saveQ = saveMod[record[pK]] = saveMod[record[pK]] || {} 
-			var recs = record[attr] || [];
-			if(field.relType == "belongsTo"){
-				recs = !Array.isArray(record[attr]) ? [record[attr]] : record[attr]; 
-			}
-			recs.forEach(function(item, index){
-				var q = saveQ[field.relKey] = saveQ[field.relKey] || [];
-				store.$.checkAndAddToArray(q, item[relPk]);
-			});
-		},
-		addToIDBonSave:function(modelName, rec){
-			var model = store.model[modelName];
-			var fields = model.fieldList;
-			var saveMod = store.$.onSave ? store.$.onSave[modelName] : undefined;
-			if(saveMod){
-				var pK = store.model[modelName]._primaryKey;
-				var saveQ = rec && pK ? saveMod[rec[pK]] : undefined;
-				if(saveQ){
-					for(var key in saveQ){
-						var ids = saveQ[key];
-						var relMod = fields[key].relatedTo;
-						ids.forEach(function(item, index){
-							var rec = store.peekRecord(relMod,item);
-							var parent = rec.$.parent;
-							if(Lyte.isRecord(parent)){
-								var mod = parent.$.model;
-								var modName = mod._name;
-								var modPk = mod._primaryKey;
-								store.$.checkAndAddToIDBQ(modName, "updateRecord", store.peekRecord(modName,parent[modPk]).$.toJSON(true));
-							}
-							else{
-								store.$.checkAndAddToIDBQ(relMod, "updateRecord", store.peekRecord(relMod,item).$.toJSON(true));
-							}
-						});
-					}
-					store.$.removeOnSave(modelName, rec[pK]);
-				}
-			}
-		},
-		removeOnSave:function(modelName, pkVal){
-			var saveMod = store.$.onSave ? store.$.onSave[modelName] : undefined;
-			if(saveMod && saveMod[pkVal]){
-				delete saveMod[pkVal];
-			}
-		},
-		checkAndAddToIDBQ:function(modelName, type, data){
-			var obj = {model: modelName, type:type, data:data};
-			var q = store.$.idbQ2[modelName] = store.$.idbQ2[modelName] || [];
-			q.push(obj);
-		},
-		checkAndRemoveKey:function(rawData, fields, deserializeKeys){
-			for(var key in rawData){
-				var field = fields[key];
-				if(field && field.type == "relation"){
-					if(deserializeKeys && !this.checkPresenceInArray(deserializeKeys,key)){
-						delete rawData[key];
-					}
-					else{
-						this.removeNotNeededKeys(field.relatedTo, rawData[key]);
-					}
-				} 
-			}
-		},
-		removeNotNeededKeys:function(modelName, rawData){
-			var model = store.model[modelName];
-			var fields = model.fieldList;
-			var deserializeKeys = model.idb ? model.idb.deserializeKeys : undefined;
-			if(model){
-				var self = this;
-				if(Array.isArray(rawData)){
-					rawData.forEach(function(item, index){
-						self.checkAndRemoveKey(item, fields, deserializeKeys);
-					});
-				}
-				else{
-					this.checkAndRemoveKey(rawData, fields, deserializeKeys)
-				}
-			}
-			return rawData;
-		},
-		idbQ2Push:function(modelName,rawData,queryParams,type,key){
-			try{
-				var model = store.model[modelName];
-				if(model.hasOwnProperty("idb")){
-					rawData = Lyte.deepCopyObject(rawData);
-					var qObj = {model:modelName,type:type};
-					var pK = model._primaryKey;
-					var q =	store.$.idbQ2[modelName] = store.$.idbQ2[modelName] || [];
-					switch(type){
-						case "action":{
-							delete q[type];
-							return;
-						}
-						case "update":
-						case "create":{
-							qObj.data = []
-							rawData.forEach(function(item,index){
-								qObj.data.push(Lyte.isRecord(item)?item.$.toJSON():item);
-							});
-							break;
-						}
-						case "updateRecord":
-						case "createRecord":{
-							qObj.data = rawData;
-							break;
-						}
-						case "delete":{
-							qObj.data = rawData;
-							break;
-						}
-						case "destroyRecord":
-						case "deleteRecord":{
-							qObj.id = rawData;
-							break;
-						}
-						case "findRecord":
-							qObj.key = key;		
-						case "findAll": {
-							rawData[modelName] = this.removeNotNeededKeys(modelName, rawData[modelName]);
-							// for(var i=0; i<q.length; i++){
-							// 	var item = q[i];
-							// 	var qP = item.queryParams, len = 0;
-							// 	qpLen = typeof qP =="object" ? Object.keys(qP).length : 0;
-							// 	if(queryParams === undefined){
-							// 		if(queryParams == qP){
-							// 			item.data = rawData;
-							// 			return;
-							// 		}
-							// 		continue;					
-							// 	}
-							// 	for(var key in qP){
-							// 		if(qP[key] == queryParams[key]){
-							// 			len++;
-							// 		}
-							// 	}
-							// 	if(len && qpLen && len == qpLen){
-							// 		item.data = rawData;
-							// 		return;
-							// 	}	
-							// }
-							qObj.queryParams = queryParams;
-							qObj.data = rawData;
-							break;
-						}
-						case "pushPayload": {
-							rawData = this.removeNotNeededKeys(modelName, rawData);
-							qObj.data = rawData;
-							break;
-						}
-					}
-					q.push(qObj);
-				}	
-			}
-			catch(err){
-				console.log("Error while adding to IDBQueue ",err);
-			}
-		},
-		isEmpty:function(val){
-			if(val != undefined && val !== "" && val != null){
-				return false;
-			}
-			return true;
-		},
-		registerField:function(model,key,field,obs){
-			// var field = fields[key];
-			if(field.type == "observer"){
-				obs.push(field);
-			}
-			else if(field.type == "callBack"){
-				if(field.observes){
-					obs.push(field.observes);
-				}
-				var props = field.properties;
-				for(var i=0;i<props.length;i++){
-					if(props[i] === "didLoad" || props[i] === "init"){
-						if(!model.didLoad){
-							model.didLoad = [];
-						}
-						model.didLoad.push(field.value);	
-					}
-					else if(props[i] === "add" || props[i] === "change"){
-						model.on(props[i],field.value);
-					}
-				}
-				if(key == "didLoad"){
-					if(!model.didLoad){
-						model.didLoad = [];
-					}
-					model.didLoad.push(field.value);
-				}
-			}
-			else if(key == "didLoad"){
-				if(!model.didLoad){
-					model.didLoad = [];
-				}
-				model.didLoad.push(field);
-			}
-			else if(Object.keys(field).length){
-				if(field.primaryKey){
-					if(model.fieldList.id.defined == false){
-						delete model.fieldList.id;
-					}
-					model._primaryKey = key;
-				}
-				model.fieldList[key] = field;				
-			}
-			if(field.type === "relation"){
-				field.relKey = key;
-				if(!model.relations[field.relatedTo]){
-					model.relations[field.relatedTo] = [];
-				}
-				model.relations[field.relatedTo].push(model.fieldList[key]);
-			}	
-		},
         setError:function(err,attr,codeObj){
             if(err.$.hasOwnProperty("error")){
                 if(typeof LyteComponent != "undefined"){
@@ -1660,24 +1067,9 @@ var store={
                 }
             }
             else{
-                Lyte.error("LD03",err,attr);
+                console.error("Cannot set the error ",err," for ", attr);
             }
-		},  
-		unregisterCallback:function(type,name){
-			var callback = store[type][name];
-			if(!callback){
-				Lyte.error(type," not present - ",name);
-				return;
-			}
-			var extendedBy = callback.__extendedBy;
-			extendedBy.forEach(function(item){
-				store.$.unregisterCallback(type,item);
-			});
-			if(callback.$super){
-				callback.$super.__extendedBy.splice(callback.$super.__extendedBy.indexOf(name));
-			}
-			delete store[type][name];
-		},
+        },  
         eventListeners : {
           add: function(scope,type,func){
             scope.events = scope.events || {};
@@ -1715,25 +1107,46 @@ var store={
             }            
           }
         },
-        extendCallback:function(scope,type,parent){
-            var callback = scope[type];
-            var res;
-            if(parent && typeof parent === "string"){
-                res = callback[parent];
-                if(!res){
-					callback.__toAddSuper = callback.__toAddSuper || {};
-                     if(!callback.__toAddSuper.hasOwnProperty(parent)){
-                        callback.__toAddSuper[parent] = [];   
-                     }
-                     callback.__toAddSuper[parent].push(this.__name);
-                }
-            }	
-            if(res && res.is == type && !this.$super){
-				this.$super = res;
-				res.__extendedBy.push(this.__name);
-            }
-            return this;            
-        },
+		extendAdapter:function(parent){
+                var res;
+				if(parent && typeof parent === "string"){
+					res = store.adapter[parent];
+                    if(!res){
+                         if(!store.adapter.__toAddSuper){
+                             store.adapter.__toAddSuper = {};
+                         }
+                         if(!store.adapter.__toAddSuper.hasOwnProperty(parent)){
+                            store.adapter.__toAddSuper[parent] = [];   
+                         }
+                         store.adapter.__toAddSuper[parent].push(this.__name);
+                    }
+                }	
+                if(res && res.isAdapter && !this.$super){
+					this.$super = res;
+				}
+				return this;
+//				store.registerAdapter(name,opts,this);
+		},
+		extendSerializer:function(parent){
+                var res;
+				if(parent && typeof parent === "string"){
+					res = store.serializer[parent];
+                    if(!res){
+                         if(!store.serializer.__toAddSuper){
+                             store.serializer.__toAddSuper = {};
+                         }
+                         if(!store.serializer.__toAddSuper.hasOwnProperty(parent)){
+                            store.serializer.__toAddSuper[parent] = [];   
+                         }
+                         store.serializer.__toAddSuper[parent].push(this.__name);
+                    }
+				}
+				if(res && res.isSerializer && !this.$super){
+					this.$super = res;
+				}
+				return this;
+//				store.registerSerializer(name,opts,this);
+		},
 		extendModel:function(extend){
 			if(!extend || !store.model[extend]){
 				return;
@@ -1747,7 +1160,9 @@ var store={
 			this.fieldList = Object.assign(this.fieldList, parentFields);
 			var name = this._name;
 			store.model[name].extend = extend;
-			store.model[extend].extendedBy = store.model[extend].extendedBy || {};
+			if(!store.model[extend].extendedBy){
+				store.model[extend].extendedBy = {};
+			}
 			store.model[extend].extendedBy[name] = true;
 			if(!store.adapter[name] && store.adapter[extend]){
 				store.adapter[name] = store.adapter[extend];
@@ -1790,8 +1205,51 @@ var store={
 				}	
 			}
 		},
-		setData:function(self, attr, value, redoObj){
-			var toEmit = {emit : false, attr : [], oldRec : {}};
+        //Will expect a arguments to be
+        //modelName, POST/PATCH/DELETE, data(either object/array)
+        dataFromSocket:function(modelName, type, data){
+            var model = store.modelFor(modelName),pK = model._primaryKey,rec;
+            if(!Array.isArray(data)){
+                data = [data];
+            }
+            if(type === "POST"){
+                for(var i=0;i<data.length;i++){
+                    rec = undefined;
+                    if(data){
+                        rec = store.$.newRecord(modelName,data[i]);
+                        rec.$.isNew = false;
+                        store.$.deleteFromArray(model.dirty, rec[pK]);
+                    }
+                }
+            }else if(type === "PATCH"){
+                for(var i=0;i<data.length;i++){
+                    rec = undefined;
+                    if(data){
+                        rec = store.peekRecord(modelName,data[i][pK]);
+                        if(!rec.$.isModified){
+                            delete data[i][pK];
+                            for(var key in data[i]){
+                                LyteComponent.set(rec,key,data[i][key],true);
+                            }
+                            rec.$.isModified = false;                            
+                        }
+                    }
+                }
+                
+            }else if(type === "DELETE"){
+                for(var i=0;i<data.length;i++){
+                    rec = undefined;
+                    if(data){
+                        rec = store.peekRecord(modelName,data[i][pK]);
+                        if(!rec.$.isModified){
+                            store.unloadRecord(modelName,data[i][pK]);                            
+                        }
+                    }
+                }
+            }
+        },
+		setData:function(self,attr,value){
+			var toEmit = {emit : false, attr : []};
 			if(attr instanceof Object){
 				for(var key in attr){
 					this.setValue(self, key, attr[key], toEmit);
@@ -1804,53 +1262,37 @@ var store={
                 var arr = [self.record, toEmit.attr];
 				self.emit("change", arr);
 				self.model.emit("change", arr);
-				store.emit("change", [self.model._name,self.record, toEmit.attr]);
-				if(redoObj){
-					for(var key in toEmit.oldRec){
-						redoObj[key] = toEmit.oldRec[key];
-					}
-				}
-				else{
-					self.undoStack.push(toEmit.oldRec);
-				}
+                store.emit("change", [self.model._name,self.record, toEmit.attr]);
 			}
 			return self.record;
 		},
 		setValue:function(self,attr,value, toEmit){
-			var model = self.model, oldAttrVal, hasAttr, pK = model._primaryKey;
+			var model = self.model;
 			if(attr != model._primaryKey){
 				var field = model.fieldList[attr], record = self.record;
 				if(!field){
-					hasAttr = record.hasOwnProperty(attr),oldAttrVal = record[attr];
 					if(typeof LyteComponent != "undefined"){
-						LyteComponent.set(record,attr,value,true);
-					}
-					else{
-						record[attr] = value;
-					}					
+                                                        LyteComponent.set(record,attr,value,true);
+                                        }
+                                        else{
+                                                        record[attr] = value;
+                                        }
+					toEmit.emit = true;
+					toEmit.attr.push(attr);
 				}
-				else if(field.mandatory && (value == undefined || value == null || value === "")){
+				else if((value == undefined || value == null || value == "") && field.mandatory){
 					store.$.setRecordError(self, attr, "ERR02");
 				}
 				else if(field.relType){
-					var rel ={}, oldVal, oldVal1, relMod = store.modelFor(field.relatedTo), relPk = relMod._primaryKey;
-					this.getRelations(model, field.relKey, relMod, rel);
+					var rel ={}, oldVal;
+					this.getRelations(model, field.relKey, store.modelFor(field.relatedTo), rel);
 					if(record[attr] && field.relType == "hasMany"){
-						oldVal = [];
-						record[attr].forEach(function(item, index){
-							oldVal.push(item[relPk]);
-						});
-						// oldVal = record[attr].slice(0);
-						// oldVal1 = record[attr].mapBy(relMod._primaryKey);
-						store.$.addOnSave(model._name,record,attr,field,pK,relPk);
+						oldVal = record[attr].slice(0);
 						this.toDemolishLink(model, record, rel.forward);
 						record[attr].splice(0, record[attr].length);
 					}
 					else if(record[attr] && field.relType == "belongsTo"){
-						oldVal = record[attr][relPk];
-						// oldVal = this.createCopy(record[attr]);
-						store.$.addOnSave(model._name,record,attr,field,pK,relPk);
-						// oldVal1 = record[attr][relMod._primaryKey];
+						oldVal = this.createCopy(record[attr]);
 						this.toDemolishLink(model, record, rel.forward);
 						record[attr] = undefined;
 					}
@@ -1862,19 +1304,15 @@ var store={
 						store.$.setRecordError(self, attr, "ERR21", value);
 						return;
 					}
-					var bModel = relMod, bPk = bModel._primaryKey, bPkType = bModel.fieldList[bPk].type, err = [];
+					var bModel = store.modelFor(field.relatedTo), bPk = bModel._primaryKey, bPkType = bModel.fieldList[bPk].type, err = [];
 					for(var i=0; i<value.length; i++){
 						if(value[i] == undefined){
 							continue;
 						}
-						var relRecord = value[i], relMod1 = (value[i] && value[i]._type) ? value[i]._type : field.relatedTo;
+						var relRecord = value[i];
 						if(typeof value[i] == bPkType){
 							relRecord = store.peekRecord((value[i]._type) ? value[i]._type : field.relatedTo, value[i]);
-							if(relRecord == undefined){
-								this.addToRelate(model._name, record, rel, value[i]);
-							}
-							else
-							 if(relRecord.$ && relRecord.$.isError){
+							if(relRecord.$ && relRecord.$.isError){
 								err.push({code : "ERR15", message : Lyte.errorCodes.ERR15, error : Object.assign({}, relRecord)});
 								continue;
 							}
@@ -1885,7 +1323,7 @@ var store={
 								continue;
 							}
 							else if(!Lyte.isRecord(relRecord)){
-								relRecord = this.newRecord(relMod1, value[i]);
+								relRecord = this.newRecord((value[i]._type ? value[i]._type : field.relatedTo), value[i]);
 								if(relRecord.$.isError){
 									err.push({code : "ERR15", data : value[i], message : Lyte.errorCodes.ERR15, error : Object.assign({}, relRecord)});
 									continue;
@@ -1895,9 +1333,6 @@ var store={
 						var changed = this.establishLink(rel.forward, rel.backward, record, relRecord);
 						if(changed != true){
 							err.push({code : changed, data : value[i], message : Lyte.errorCodes[changed]});
-						}
-						else{
-							store.$.addOnSave(model._name,record,attr,field,pK,relPk);
 						}
 					}
 					if(err.length && (err.length == value.length)){
@@ -1923,8 +1358,6 @@ var store={
 						record.$._attributes[attr].push({_type : "changed", records : oldVal});
 						toEmit.emit = true;
 						toEmit.attr.push(attr);
-						var obj = {}; obj.records = oldVal; obj._type = "update";
-						toEmit.oldRec[attr] = obj;
 						var arr = record.$.getInitialValues(attr), changed = true;
 						if(arr && Array.isArray(record[attr]) && arr.length == record[attr].length){
 							changed = false;
@@ -1941,23 +1374,23 @@ var store={
 					}
 				}
 				else{
-					if(value !== record[attr]){
-						for(var property in field){
-							var resp = Lyte.checkProperty(property, value, attr, field[property]);
-							if(resp != true){
-								store.$.setRecordError(self, attr, resp, value);
-								return;
+					if(value != record[attr]){
+						if(value != undefined){
+							for(var property in field){
+								var resp = this.checkProperty(property, value, attr, field[property]);
+								if(resp != true){
+									store.$.setRecordError(self, attr, resp, value);
+									return;
+								}
 							}
 						}
 						var attribute = record.$._attributes[attr];
-						if( !record.$._attributes.hasOwnProperty(attr)){
+						if( !record.$._attributes.hasOwnProperty(attr) && value != undefined){
 							record.$._attributes[attr] = this.createCopy(record[attr]);
 						}
 						else if((typeof value == "object" && store.adapter.$.compareObjects(attribute, value)) || (attribute == value)){
 							delete record.$._attributes[attr];
 						}
-						hasAttr = record.hasOwnProperty(attr);
-						oldAttrVal = record[attr];
                         if(typeof LyteComponent != "undefined"){
 							LyteComponent.set(record,attr,value,true);
 						}
@@ -1967,25 +1400,6 @@ var store={
 						toEmit.emit = true;
 						toEmit.attr.push(attr);
 						store.$.clearRecordError(self, attr);
-						var obj = {};
-						obj._type = "update";
-						obj.val = oldAttrVal;
-						if(!hasAttr){
-							obj.type = "propAdd";
-						}
-						toEmit.oldRec[attr] = obj;	
-					}
-					else if(value === record[attr] && record.$.isError && record.$.error[attr]){
-						var valid = true;
-						for(var property in field){
-							var resp = Lyte.checkProperty(property, value, attr, field[property]);
-							if(resp != true){
-								valid = false;
-							}
-						}
-						if(valid){
-							store.$.clearRecordError(self,attr);
-						}
 					}
 				}
 				if(Object.keys(record.$._attributes).length){
@@ -2035,23 +1449,22 @@ var store={
 				}				
 			}
 			else{
-                this.removeKeys((polymorphic)?(Lyte.isRecord(records)?records.$.model.fieldList:fieldList):fieldList,records);
+                this.removeKeys((polymorphic)?(Lyte.isRecord(record)?record.$.model.fieldList:fieldList):fieldList,record);
 			}
 		},
-		add:function(value,type,redoObj){
+		add:function(value,type){
 			var record= this.record, model = record.$.model, attr = this.key, field = model.fieldList[attr], rel = {};
 			store.$.getRelations(model, field.relKey, store.modelFor(field.relatedTo), rel);
 			if(!Array.isArray(value)){
 				value = [value];
 			}
-			var relMod = store.modelFor(rel.forward.relatedTo);
-			var pK = relMod._primaryKey, err = [], arr = [];
+			var pK = store.modelFor(rel.forward.relatedTo)._primaryKey, err = [], arr = [];
 			for(var i=0; i<value.length; i++){
 				var rec = value[i];
 				if(typeof rec == "object" && !Lyte.isRecord(rec)){
 					rec = store.$.newRecord((rec._type) ? rec._type : type ? type : field.relatedTo, rec);
 				}
-				else if(relMod.fieldList[pK].type.toLowerCase() == typeof rec){
+				else if(store.modelFor(rel.forward.relatedTo).fieldList[pK].type.toLowerCase() == typeof rec){
 					if(this.polymorphic && !type){
 						err.push({code : "ERR22", data : value[i], message : Lyte.errorCodes.ERR22});
 						continue;
@@ -2092,15 +1505,6 @@ var store={
 						store.$.deleteFromArray(model.dirty, record[model._primaryKey]);
 					}
 				}
-				var obj = {_type:"added", records: arr};
-				if(redoObj){
-					redoObj[attr] = obj; 
-				}
-				else{
-					var stackObj = {};
-					stackObj[attr] = obj;
-					record.$.undoStack.push(stackObj);
-				}
 			}
 			if(err.length > 0){
 				store.$.setRecordError(record.$, attr, err);
@@ -2110,16 +1514,15 @@ var store={
 			}
 			return record;
 		},
-		remove:function(key,type,redoObj){
+		remove:function(key,type){
 			var record = this.record, model = record.$.model, attr =  this.key, field = model.fieldList[attr], rel = {};
 			store.$.getRelations(model, field.relKey, store.modelFor(field.relatedTo), rel);
 			if(!Array.isArray(key)){
 				key = [key];
 			}
-			var relMod = store.modelFor(rel.forward.relatedTo);
-			var pK = relMod._primaryKey, err = [], relatedRecord, arr = [], indices = [];
+			var pK = store.modelFor(rel.forward.relatedTo)._primaryKey, err = [], relatedRecord, arr = [], indices = [];
 			for(var i=0; i<key.length; i++){
-				if(relMod.fieldList[pK].type.toLowerCase() == typeof key[i]){
+				if(store.modelFor(rel.forward.relatedTo).fieldList[pK].type.toLowerCase() == typeof key[i]){
 					if(this.polymorphic == true && !type){
 						err.push({code : "ERR22", data : key[i], message : Lyte.errorCodes.ERR22});
 						continue;
@@ -2145,7 +1548,7 @@ var store={
 					store.$.checkAndAddToArray(model.dirty, record[model._primaryKey]);
 				}
 				else if(store.$.hasRecordsArrayChanged(record, attr)){
-					record.$._attributes[attr].push({_type : "removed", records : arr, _indices : indices});
+					record.$._attributes[attr].push({_type : "removed", records : arr, indices : indices});
 				}
 				else{
 					record.$.isModified = false;
@@ -2155,15 +1558,6 @@ var store={
 					}
 				}
 				store.$.emit("change", record, [attr]);
-				var obj = {_type:"removed", records: arr, _indices : indices};
-				if(redoObj){
-					redoObj[attr] = obj; 
-				}
-				else{
-					var stackObj = {};
-					stackObj[attr] = obj;
-					record.$.undoStack.push(stackObj);
-				}
 			}
 			if(err.length > 0){
 				store.$.setRecordError(record.$, attr, err);
@@ -2182,6 +1576,7 @@ var store={
 			if(j === len){
 				return true;
 			}
+
 		},
 		filterBy : function(obj){
 			var len = Object.keys(obj).length, j = 0, arr = [];
@@ -2191,88 +1586,47 @@ var store={
 				}
 			}
 			if(!arr.filterBy){
-				store.$.defineArrayUtils(arr);
-				store.$.defineUtilsFor(arr,this.model);
+				Object.defineProperties(arr,{
+					model:{
+						enumerable:false,
+						value:this.model
+					},
+					filterBy:{
+						enumerable:false,
+						value:this.filterBy
+					},
+					sortBy : {
+						enumerable : false,
+						value : this.sortBy
+					},
+					mapBy : {
+						enumerable : false,
+						value : store.$.mapBy
+					}
+				});
 			}
 			return arr;
 		},
-		removeSelfCircularReference : function(modelName,obj,expose,type){
-			var model = store.modelFor(modelName), fieldList = model.fieldList, pK = model._primaryKey;
-			var extended = model.extend ? true : false;
-			store.$.recStack[modelName] = store.$.recStack[modelName] || []; 
-			var ret = store.$.checkAndAddToArray(store.$.recStack[modelName], obj[pK]);
+		removeSelfCircularReference : function(modelName,obj,expose){
+			var model = store.modelFor(modelName), fieldList = model.fieldList;
 			for(var key in obj){
-				var field = fieldList[key], extMod, swap;
-				var removePk = (type == "create" && model._primaryKey == key) ? true: false;
-				if(removePk){
-					delete obj[key];
-					continue;
-				}
-				if(!field && extended){
-				    extMod = store.modelFor(model.extend);
-					field = extMod.fieldList[key];
-					swap = true;
-				}
+				var field = fieldList[key];
 				if(obj[key] && field && field.type == "relation"){
 					var bModel = store.modelFor(field.relatedTo);
 					if(bModel == undefined){
 						continue;
 					}
 					var relKey = field.relKey, rel = {};
-					if(swap){
-						this.getRelations(extMod, field.relKey, store.modelFor(field.relatedTo), rel);						
-					}
-					else{
-						this.getRelations(model, relKey, bModel, rel);
-					}
-					var opts = field.opts;
-					var serialize = opts ? opts.serialize : undefined, val = obj[relKey], pK = model._primaryKey, pkVal = obj[pK];
-					var polymorphic = opts ? opts.polymorphic : undefined, bPk = bModel._primaryKey;
-					if(expose == "idb"){
+					this.getRelations(model, relKey, bModel, rel);
+					var serialize = field.opts ? field.opts.serialize : undefined, val = obj[relKey], pK = model._primaryKey, pkVal = obj[pK];
+					if(expose || serialize == "id"){
 						if(Array.isArray(val)){
-							val.forEach(function(item, index){
-								if(Lyte.isRecord(item) && item.$.inIDB){
-									val[index] = item[bPk];										
-								}
-								else if(!store.$.checkPresenceInArray(store.$.recStack[field.relatedTo],item[bPk])){
-									store.$.removeBackwardRel(item, rel, pK, pkVal, true);
-									store.$.removeSelfCircularReference(bModel._name, item, expose);
-								}
-								else{
-									val[index] = item[bPk];										
-								}
-							});
+							 obj[relKey] = val.map(function(value, i){
+								 return value[pK];
+							 });
 						}
 						else if(val && Lyte.isRecord(val)){
-							if(Lyte.isRecord(val) && val.$.inIDB){
-								obj[relKey] = val[bPk];
-							}
-							else if(!this.checkPresenceInArray(store.$.recStack[field.relatedTo],val[bPk])){
-								this.removeBackwardRel(val, rel, pK, pkVal, true);
-								this.removeSelfCircularReference(bModel._name, val,expose);
-							}else{
-								obj[relKey] = val[bPk];
-							}
-						}
-					}
-					else if(expose || serialize == "id"){
-						if(Array.isArray(val)){
-							if(polymorphic){
-								obj[relKey] = this.polymorphicToJSON(field,val);
-							}
-							else{
-								obj[relKey] = val.map(function(value, i){
-									return value[pK];
-								});   
-							}
-						}
-						else if(val && Lyte.isRecord(val)){
-							if(polymorphic){
-								obj[relKey] = this.polymorphicToJSON(field,val);								
-							}
-							else{
-								obj[relKey] = val[bPk];
-							}
+							 obj[relKey] = val[bModel._primaryKey];
 						}
 					}
 					else if(serialize === "record"){
@@ -2291,16 +1645,12 @@ var store={
 						}
 					}
 					else{
-						delete obj[relKey];
-					}
+						 delete obj[relKey];
+					 }
 				}
 			}
 		},
-		removeBackwardRel:function(val,rel,pK,pkVal,wholeRelKey){
-			if(wholeRelKey){
-				delete val[rel.backward.relKey];
-				return; 
-			}
+		removeBackwardRel:function(val,rel,pK,pkVal){
 			var rec = val[rel.backward.relKey];
 			if(Array.isArray(rec)){
 				for(var i=0; i<rec.length; i++){
@@ -2317,53 +1667,21 @@ var store={
 				delete val[rel.backward.relKey];
 			}
 		},
-		polymorphicToJSON : function(rel,data){
-			var opts = rel.opts;
-			if(opts && opts.polymorphic){
-				if(Array.isArray(data)){
-					var res = [];
-					data.forEach(function(item, index){
-						res.push(store.$.polyToJSON(item));
-					});
-					return res;
-				}
-				else{
-					return store.$.polyToJSON(data);
-				}
-			}
-		},
-		polyToJSON : function(data){
-			var type = data ? data._type : undefined;
-			var polyMod = store.modelFor(type);
-			var pK = polyMod ? polyMod._primaryKey : undefined;
-			var poly = {};
-			poly[pK] = data[pK];
-			poly._type = data._type;
-			return poly;
-		},
-		toJSON : function(modelName,obj,expose,type){
+		toJSON : function(modelName,obj,expose){
 			var copyObj;
-			store.$.recStack = {};
 			if(Array.isArray(obj)){
 				var arr = [];
 				for(var i=0; i<obj.length; i++){
-					copyObj = Lyte.deepCopyObject(obj[i]);
-					this.removeSelfCircularReference(modelName, copyObj,expose,type);
-					if(expose == "idb"){
-						this.removeNotNeededKeys(modelName, copyObj);
-					}
+					copyObj = this.deepCopyObject(obj[i]);
+					this.removeSelfCircularReference(modelName, copyObj, expose);
 					arr.push(copyObj);
 				}
 				return arr;
 			}
 			else if(typeof obj === "object" || Lyte.isRecord(obj)){
-				copyObj = Lyte.deepCopyObject(obj);
-				this.removeSelfCircularReference(modelName,copyObj,expose,type);
-				if(expose == "idb"){
-					this.removeNotNeededKeys(modelName, copyObj);						
-				}
+				copyObj = this.deepCopyObject(obj);
+				this.removeSelfCircularReference(modelName,copyObj,expose);
 			}
-			store.$.recStack = {};
 			return copyObj;
 		},
 		deepCopyObject : function( obj )  
@@ -2399,14 +1717,14 @@ var store={
 				if(data.save){
 					var arr = [];
 					for(var i=0; i<data.length; i++){
-						var rec = Lyte.deepCopyObject(data[i]);
+						var rec = this.deepCopyObject(data[i]);
 						arr.push(rec);
 					}
 					return arr;
 				}
 			}
 			else if(data && ( Lyte.isRecord(data) || typeof data == "object")){
-				return Lyte.deepCopyObject(data);
+				return this.deepCopyObject(data);
 			}
 			return data;
 		},
@@ -2443,15 +1761,13 @@ var store={
 			return false;
 		},
 		checkPresenceInArray : function(arr,value){
-			return arr && arr.some(function(val,key){
+			return arr.some(function(val,key){
 				return val === value;
 			});
 		},
 		checkAndAddToArray : function(arr,value){
 			if(!this.checkPresenceInArray(arr,value)){
 				arr.push(value);
-			}else{
-				return -1;
 			}
 		},
 		deleteFromArray : function(arr,value){
@@ -2482,51 +1798,44 @@ var store={
 				opts = {};
 			}
 			var fields = model.fieldList, record = {}, errorObj = new error1();
-			var pK = model._primaryKey;
+            var pK = model._primaryKey;
 			if(!opts[pK]){
                 var type = fields[pK].type;
                 this.generateRandomPk(model, opts, pK, type)
 			}
 			else if(this.isDuplicateRecord(model.data, opts, pK)){
                 store.$.setError(errorObj,pK,{code : "ERR16", data : record[pK], message : Lyte.errorCodes.ERR16})
+				//errorObj[pK] = {code : "ERR16", data : record[pK], message : Lyte.errorCodes.ERR16};
 			}
 			for(var field in fields){
 				var fieldKeys = fields[field];
-				// if(fieldKeys.type == "object"){
-				// 	record[field] = {};
-				// }
-				// else if(fieldKeys.type == "array"){
-				// 	record[field] = [];
-				// }
 				if(fieldKeys.relType == "hasMany"){
 					record[field] = [];
 				}
-				var val = opts[field];     
-				if(fieldKeys.type != "relation"){
-					if(val == undefined || val == "" || val == null){
-						if(fieldKeys.hasOwnProperty("default")){
-							record[field] = fieldKeys.default;
-						}
-						if(fieldKeys.mandatory && store.$.isEmpty(record[field]) && !withoutValidation){
-							store.$.setError(errorObj,field,{code : "ERR02", message : Lyte.errorCodes.ERR02});
-							//errorObj[field] = {code : "ERR02", message : Lyte.errorCodes.ERR02};
-						}
-						if(fieldKeys.pattern && !withoutValidation){
-							if(!(new RegExp(fieldKeys.pattern).test(val))){
-								store.$.setError(errorObj,field,{code : "ERR08", message : Lyte.errorCodes.ERR08,expected:fieldKeys.pattern});
-							}
+				var val = opts[field];         
+				if(val == undefined || val == "" || val == null){
+					if(fieldKeys.hasOwnProperty("default")){
+						record[field] = fieldKeys.default;
+					}
+					if(fieldKeys.mandatory && !withoutValidation){
+                        store.$.setError(errorObj,field,{code : "ERR02", message : Lyte.errorCodes.ERR02});
+						//errorObj[field] = {code : "ERR02", message : Lyte.errorCodes.ERR02};
+					}
+                    if(fieldKeys.pattern && !withoutValidation){
+                        if(!(new RegExp(fieldKeys.pattern).test(val))){
+                            store.$.setError(errorObj,field,{code : "ERR08", message : Lyte.errorCodes.ERR08,expected:fieldKeys.pattern});
+                        }
+                    }
+				}
+				else if(fieldKeys.type != "relation" && !withoutValidation){
+					for(var property in fieldKeys){
+						var resp = this.checkProperty(property, val, field, fieldKeys[property], opts);
+						if(resp != true){
+                            store.$.setError(errorObj,field,resp);
+							//errorObj[field] = resp;
 						}
 					}
-					else if(!withoutValidation){
-						for(var property in fieldKeys){
-							var resp = Lyte.checkProperty(property, val, field, fieldKeys[property], opts);
-							if(resp != true){
-								store.$.setError(errorObj,field,resp);
-								break;
-							}
-						}
-					}	
-				}    
+				}
 			}
 			for(var opt_key in opts){
 				record[opt_key] = opts[opt_key];
@@ -2542,6 +1851,7 @@ var store={
 						var fieldKeys = relation[i], rel = {}, resp = this.getRelations(model, fieldKeys.relKey, store.modelFor(fieldKeys.relatedTo), rel);
 						if(resp != true){
 							store.$.setError(errorObj,fieldKeys.relKey,{code : resp, data : relation, message : Lyte.errorCodes[resp]});
+                            //errorObj[fieldKeys.relKey] = {code : resp, data : relation, message : Lyte.errorCodes[resp]};
 							continue;
 						}
 						var bModel = store.modelFor(fieldKeys.relatedTo), bPkType = bModel.fieldList[bModel._primaryKey].type;
@@ -2550,6 +1860,7 @@ var store={
 						}
 						else if(relation[i].relType == "belongsTo"){
 							store.$.setError(errorObj,fieldKeys.relKey,{code : "ERR21", data : optsRelVal, message : Lyte.errorCodes.ERR21});
+                            //errorObj[fieldKeys.relKey] = {code : "ERR21", data : optsRelVal, message : Lyte.errorCodes.ERR21};
 							continue;
 						}
 						errorObj[fieldKeys.relKey] = [];
@@ -2566,12 +1877,14 @@ var store={
 							}
 							if(relRecord && relRecord.$ && relRecord.$.isError){
 								store.$.setError(errorObj, fieldKeys.relKey,{code : "ERR15", data : optsRelVal[j], message : Lyte.errorCodes.ERR15, error : Object.assign({}, relRecord)});
+                                //errorObj[fieldKeys.relKey].push({code : "ERR15", data : optsRelVal[j], message : Lyte.errorCodes.ERR15, error : Object.assign({}, relRecord)});
 								continue;
 							}
 							if(relRecord && relRecord.$ && !relRecord.$.isError){
 								resp = this.establishLink(rel.forward, rel.backward, record, relRecord);
 								if(resp != true){
                                     store.$.setError(errorObj,fieldKeys.relKey,{code : resp, data : optsRelVal[j], message : Lyte.errorCodes[resp]});
+									//errorObj[fieldKeys.relKey].push({code : resp, data : optsRelVal[j], message : Lyte.errorCodes[resp]});
 								}							
 							}							
 						}
@@ -2590,9 +1903,41 @@ var store={
 										value: true
 									});
 								}
-								store.$.defineArrayUtils(record[fieldkey]);
-								store.$.defineUtilsFor(record[fieldkey], store.modelFor(relation[i].relatedTo),record,fieldkey);
-								store.$.definePolymorphicUtils(record[fieldkey]);
+								Object.defineProperties(record[fieldkey], {
+                                    model:{
+                                        enumerable:false,
+                                        value: store.modelFor(relation[i].relatedTo)  
+                                    },
+									record : {
+										enumerable : false,
+										writable : true,
+										value : record
+									},
+									key : {
+										enumerable : false,
+										value : fieldkey
+									},
+									filterBy : {
+										enumerable : false,
+										value : this.filterBy
+									},
+									add : {
+										enumerable : false,
+										value : this.add
+									},
+									remove : {
+										enumerable : false,
+										value : this.remove
+									},
+									sortBy : {
+										enumerable : false,
+										value : this.sortBy
+									},
+									mapBy : {
+										enumerable : false,
+										value : this.mapBy
+									}
+								});
 							}
 						}
 					}
@@ -2602,18 +1947,13 @@ var store={
 				return errorObj;
 			}
 			record.$.isNew = true;
-			var toRel = store.$.toRelate[model._name], pkVal = record[pK];
-			if(toRel && toRel.hasOwnProperty(pkVal)){
-				store.$.establishToRelated(record, toRel[pkVal]);
-				delete toRel[pkVal];
+			if(typeof Lyte.arrayUtils != "undefined"){
+//				LyteComponent.arrayFunctions(model.data, "push", record);
+				Lyte.arrayUtils(model.data, "push", record);
 			}
-			if(model.didLoad){
-				var callBack = model.didLoad;
-				for(var i=0;i<callBack.length;i++){
-					callBack[i].apply(record);				
-				}
+			else{
+				model.data.push(record);
 			}
-			this.handleArrayOperations(model.data,"push",record);
 			this.checkAndAddToArray(model.dirty, record[model._primaryKey]);
 			model.emit("add",[record]);
             store.emit("add",[model._name,record]);
@@ -2622,18 +1962,12 @@ var store={
 			}
 			return record;
 		},
-		toInsertData: function(modelName, payLoad, saveParent){
-			var model = store.modelFor(modelName);
-			var data = this.insertIntoStore(model, payLoad[modelName],saveParent,true);
-			delete model.rel;
-			return data;
-		},
-		insertIntoStore:function(model,data,saveParent,stack){
+		insertIntoStore:function(model,data){
 			var ret;
 			if(Array.isArray(data)){
 				ret = [];
 				for(var i=0; i<data.length; i++){
-					ret[i] = this.insertIntoStore(model, data[i], saveParent, stack);
+					ret[i] = this.insertIntoStore(model, data[i]);
                     if(ret[i] && ret[i].$ && ret[i].$.isError){
                         ret.$ = ret.$ || Object.defineProperty(ret,"$",{
                             enumerable:false,
@@ -2645,7 +1979,7 @@ var store={
 			}
 			else if(data && Object.keys(data).length){
 				var currentModel = model;
-				if(data._type && model.extendedBy){
+				if(data._type){
 					currentModel = (model.extendedBy[data._type]) ? store.modelFor(data._type) : undefined;
 				}
 				if(Lyte.isRecord(data))
@@ -2653,29 +1987,10 @@ var store={
 					return undefined;
 				}
 				if(!this.isDuplicateRecord(currentModel.data, data, currentModel._primaryKey)){
-					var rec = new Record(currentModel._name, data);
-					var pK = currentModel._primaryKey;
-					var toRel = store.$.toRelate[currentModel._name], pkVal = rec[pK];
-					if(toRel && toRel.hasOwnProperty(pkVal)){
-						store.$.establishToRelated(rec, toRel[pkVal]);
-						delete toRel[pkVal];
-					}
-					if(saveParent){
-						store.$.saveParent = rec;
-					}
-					var recStack = store.$.recStack =  store.$.recStack || {};
-					var rObj = recStack[model._name] = recStack[model._name] || {};
-					rObj[rec[model._primaryKey]] = rec;
-					ret = this.validateAndPush(currentModel,rec);
+					ret = this.validateAndPush(currentModel,new Record(currentModel._name,data));
 				}
 				else{
 					ret = this.validateAndMerge(currentModel,data);
-				}
-				if(saveParent){
-					store.$.saveParent = undefined;
-				}
-				if(stack){
-					store.$.recStack = {};
 				}
 			}
 			return ret;
@@ -2698,7 +2013,13 @@ var store={
 					this.toDemolishRelation(model, index);
 				}
 				var deleted;
-				deleted = this.handleArrayOperations(data,"removeAt",undefined,index,1)
+				if(typeof Lyte.arrayUtils != "undefined"){
+//					deleted = LyteComponent.arrayFunctions(data, "remove", index);
+					deleted = Lyte.arrayUtils(data, "removeAt",index,1);
+				}
+				else{
+					deleted = data.splice(index, 1);
+				}
 				if(deleted && !fromStore){
 					deleted[0].$.isDeleted = true;
 					if(deleted[0].$.isNew || deleted[0].$.isModified){
@@ -2735,9 +2056,8 @@ var store={
 			if(!model.rel){
 				model.rel = {};
 			}
-			var pK = model._primaryKey;
-            if(!data.hasOwnProperty(pK)){
-                return new error1(pK, {code : "ERR23", data : data, message : Lyte.errorCodes.ERR23});
+            if(!data.hasOwnProperty(model._primaryKey)){
+                return new error1(model._primaryKey, {code : "ERR23", data : data, message : Lyte.errorCodes.ERR23});
             }
 			data = this.validateJSON(model, data);
 			if(!data.$.isError){
@@ -2747,11 +2067,17 @@ var store={
 						callBack[i].apply(data);				
 					}
 				}
-				if(this.isDuplicateRecord(model.data, data, pK)){
-					this.mergeData(store.peekRecord(model._name,data[pK]),data);
+				if(this.isDuplicateRecord(model.data, data, model._primaryKey)){
+					this.mergeData(store.peekRecord(model._name,data[model._primaryKey]),data);
 				}
 				else{
-					this.handleArrayOperations(model.data,"push",data);
+					if(typeof Lyte.arrayUtils != "undefined"){
+//						LyteComponent.arrayFunctions(model.data, "push", data);	
+						Lyte.arrayUtils(model.data, "push", data);
+					}
+					else{
+						model.data.push(data);
+					}
                     model.emit("add",[data]);
                     store.emit("add",[model._name,data])
                 }
@@ -2765,12 +2091,12 @@ var store={
             var pKey = model._primaryKey;
             var record = store.peekRecord(model._name, data[pKey]);
             if(!record || !Lyte.isRecord(record)){
-                Lyte.error("LD04",data);
-                return false;
+                console.error("No such record to merge, ",data);
+                return;
             }
             var toValidate = this.mergeData(record, data);
             record = this.validateJSON(model, record, Object.keys(data),toValidate);
-			if(!record.$.isError && model.didLoad){
+            if(!record.$.isError && model.didLoad){
                 var callBack = model.didLoad;
                 for(var i=0;i<callBack.length;i++){
                     callBack[i].apply(record);				
@@ -2860,9 +2186,6 @@ var store={
                     if(res == 2){
                         this.mergeData(record[key][ind],obj);
                     }
-                    else if(res == 0){
-                    	status = 0;
-                    }
                 }
                 if(status == 0){
                     if(old > 0){
@@ -2877,9 +2200,6 @@ var store={
                     else{
                         return 0;
                     }
-                }
-                else if(old < record[key].length){
-                	return 0;
                 }
                 return 1;
             }
@@ -2912,10 +2232,9 @@ var store={
                   if(field){
                         if(field.type == "relation"){
                             var res = this.compareRelations(rec,obj,data_key,field);
-                            if(res == 1){
-                                continue;
+                            if(!res){
+                                return 0;
                             }
-							return 0;
                         }
                         else if(rec[data_key] != obj[data_key]){
                             return 2;
@@ -2927,54 +2246,176 @@ var store={
             } 
             return 0;
         },
+		checkProperty:function(property,dataVal,key,fieldVal, record){
+			switch(property){
+			case "type" : 
+				if(Lyte.Transform.hasOwnProperty(fieldVal)){
+					if(Array.isArray(dataVal)){
+						if(Lyte.Transform[fieldVal].extends != "array"){
+							return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
+						}
+					}
+					else if(Lyte.Transform[fieldVal].extends != (typeof dataVal)){
+						return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
+					}
+				}
+				else if(Array.isArray(dataVal)){
+					if(fieldVal != "array"){
+						return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
+					}
+				}
+				else if(fieldVal != (typeof dataVal)){
+					return {code : "ERR03", message : Lyte.errorCodes.ERR03, expected : fieldVal};
+				}
+				break;
+			case "maximum" :
+				if((typeof dataVal == "number") && dataVal > fieldVal){
+					return {code : "ERR04", message : Lyte.errorCodes.ERR04, expected : fieldVal};
+				}
+				break;
+			case "minimum" :
+				if((typeof dataVal == "number") && dataVal < fieldVal){
+					return {code : "ERR05", message : Lyte.errorCodes.ERR05, expected : fieldVal};
+				}
+				break;
+			case "maxLength" :
+			case "maxItems" :
+				if(dataVal.length > fieldVal){
+					return {code : "ERR06", message : Lyte.errorCodes.ERR06, expected : fieldVal};
+				}
+				break;
+			case "minLength" :
+			case "minItems" :
+				if(dataVal.length < fieldVal){
+					return {code : "ERR07", message : Lyte.errorCodes.ERR07, expected : fieldVal};
+				}
+				break;
+			case "pattern" :
+				if((typeof dataVal == "string") && !(new RegExp(fieldVal).test(dataVal))){
+					return {code : "ERR08", message : Lyte.errorCodes.ERR08, expected : fieldVal};
+				}
+				break;
+			case "uniqueItems" :{
+				if(Array.isArray(dataVal) && fieldVal){
+					var newArr = [];
+					for(var i=0; i<dataVal.length; i++){
+						var val = dataVal[i];
+						if(newArr.indexOf(val) != -1){
+							return {code : "ERR09", message : Lyte.errorCodes.ERR09};
+						}
+						newArr.push(val);
+					}					
+				}
+				break;				
+			}
+			case "constant" :
+				if(Array.isArray(dataVal)){
+					var resp = dataVal.length==fieldVal.length && dataVal.every(function(v,i) { return v === fieldVal[i]});
+					if(!resp){
+						return {code : "ERR10", message : Lyte.errorCodes.ERR10, expected : fieldVal};
+					}
+				}
+				else if(typeof dataVal == "object"){
+					var resp = store.adapter.$.compareObjects(dataVal, fieldVal);
+					if(!resp){
+						return {code : "ERR10", message : Lyte.errorCodes.ERR10, expected : fieldVal};
+					}
+				}
+				else if(dataVal != fieldVal){
+					return {code : "ERR10", message : Lyte.errorCodes.ERR10, expected : fieldVal};
+				}
+				break;
+			case "items" :{
+				if(Array.isArray(dataVal)){
+					for(var i=0; i<dataVal.length; i++){
+						for(var property in fieldVal){
+							var resp = this.checkProperty(property, dataVal[i], i, fieldVal[property]);
+							if(resp != true){
+								return resp;
+							}
+						}
+					}					
+				}
+				break;				
+			}
+			case "properties" :
+				if(typeof dataVal == "object" && !Array.isArray(dataVal)){
+					for(var key in dataVal){
+						for(var property in fieldVal){
+							var resp = this.checkProperty(property, dataVal[key], key, fieldVal[property]);
+							if(resp != true){
+								return resp;
+							}
+						}
+					}					
+				}
+				break;
+			case "validation" :{
+				var resp =  Lyte.customValidator[fieldVal].apply(record, [key, dataVal]);
+				if(resp != true){
+					return resp;
+				}
+			}				
+			}
+			return true;
+		},
 		validateJSON:function(model,data,keys,toValidate){
             var validate = (toValidate) ? toValidate.toValidate : undefined;
             var fields = (validate && Object.keys(validate).length) ? validate : model.fieldList;
-			var extended = model.extend ? true : false;
-			for(var key in data){
+			for(var key in fields){
 				if(keys && keys.indexOf(key) == -1){
 					continue;
 				}
-				var fld = fields[key];
-				if(fld){
-					if(fld.type == "relation" && data[key]){
-						var partialAdd = (toValidate && toValidate.toPartialAdd) ? toValidate.toPartialAdd[key] : undefined;
-						var resp = this.handleRelation(key, model, fld, data, partialAdd);
-						if(resp != true){
-							return new error1(key, {code : resp, data : data, message : Lyte.errorCodes[resp]});
-						}
-						if(fld.relType == "hasMany" && !data[key].add){
-							store.$.defineArrayUtils(data[key]);
-							store.$.definePolymorphicUtils(data[key]);
-							store.$.defineUtilsFor(data[key],model,data,key);
-						}
+				if(fields[key].type == "relation" && data[key]){
+                    var partialAdd = (toValidate && toValidate.toPartialAdd) ? toValidate.toPartialAdd[key] : undefined;
+					var resp = this.handleRelation(key, model, fields[key], data, partialAdd);
+					if(resp != true){
+						return new error1(key, {code : resp, data : data, message : Lyte.errorCodes[resp]});
 					}
-					else if(fld.type){
-						var fieldKeys = fld;
-						if(data[key] == undefined && fieldKeys.default){
-							data[key] = fieldKeys.default;
-						}
-						if(data[key] && Lyte.Transform.hasOwnProperty(fieldKeys.type) && Lyte.Transform[fieldKeys.type].hasOwnProperty("deserialize")){
-							data[key] = Lyte.Transform[fieldKeys.type].deserialize(data[key]);
-						}
+					if(fields[key].relType == "hasMany" && !data[key].add){
+						Object.defineProperties(data[key],{
+							record:{
+								enumerable:false,
+								value:data
+							},
+							model:{
+								enumerable:false,
+								value:model
+							},
+							key:{
+								enumerable:false,
+								value:key
+							},
+							filterBy:{
+								enumerable:false,
+								value:this.filterBy
+							},
+							add : {
+								enumerable : false,
+								value : this.add
+							},
+							sortBy : {
+								enumerable : false,
+								value : this.sortBy
+							},
+							mapBy : {
+								enumerable : false,
+								value : this.mapBy
+							},
+							remove : {
+								enumerable : false,
+								value : this.remove
+							}
+						});
 					}
 				}
 				else{
-					if(extended){
-						var extMod = store.modelFor(model.extend);
-						var extKey = extMod.fieldList[key];
-						if(extKey && extKey.type == "relation"){
-							var partialAdd = (toValidate && toValidate.toPartialAdd) ? toValidate.toPartialAdd[key] : undefined;
-							var resp = this.handleRelation(key, extMod, extKey, data, partialAdd);
-							if(resp != true){
-								return new error1(key, {code : resp, data : data, message : Lyte.errorCodes[resp]});
-							}
-							if(extKey.relType == "hasMany" && !data[key].add){
-								store.$.defineArrayUtils(data[key]);
-								store.$.definePolymorphicUtils(data[key]);
-								store.$.defineUtilsFor(data[key],extMod,data,key);
-							}
-						}
+					var fieldKeys = fields[key];
+					if(data[key] == undefined && fieldKeys.default){
+						data[key] = fieldKeys.default;
+					}
+					if(data[key] && Lyte.Transform.hasOwnProperty(fieldKeys.type) && Lyte.Transform[fieldKeys.type].hasOwnProperty("deserialize")){
+						data[key] = Lyte.Transform[fieldKeys.type].deserialize(data[key]);
 					}
 				}
 			}
@@ -2983,10 +2424,10 @@ var store={
 		handleRelation:function(key,model,field,data,partialAdd){
 			var rel = {};
 			if (!model.rel.hasOwnProperty(key)){
-				var relResp = this.getRelations(model,key,store.modelFor(field.relatedTo),rel);	
-				if(relResp !== true){
-					return relResp;
+				if(store.modelFor(field.relatedTo) == undefined){
+					return "ERR11";
 				}
+				this.getRelations(model,key,store.modelFor(field.relatedTo),rel);	
 				model.rel[key] = rel;
 			}
 			else{
@@ -2996,15 +2437,10 @@ var store={
 		},
 		getRelations:function(fModel,key,bModel,rel){
 			if(bModel == undefined){
-				Lyte.error("LD05",fModel.fieldList[key].relatedTo,key,fModel._name)
 				return "ERR11";
 			}
 			rel.forward = fModel.fieldList[key];
 			rel.backward = this.getBackwardRel(fModel,rel.forward,bModel);
-			if(rel.backward === undefined){
-				Lyte.error("LD06",bModel._name,key,fModel._name);
-				return "ERR25"
-			}
 			return true;
 		},
 		getBackwardRel:function(fModel,rel,bModel){
@@ -3012,9 +2448,6 @@ var store={
 			if(rel.opts){
 				inverse = rel.opts.inverse;
 				polymorphic = rel.opts.polymorphic;
-				if(inverse === null){
-					return null;
-				}
 				if(polymorphic){
 					var extendedModels = bModel.extendedBy;
 					if(extendedModels){
@@ -3063,7 +2496,7 @@ var store={
 				if(forward.relatedTo === fModel._name){
 					backward = forward;
 				}
-				if(backward === undefined){
+				if(!backward){
 					return "ERR12";
 				}
 			}
@@ -3088,9 +2521,13 @@ var store={
 			for(var i=0; i<val.length; i++){
 				var relatedRecord;
 				if(typeof val[i] == bModel.fieldList[bModel._primaryKey].type){
-					relatedRecord = store.peekRecord(bModel._name, val[i]) ||  ((store.$.recStack && store.$.recStack[bModel._name]) ? store.$.recStack[bModel._name][val[i]] : undefined );					
+					relatedRecord = store.peekRecord(bModel._name, val[i]);
 				}
 				else if(typeof val[i] == "object" && !Lyte.isRecord(val[i])){
+//					if(val[i]._type){
+//						relatedModel = store.modelFor(val[i]._type);
+//						backward = this.getBackwardRel(fModel,forward,relatedModel);
+//					}
 					relatedRecord = this.insertIntoStore(bModel, val[i]);					
 				}
                 if(relatedRecord && relatedRecord.$ &&relatedRecord.$.isError){
@@ -3106,9 +2543,6 @@ var store={
 					if(!this.hasDuplicateRelation(relatedRecord, data[key], bModel._primaryKey, val[i]._type)){
 						this.establishLink(forward, backward, data, relatedRecord);							
 					}
-				}
-				else{
-					this.addToRelate(fModel._name, data, rel, val[i]);
 				}
 			}
 			return true;
@@ -3128,7 +2562,7 @@ var store={
                     }
                     else{
                         data[fRelKey] = relatedRecord;
-					}
+                    }
                 }
 			}
 			else if(forward.relType === "hasMany"){
@@ -3150,40 +2584,64 @@ var store={
 						relModel = store.modelFor(relModel.extend);
 					}
                     store.$.establishObserverBindings(data,data.$.model._properties);
-					store.$.defineArrayUtils(data[fRelKey]);
-					store.$.definePolymorphicUtils(data[fRelKey]);
-					store.$.defineUtilsFor(data[fRelKey],relModel,data,fRelKey);
+					Object.defineProperties(data[fRelKey],{
+						record:{
+							enumerable:false,
+							value:data
+						},
+						model:{
+							enumerable:false,
+							value:relModel
+						},
+						key:{
+							enumerable:false,
+							value:fRelKey
+						},
+						filterBy:{
+							enumerable:false,
+							value:this.filterBy
+						},
+						add:{
+							enumerable:false,
+							value:this.add
+						},
+						remove : {
+							enumerable : false,
+							value : this.remove
+						},
+						sortBy : {
+							enumerable : false,
+							value : this.sortBy
+						},
+						mapBy : {
+							enumerable : false,
+							value : store.$.mapBy
+						}
+					});
 				}
 				if( !this.hasDuplicateRelation(relatedRecord, data[fRelKey], (forward?store.modelFor(forward.relatedTo)._primaryKey : undefined),type) ){
 					if(index != undefined){
-						if(typeof LyteComponent != "undefined"){
- 							LyteComponent.arrayFunctions(data[fRelKey],"insertAt",index,relatedRecord);						
-						}
-						else{
-							data[fRelKey].splice(index, 0, relatedRecord);
-						}
+						data[fRelKey].splice(index, 0, relatedRecord);
+					}
+					else if(typeof Lyte.arrayUtils != "undefined"){
+//						LyteComponent.arrayFunctions(data[fRelKey], "push", relatedRecord);
+						Lyte.arrayUtils(data[fRelKey], "push", relatedRecord);
 					}
 					else{
-						this.handleArrayOperations(data[fRelKey],"push",relatedRecord);
+						data[fRelKey].push(relatedRecord);
 					}
 				}
 			}
 			if(forward == backward){
 				return true;
 			}
-			if(backward === null){
-				if(relatedRecord.hasOwnProperty(bRelKey)){
-					delete relatedRecord[bRelKey];
-				}
-				return true;
-			}
-			var bRelKey = backward.relKey, relRecMod = relatedRecord.$.model;
 			if( !this.checkForCorrectRelation(backward, data) ){
 				return "ERR14";
 			}
+			var bRelKey = backward.relKey;
 			if(backward.relType == "belongsTo"){
 				if(relatedRecord[bRelKey] != undefined  && relatedRecord[backward.relKey] !== data){
-					this.toDemolishLink(relRecMod, relatedRecord, backward);
+					this.toDemolishLink(relatedRecord.$.model, relatedRecord, backward);
 				}
                 if(relatedRecord[bRelKey] !== data){
                     if(typeof LyteComponent != "undefined"){
@@ -3191,7 +2649,7 @@ var store={
                     }
                     else{
                         relatedRecord[bRelKey] = data;				
-					}
+                    }
                 }
 			}
 			else if(backward.relType === "hasMany"){
@@ -3204,12 +2662,49 @@ var store={
                     }
 				}
 				if(!relatedRecord[bRelKey].model){
-					store.$.defineArrayUtils(relatedRecord[bRelKey]);
-					store.$.definePolymorphicUtils(relatedRecord[bRelKey]);
-					store.$.defineUtilsFor(relatedRecord[bRelKey],data.$.model,relatedRecord,bRelKey);
+					Object.defineProperties(relatedRecord[bRelKey],{
+						record:{
+							enumerable:false,
+							value:relatedRecord
+						},
+						model:{
+							enumerable:false,
+							value:data.$.model
+						},
+						key:{
+							enumerable:false,
+							value:bRelKey
+						},
+						filterBy:{
+							enumerable:false,
+							value:this.filterBy
+						},
+						add : {
+							enumerable : false,
+							value : this.add
+						},
+						sortBy : {
+							enumerable : false,
+							value : this.sortBy
+						},
+						mapBy : {
+							enumerable : false,
+							value : this.mapBy
+						},
+						remove : {
+							enumerable : false,
+							value : this.remove
+						}
+					});
 				}
 				if( !this.hasDuplicateRelation(data, relatedRecord[bRelKey], (backward ? store.modelFor(backward.relatedTo)._primaryKey : undefined), type) ){
-					this.handleArrayOperations(relatedRecord[bRelKey],"push",data);
+					if(typeof Lyte.arrayUtils != "undefined"){
+//						LyteComponent.arrayFunctions(relatedRecord[bRelKey], "push", data);
+						Lyte.arrayUtils(relatedRecord[bRelKey], "push", data);
+					}
+					else{
+						relatedRecord[bRelKey].push(data);
+					}
 				}
 			}
 			return true;
@@ -3229,9 +2724,6 @@ var store={
 		},
 		toDemolishLink:function(model,record,relation){
 			var records = record[relation.relKey], priKey = model._primaryKey, relatedModel = store.modelFor(relation.relatedTo), relPriKey = relatedModel._primaryKey, relatedModelName = relation.relatedTo, bRelation = this.getBackwardRel(model, relation, relatedModel);
-			if(bRelation === null){
-				return;
-			}
 			if(Array.isArray(records)){
 				for(var i=0; i<records.length; i++){
 					this.demolishLink(record, priKey, records[i], bRelation.relKey);
@@ -3243,16 +2735,26 @@ var store={
 		},
 		demolishLink : function(record, priKey, relatedRecord, bRelKey){
 			var links = relatedRecord[bRelKey];
-			var relMod = relatedRecord.$.model;
 			if(Array.isArray(links)){
                 var ind = this.getIndex(links, priKey, record[priKey],record._type);
                 if(ind != -1){
-					this.handleArrayOperations(relatedRecord[bRelKey],"removeAt",undefined,ind,1);
-				}
+                    if(typeof Lyte.arrayUtils != "undefined"){
+                        Lyte.arrayUtils(relatedRecord[bRelKey],"removeAt",ind,1);
+                    }
+                    else{
+                        relatedRecord[bRelKey].splice(ind, 1);                    
+                    }                    
+                }
 			}
 			else if(links && (typeof links == "object" || Lyte.isRecord(links)) ){
 				delete relatedRecord[bRelKey];
 			}
+		},
+		toInsertData: function(modelName, payLoad){
+				var model = store.modelFor(modelName);
+				var data = this.insertIntoStore(model, payLoad[modelName]);
+				delete model.rel;
+				return data;
 		},
 		rollBackRecordsArray : function(oldVal, record, model, field){
 			var rel = {}, pK = model._primaryKey, relPK = store.modelFor(field.relatedTo)._primaryKey;
@@ -3290,9 +2792,6 @@ var store={
 					}
 					for(var j=0; j<records.length; j++){
 						var relatedRecord = records[j];
-						if(typeof relatedRecord == "string"){
-							relatedRecord = store.peekRecord(rel.forward.relatedTo,relatedRecord);
-						}
 						this.establishLink(rel.forward, rel.backward, record, relatedRecord);
 					}						
 				}
@@ -3331,8 +2830,24 @@ var store={
 					newArr = oldArr.concat(newArr);
 				}				
 			}
-			store.$.defineArrayUtils(newArr);
-			store.$.defineUtilsFor(newArr,this.model);
+			Object.defineProperties(newArr,{
+				model:{
+					enumerable:false,
+					value:this.model
+				},
+				filterBy:{
+					enumerable:false,
+					value:this.filterBy
+				},
+				sortBy : {
+					enumerable : false,
+					value : this.sortBy
+				},
+				mapBy : {
+					enumerable : false,
+					value : this.mapBy
+				}
+			});
 			return newArr;
 		},
 		mapBy : function(field){
@@ -3348,49 +2863,47 @@ var store={
 				if(!Array.isArray(oldVal)){
 					oldVal = [oldVal];
 				}
-				for(var i =0; i<oldVal.length; i++){
+				for(var i=0; i<oldVal.length; i++){
 					this.establishLink(rel.forward, rel.backward, record, oldVal[i]);
 				}
 			}
 		},
 		rollBackDelete : function(model, index){
-			var deleted = model._deleted, rec = deleted.splice(index, 1)[0], pK = model._primaryKey;
+			var deleted = model._deleted, rec = deleted.splice(index, 1)[0];
 			rec.$.isDeleted = false;
-			this.handleArrayOperations(model.data,"push",rec);
-			var relArr = model.relations;
-			if(relArr){
-				for(var key in relArr){
-					var rel = relArr[key] || [];
-					var self = this;
-					rel.forEach(function(item, index){
-						var key = item.relKey, bRel, bMod;
-						if(rec.hasOwnProperty(key)){
-							bMod = store.modelFor(item.relatedTo);
-							bRel = self.getBackwardRel(model,item,bMod);
-						}
-						self.establishLink(item,bRel,rec,rec[key]);
-					});
-				}
+			if(typeof Lyte.arrayUtils != "undefined"){
+//				LyteComponent.arrayFunctions(model.data, "push", rec);
+				Lyte.arrayUtils(model.data, "push", rec);
+			}
+			else{
+				model.data.push(rec);
 			}
 			if(rec.$.isNew || rec.$.isModified){
 				this.checkAndAddToArray(model.dirty, rec[model._primaryKey]);
 			}
-			store.$.clearRecordError(rec.$, pK, "ERR17");
+			store.$.clearRecordError(rec.$, model._primaryKey, "ERR17");
 			model.emit("add", [rec]);
             store.emit("add", [model._name,rec]);
+            
 		},
 		rollBackNew : function(model, record, pK){
 			var index = this.getIndex(model.data, pK, record[pK]);
-			this.handleArrayOperations(model.data,"removeAt",undefined,index,1);
+			if(typeof Lyte.arrayUtils != "undefined"){
+//				LyteComponent.arrayFunctions(model.data, "remove", index, 1);
+				Lyte.arrayUtils(model.data, "removeAt", index, 1);
+			}
+			else{
+				model.data.splice(index, 1);
+			}
 			record.$.isNew = false;
 			model.emit("delete", [record]);
             store.emit("delete", [model._name,record]);
 			this.deleteFromArray(model.dirty, record[pK]);
 		},
-		emit : function(type, record, attr, err){
-			record.$.emit(type, [record,attr,err]);
-			record.$.model.emit(type, [record, attr, err]);
-            store.emit(type, [record.$.model._name, record, attr, err]);
+		emit : function(type, record, attr){
+			record.$.emit(type, [record,attr]);
+			record.$.model.emit(type, [record, attr]);
+            store.emit(type, [record.$.model._name, record, attr]);
 		},
 		hasRecordsArrayChanged : function(record, attr){
 			var arr = record.$.getInitialValues(attr), changed = true, pK = record.$.model._primaryKey;
@@ -3406,30 +2919,28 @@ var store={
 		},
 		setRecordError : function($record, field, code, value){
 			$record.isError = true;
-            var errObj = code;
-			if(typeof errObj == "object"){
+			if(typeof code == "object"){
 				if(typeof LyteComponent != "undefined"){
-                    LyteComponent.set($record.error,field,errObj);
+                    LyteComponent.set($record.error,field,code);
                 }else{
-                    $record.error[field] = errObj;                    
+                    $record.error[field] = code;                    
                 }
 			}
 			else{
-				errObj = {code : code, message : Lyte.errorCodes[code]};
                 if(typeof LyteComponent != "undefined"){
-                    LyteComponent.set($record.error,field,errObj);
+                    LyteComponent.set($record.error,field,{code : code, message : Lyte.errorCodes[code]});
                 }else{
-				    $record.error[field] = errObj;                    
+				    $record.error[field] = {code : code, message : Lyte.errorCodes[code]};                    
                 }
 				if(value){
 					if(typeof LyteComponent != "undefined"){
-                        LyteComponent.set($record.error[field],"value",value);
+                        LyteComponent.set($record.error.field,"value",value);
                     }else{
                         $record.error[field].value = value;                        
                     }
+                    
 				}				
 			}
-            store.$.emit("error",$record.record,field,errObj);
 		},
 		clearRecordError : function($record, field, code){
 			if(code){
@@ -3465,92 +2976,25 @@ var store={
 			}
 		},
         cacheQuery: function(modelName, queryParams, data){
-			store.model.cachedQueries = store.model.cachedQueries || {};
-			store.model.cachedQueries[modelName] = store.model.cachedQueries[modelName] || [];
+			if(store.model.cachedQueries == undefined){
+				store.model.cachedQueries = {};
+			}
+			if(store.model.cachedQueries[modelName] == undefined){
+				store.model.cachedQueries[modelName] = [];
+			}
 			store.model.cachedQueries[modelName].push({queryParams : queryParams, data : data});
 		},
 		cacheRecordQuery: function(modelName, key, queryParams, data){
-			store.model.cachedRecordQueries = store.model.cachedRecordQueries || {};
-			store.model.cachedRecordQueries[modelName] = store.model.cachedRecordQueries[modelName] || {};
-			store.model.cachedRecordQueries[modelName][key] = store.model.cachedRecordQueries[modelName][key] || [];
+			if(store.model.cachedRecordQueries == undefined){
+				store.model.cachedRecordQueries = {};
+			}
+			if(store.model.cachedRecordQueries[modelName] == undefined){
+				store.model.cachedRecordQueries[modelName] = {};
+			}
+			if(store.model.cachedRecordQueries[modelName][key] == undefined){
+				store.model.cachedRecordQueries[modelName][key] = [];
+			}
 			store.model.cachedRecordQueries[modelName][key].push({queryParams : queryParams, data : data});
-		},
-		handleArrayOperations:function(data,type,obj,pos,len){
-			if(typeof Lyte.arrayUtils != "undefined"){
-                switch(type){
-                    case "push":
-                        Lyte.arrayUtils(data, type, obj);
-                        break;
-                    case "removeAt":
-                        return Lyte.arrayUtils(data,type,pos,len);
-                        break;
-                    default:
-                        Lyte.error("LD07", type);
-                        break;
-                }
-			}
-			else{
-				switch(type){
-					case "push":
-						data.push(obj);
-						break;
-					case "removeAt":
-						return data.splice(pos,len);
-						break;
-                    default:
-                        Lyte.error("LD07", type);
-                        break;
-				}
-			}
-		},
-		defineArrayUtils:function(obj){
-			Object.defineProperties(obj, {
-				filterBy : {
-					enumerable : false,
-					value : store.$.filterBy
-				},
-				sortBy : {
-					enumerable : false,
-					value : store.$.sortBy
-				},
-				mapBy : {
-					enumerable : false,
-					value : store.$.mapBy
-				}
-			});
-		},
-		definePolymorphicUtils:function(obj){
-			Object.defineProperties(obj,{
-				add : {
-					enumerable : false,
-					value : store.$.add
-				},
-				remove : {
-					enumerable : false,
-					value : store.$.remove
-				}
-			})
-		},
-		defineUtilsFor:function(obj,model,record,key){
-			if(model){
-				Object.defineProperty(obj,"model",{
-					enumerable:false,
-					value:model
-				});
-			}
-			if(record){
-				Object.defineProperty(obj,"record",{
-					enumerable:false,
-					writable:true,
-					value:record
-				});
-			}
-			if(key){
-				Object.defineProperty(obj,"key",{
-					enumerable:false,
-					value:key
-				});
-			}
 		}
 	}
 }
@@ -3568,26 +3012,22 @@ function Adapter(opts,parent,name){
 	for(key in opts){
 		this[key] = opts[key];
 	}
-	this.__extendedBy = [];
     if(store.adapter.__toAddSuper && store.adapter.__toAddSuper.hasOwnProperty(name)){
         var addSuper = store.adapter.__toAddSuper[name];
         for(var i=0; i<addSuper.length; i++){
             var child = store.adapter[addSuper[i]];
-            if(child.is == "adapter"){
-				child.$super = this;
-				this.__extendedBy.push(addSuper[i]);
+            if(child.isAdapter){
+                child.$super = this;
             }
         }
         delete store.adapter.__toAddSuper[name];
     }
 	Object.defineProperty(this,"extends", {
 		enumerable: false,
-		value: function value(name){
-			store.$.extendCallback.call(this,store,"adapter",name);
-		}
+		value: store.$.extendAdapter
 	});
-	Object.defineProperty(this,"is", {
-		value: "adapter",
+	Object.defineProperty(this,"isAdapter", {
+		value: true,
 		enumerable: false
 	});
     Object.defineProperty(this,"__name", {
@@ -3606,27 +3046,17 @@ store.adapter = {
 				}
 				else{
 					adapter = store.adapter.application;
-					if(adapter && adapter.hasOwnProperty(key)){
+					if(adapter && adapter[key]){
 						result = adapter[key];
 					}
 					else{
 						switch(key){
-							case "host":{
+							case "host":
 								result = window.location.origin ? window.location.origin : window.location.protocol+"//"+window.location.host;
 								break;
-							}
-							case "namespace": {
+							case "namespace":
 								result = "";
 								break;
-							}
-							case "actionNamespace":{
-								result = "action";
-								break;
-							}
-							case "batchNamespace":{
-								result = "batch";
-								break;
-							}
 							default:
 								result = undefined;	
 						}
@@ -3636,62 +3066,84 @@ store.adapter = {
 			}
 			return result;
 		},
-		buildURL : function(type,method,modelName,key, snapshot, queryParams,actionName,customData){
-			var adapter = store.adapter[modelName], host = this.getFromAdapter(adapter,"host"), url = "";
-			if(!store.$.makeBatch){
-				if(host != undefined){
-					url += host;
-					if(host[host.length-1] != "/"){
-						url+="/";					
-					}
+		getNamespace:function(adapter){
+			var namespace = adapter ? adapter.namespace : undefined;
+			while(namespace == undefined){
+				if(adapter && adapter.$super){
+					adapter = adapter.$super;
+					namespace = adapter ? adapter.namespace : undefined;					
+				}
+				else{
+					adapter = store.adapter.application;
+					namespace = (adapter && adapter.namespace) ? adapter.namespace : "";
 				}
 			}
-			var namespace = this.getFromAdapter(adapter,"namespace");
+			return namespace;
+		},
+		getHost : function(adapter){
+			var host = adapter ? adapter.host : undefined;
+			while(host == undefined){
+				if(adapter && adapter.$super){
+					adapter = adapter.$super;
+					host = adapter ? adapter.host : undefined;
+				}
+				else{
+					adapter = store.adapter.application;
+					host = (adapter && adapter.host) ? adapter.host : window.location.origin ? window.location.origin : window.location.protocol+"//"+window.location.host;
+				}
+			}
+			return host;
+		},
+		buildURL : function(type,method,modelName,key, snapshot, queryParams,actionName,customData){
+			var adapter = store.adapter[modelName], host = this.getHost(adapter), url = "";
+			if(host != undefined){
+				url+=host;
+				if(host[host.length-1] != "/"){
+					url+="/";					
+				}
+			}
+			var namespace = this.getNamespace(adapter);
 			if(namespace != "" && namespace[namespace.length-1] != "/"){
 				url+=namespace+"/";
 			}
 			else{
 				url+=namespace;
 			}
-			if(type != "batch"){
-				url+=modelName;
-				if(key){
-					url+="/"+key;
-				}	
+			url+=modelName;
+			if(key){
+				url+="/"+key;
 			}
 			if(type == "action"){
-				url+="/"+this.getFromAdapter(adapter,"actionNamespace");
+				url+="/"+this.getActionNamespace(adapter);
 				var actions = store.modelFor(modelName).actions, action = actions[actionName].endPoint?actions[actionName].endPoint:actionName;
 				url+="/"+action;
-			} else if(type == "batch"){
-				url+=this.getFromAdapter(store.adapter.application,"batchNamespace");
 			}
             if(!queryParams){
 				queryParams = {};
 			}
 			var scope =  this.getCallBackScope(modelName, "headersForRequest"), args, ret = {method : (method)? method : ""};
 			if(scope){
-				args = this.constructArgs(type, queryParams, customData, actionName, key);
+				args = this.constructArgs(type, queryParams,customData);
 				ret.headers = this.callBack(scope, args);
 			}
 			scope = this.getCallBackScope(modelName, "buildURL");
 			if(scope){
-				args = this.constructArgs(modelName, type, queryParams, snapshot, url,actionName,customData, key);
+				args = this.constructArgs(modelName, type, queryParams, snapshot, url,actionName,customData);
 				url = this.callBack(scope, args);
 			}
 			scope = this.getCallBackScope(modelName, "methodForRequest");
 			if(scope){
-				args = this.constructArgs(method, type, queryParams, customData, actionName, key);
+				args = this.constructArgs(method, type, queryParams,customData);
 				ret.method = this.callBack(scope, args);
 			}
-            if(!store.$.makeBatch && Object.keys(queryParams).length){
+            if(!ret.data && Object.keys(queryParams).length){
 				url+="?";
 				var index = 0;
 				for(var key in queryParams){
 					if(index != 0){
 						url+="&";
 					}
-					url+=key+"="+encodeURIComponent(queryParams[key]);
+					url+=key+"="+queryParams[key];
 					index++;
 				}
 			}
@@ -3699,7 +3151,6 @@ store.adapter = {
                 ret.withCredentials = true;
             }
 			ret.url = url;
-			ret.qP = queryParams;
 			return ret;
 		},
 		getCallBackScope:function(modelName,type){
@@ -3730,22 +3181,18 @@ store.adapter = {
  			return arr;
  		},
 		get : function(type, modelName, key, queryParams, cacheQuery, customData){
-			var mdl = store.modelFor(modelName), makeBatch = store.$.makeBatch;
-			if(mdl){
+			if(store.modelFor(modelName)){
 				if(type == "findAll" && queryParams && store.model.cachedQueries && store.model.cachedQueries[modelName]){
 					var cachedQueries = store.model.cachedQueries[modelName], sendData;
 					for(var i=0; i<cachedQueries.length; i++){
 						var params = cachedQueries[i].queryParams;
-						if(this.compareObjects(params, queryParams, true)){
+						if(this.compareObjects(params, queryParams)){
 							sendData = [cachedQueries[i].data, "cache"];
 							break;
 						}
 					}
 					if(sendData){
 						return new Promise(function(resolve, reject){
-							if(makeBatch){
-								store.$.addToCachedBatch(sendData);
-							}
 							resolve(sendData);
 						});
 					}
@@ -3754,16 +3201,13 @@ store.adapter = {
 					var cachedQueries = store.model.cachedRecordQueries[modelName][key], sendData;
 					for(var i=0; i<cachedQueries.length; i++){
 						var params = cachedQueries[i].queryParams;
-						if(this.compareObjects(params, queryParams,true)){
+						if(this.compareObjects(params, queryParams)){
 							sendData = [cachedQueries[i].data, "cache"];
 							break;
 						}
 					}
 					if(sendData){
 						return new Promise(function(resolve, reject){
-							if(makeBatch){
-								store.$.addToCachedBatch(sendData);
-							}
 							resolve(sendData);
 						});
 					}
@@ -3782,24 +3226,17 @@ store.adapter = {
 							var toRet = {};
 							toRet[modelName] = records;
 							return new Promise(function(resolve, reject){
-								if(makeBatch){
-									store.$.addToCachedBatch(toRet);
-								}
 								resolve([toRet, "cache"], "success", undefined, true);
 							});
 						}
 					}
 				}
-
-				var urlObj = this.buildURL(type, "GET", modelName, key, undefined, queryParams,undefined,customData), self = this, xhr, res, rej;
+				var urlObj = this.buildURL(type, "GET", modelName, key, undefined, queryParams,undefined,customData), self = this;
 				return new Promise(function(resolve, reject){
-					res = resolve, rej = reject;
-					var model = store.modelFor(modelName);
-					var idbObj = model.idb;
 					var processRequest = self.getFromAdapter(store.adapter[modelName],"processRequest"),payLoad, sendXHR = true;
 					if(processRequest){
 						sendXHR = false;
-						var returnPromise = self.callGeneric(type,modelName,undefined,undefined,customData);
+						var returnPromise = self.callGeneric(type,modelName);
 						if(returnPromise instanceof Promise){
 							returnPromise.then(function(resp){
                                 resp = (resp == "" ? JSON.parse("{}") : JSON.parse(resp));
@@ -3813,148 +3250,55 @@ store.adapter = {
 							sendXHR = true;
 						}
 					}
-					var argsXHR = [modelName,type,key,urlObj,resolve,reject,"get"];
-					if(makeBatch){
-						store.adapter.$.constructBatch.apply(store.adapter.$, argsXHR).then(function(resObj){
-							var payLoad = resObj.content;
-							store.adapter.$.getSuccess(modelName,type,key,urlObj,undefined,resolve,payLoad,resObj);
-							resolve(payLoad);							
-						},function(){
-							store.adapter.$.sendXHR.apply(store.adapter.$, argsXHR).then(function(xhrReq){
-								store.adapter.$.getSuccess(modelName,type,key,urlObj,xhrReq,resolve);
-							},function(xhrReq){
-								store.adapter.$.getFailure(modelName,type,key,urlObj,xhrReq,reject);
-							});
-						});
-					}
-					else if(idbObj){
-						store.adapter.$.getFromIDB(idbObj, modelName, type, queryParams, key, urlObj).then(function(payLoad){
-							var scope =  store.serializer.$.getCallBackScope(modelName, "idbResponse"), args;
-							if(scope){
-								args = self.constructArgs(modelName, type, queryParams, key, payLoad);
-								payLoad = self.callBack(scope, args);
+					if(sendXHR){
+						var xhr = new XMLHttpRequest();
+						xhr.open("GET", urlObj.url, true);
+						for(var key in urlObj.headers){
+							xhr.setRequestHeader(key, urlObj.headers[key]);
+						}
+                        xhr.withCredentials = (urlObj.withCredentials)?true:false;
+						xhr.send(urlObj.data);
+						xhr.onreadystatechange = function(){
+							if(xhr.readyState == 4){
+								if(xhr.status.toString()[0] == "2" || xhr.status.toString()[0] == "3"){
+									var resp = xhr.responseText;
+                                    resp = (resp == "" ? JSON.parse("{}") : JSON.parse(resp));
+                                    if(store.adapter && store.adapter[modelName]){
+                                        var scope =  self.getCallBackScope(modelName, "parseResponse"), args;
+                                        if(scope){
+                                            args = self.constructArgs(type, modelName, xhr, resp);
+                                            resp = self.callBack(scope, args);
+                                        }
+
+                                    }
+									payLoad = self.getResponse(resp,modelName,type,key,urlObj,xhr);
+									resolve([payLoad, xhr.statusText, xhr]);
+								}
+								else{
+                                    var scope =  self.getCallBackScope(modelName, "parseResponse"), args;
+                                    if(scope){
+                                        args = self.constructArgs(type, modelName, xhr);
+                                        resp = self.callBack(scope, args);
+                                    }
+									reject(xhr);
+								}
 							}
-							if(payLoad == false){
-								store.adapter.$.sendXHR.apply(store.adapter.$, argsXHR).then(function(xhrReq){
-									store.adapter.$.getSuccess(modelName,type,key,urlObj,xhrReq,resolve);
-								}, function(xhrReq){
-									store.adapter.$.getFailure(modelName,type,key,urlObj,xhrReq,reject);
-								});							
-							}
-							else{
-								store.adapter.$.getSuccess(modelName,type,key,urlObj,undefined,resolve,payLoad);
-							}
-						},function(message){
-							store.adapter.$.sendXHR.apply(store.adapter.$, argsXHR).then(function(xhrReq){
-								store.adapter.$.getSuccess(modelName,type,key,urlObj,xhrReq,resolve);
-							}, function(xhrReq){
-								store.adapter.$.getFailure(modelName,type,key,urlObj,xhrReq,reject);
-							});							
-						});
-					}
-					else if(sendXHR){
-						store.adapter.$.sendXHR.apply(store.adapter.$, argsXHR).then(function(xhrReq){
-							store.adapter.$.getSuccess(modelName,type,key,urlObj,xhrReq,resolve);
-						},function(xhrReq){
-							store.adapter.$.getFailure(modelName,type,key,urlObj,xhrReq,reject);
-						});
+						}
 					}
 				});
-				
 			}
-			else {
-				return Promise.reject({code : "ERR19", message : Lyte.errorCodes.ERR19, data:modelName});
-			}
-		},
-		constructBatch:function(modelName,type,key,urlObj){
-			return new Promise(function(resolve, reject){
-				var batch = store.$.currentBatch;
-				var q = store.$.batch[batch] = store.$.batch[batch] || [];
-				var pro = store.$.batchPromise[batch] = store.$.batchPromise[batch] || []; 
-				var batchObj = {};
-				batchObj.method = urlObj.method;
-				batchObj.uri = "/" + urlObj.url;
-				batchObj.parameters = urlObj.qP;
-				batchObj.content = typeof urlObj.data == "string" ? JSON.parse(urlObj.data) : undefined;
-				q.push(batchObj);
-				pro.push({resolve:resolve,reject:reject});	
-			});
-		},
-		getFromIDB : function(idbObj ,modelName, type, queryParams,key, urlObj, xhr){
-			return new Promise(function(resolve, reject){
-				if(worker){
-					var reqType = idbObj.queryCache ? "getCachedData" : type == "findAll" ? "getAll" : "get";
-					var obj = {resolve : resolve, reject: reject, type:reqType, model:modelName, req:type, key:key};
-					if(reqType == "getCachedData"){
-						obj.queryParams = queryParams;
-					}
-					LyteIDB.postMessage(obj);
-				}else{
-					reject();
-				}
-			});
-		},
-		sendXHR:function(modelName,type,key,urlObj,resolve,reject,xhrType,data){
-			return new Promise(function(res, rej){
-				// var doXHR = store.$.requestHandling("add",modelName, type, key, urlObj);
-				// if(doXHR == -1){
-				// 	reject("Duplicate request "+urlObj.url);
-				// }	
-				var xhr = new XMLHttpRequest();
-				xhr.open(urlObj.method, urlObj.url, true);
-				for(var header in urlObj.headers){
-					xhr.setRequestHeader(header, urlObj.headers[header]);
-				}
-				xhr.withCredentials = (urlObj.withCredentials)?true:false;
-				store.emit("beforeRequest", [xhr, modelName, type, key]);
-				xhr.send(urlObj.data);
-				xhr.onreadystatechange = function(){
-					if(xhr.readyState == 4){
-						// store.$.requestHandling("remove",modelName, type, key, urlObj);
-						store.emit("afterRequest",[xhr, modelName, type, key]);
-						if(xhr.status.toString()[0] == "2" || xhr.status.toString()[0] == "3"){
-							return res(xhr);
-						}
-						else{
-							return rej(xhr);
-						}
-					}
-				}
-			});
-		},
-		getSuccess:function(modelName,type,key,urlObj,xhr,resolve,response,resObj){
-			var resp = response, payLoad, req = xhr, batchIndex, batch;
-			if(req){
-				resp = req.responseText;
-				resp = (resp == "" ? JSON.parse("{}") : JSON.parse(resp));
-			}
-			if(resObj){
-				batchIndex = resObj.index;
-				batch = resObj.batch;
-				req = resObj.resp;
-			}
-			if(req){
-				if(store.adapter && store.adapter[modelName]){
-					var scope =  this.getCallBackScope(modelName, "parseResponse"), args;
-					if(scope){
-						args = this.constructArgs(type, modelName, req, resp);
-						resp = this.callBack(scope, args);
-					}
-				}	
-			}
-			payLoad = this.getResponse(resp,modelName,type,key,urlObj,xhr);
-			var resArr = xhr ? [payLoad, xhr.statusText, xhr] : (batchIndex != undefined) ? [payLoad,"batch",{index:batchIndex,batch:batch}] : [payLoad];
-			resolve(resArr);
-		},
-		getFailure:function(modelName,type,key,urlObj,xhr,reject){
-			var scope =  this.getCallBackScope(modelName, "parseResponse"), args, resp;
-			if(scope){
-				args = this.constructArgs(type, modelName, xhr);
-				resp = this.callBack(scope, args);
-			}
-			reject(xhr);
+			return Promise.reject({code : "ERR19", message : Lyte.errorCodes.ERR19, data:modelName});
 		},
         getResponse:function(resp,modelName,type,key,urlObj,xhr){
+//            if(resp == ""){
+//                resp = "{}";
+//            }
+//            try{
+//                resp = JSON.parse(resp);
+//            }
+//            catch(e){
+//                //do nothin
+//            }
             resp = store.serializer.$.normalizeResponse(modelName, type, resp, key, xhr ? xhr.status : xhr, urlObj.headers);
             var scope = store.serializer.$.getCallBackScope(modelName, "extractMeta");
             var payLoad = resp,args;
@@ -3962,80 +3306,53 @@ store.adapter = {
                 payLoad = JSON.parse(payLoad);
             }
             if(scope){
-				args = this.constructArgs(payLoad,modelName,type);
-				var metaRes = this.callBack(scope, args);
-				if(!store.$.isEmpty(metaRes)){
-					payLoad.meta = metaRes;
-				}
-			}
-			var keys = Object.keys(payLoad);
-			var len = keys.length; 
-            if(len){				
-				scope = store.serializer.$.getCallBackScope(modelName, "payloadKey");
-				if(scope){
-					args = this.constructArgs(modelName,type);
-					var plKey = this.callBack(scope, args);
-					if(plKey && plKey != modelName){
-						var temp = payLoad[plKey];
-						payLoad[modelName] = temp;
-						delete payLoad[plKey];
-					}
-				}
+                args = this.constructArgs(payLoad,modelName,type);
+                payLoad.meta = this.callBack(scope, args);
+            }
+            if(payLoad){
                 scope = store.serializer.$.getCallBackScope(modelName, "deserializeKey");
                 if(scope){
-					Lyte.warn("LD08", "deserializeKey", "callback", "Please use payloadKey callback instead");
-					if(len > 2){
-						Lyte.error("LD09");
-					}
-						var index = 0;
-						if(len == 2 && keys[0] == "meta"){
-							index = 1;
-						}
-						args = this.constructArgs(modelName,type);
-						var deserializeKey = this.callBack(scope, args), rec = payLoad[keys[index]];
-						delete payLoad[keys[index]];
-						payLoad[deserializeKey] = rec;
-					// }
-					// else if(len > 2){
-					// 	console.error("Couldn't resolve using deserializekey, since there are more than 2 keys in the payLoad",modelName,type,Object.assign({},payLoad));
-					// }
-				}
+                    var keys = Object.keys(payLoad), index = 0;
+                    if(keys.length == 2 && keys[0] == "meta"){
+                        index = 1;
+                    }
+                    args = this.constructArgs(modelName,type);
+                    var deserializeKey = this.callBack(scope, args), rec = payLoad[keys[index]];
+                    delete payLoad[keys[index]];
+                    payLoad[deserializeKey] = rec;
+                }
 //					store.serializer.$.buildJSON(modelName, type, payLoad, key, xhr.status, urlObj.headers);
                 store.serializer.$.normalize(modelName, type, payLoad, key, xhr ? xhr.status : xhr, urlObj.headers);
             }
             return payLoad;
 		},
-		create : function(modelName, data, isSingleRecord, customData, qP){
-			var type= isSingleRecord ? "createRecord": "create";
-			var urlObj = this.buildURL(type, "POST", modelName, undefined, data,qP,undefined,customData);
-			var changedData = store.$.toJSON(modelName, data, undefined, "create");
-			store.$.removeNotDefinedKeys(store.modelFor(modelName), changedData);
-			this.sendingData(modelName, changedData, urlObj, type, customData, data);
-			return this.handleRequest(urlObj, modelName, data, type, changedData, customData);
-		},
-		put : function(modelName, data, record, isSingleRecord,customData, qP){
-			var type = (isSingleRecord) ? "updateRecord" : "update";
-			var urlObj = this.buildURL(type, "PATCH", modelName, isSingleRecord ? data[store.modelFor(modelName)._primaryKey] : undefined, data,qP,undefined,customData);
-            var updatedData = store.$.toJSON(modelName, data);
+		put : function(modelName, data, record, isSingleRecord,customData){
+			var type=(isSingleRecord)?"updateRecord":"update", urlObj = this.buildURL(type, "PATCH", modelName, isSingleRecord ? data[store.modelFor(modelName)._primaryKey] : undefined, data,undefined,undefined,customData);
+             var updatedData = store.$.toJSON(modelName, data);
             store.$.removeNotDefinedKeys(store.modelFor(modelName), updatedData);
-			this.sendingData(modelName, updatedData, urlObj,type,customData, record);
-			return this.handleRequest(urlObj, modelName, record, type, updatedData, customData);
+			this.sendingData(modelName, updatedData, urlObj,type,customData);
+			return this.handleRequest(urlObj, modelName, record, type);
 		},
-		del : function(modelName, data, isSingleRecord, destroy, customData, qP){
-			var type = destroy || "deleteRecord";
+		del : function(modelName, data, isSingleRecord,destroy, customData){
 			var pk = store.modelFor(modelName)._primaryKey;
-			var urlObj = this.buildURL(type, "DELETE", modelName, isSingleRecord ? data[pk] : undefined, data,qP,undefined,customData);
-			var ids = [];
+			var type = destroy || "deleteRecord", urlObj = this.buildURL(type, "DELETE", modelName, isSingleRecord ? data[pk] : undefined, data,undefined,undefined,customData);
+			var ids = {};
 			if(!isSingleRecord){
 				ids = data.map(function(val){
 					return val[pk];
 				});				
 			}
-			var pkVal = (isSingleRecord) ?  (data ? data[pk] : undefined) : ids;
-			this.sendingData(modelName, pkVal, urlObj, type, customData, data);
-			return this.handleRequest(urlObj, modelName, data, type, pkVal, customData);
+			this.sendingData(modelName, (isSingleRecord) ?  (data ? data[pk] : undefined) : ids, urlObj,type,customData);
+			return this.handleRequest(urlObj, modelName, data, type);
 		},
-		sendingData:function(modelName,data,urlObj,type,customData,snapshot){
+		create : function(modelName, data, isSingleRecord, customData){
+			var changedData = store.$.toJSON(modelName, data);
+			store.$.removeNotDefinedKeys(store.modelFor(modelName), changedData);
+			var type= isSingleRecord ? "createRecord": "create", urlObj = this.buildURL(type, "POST", modelName, undefined, data,undefined,undefined,customData);
+			this.sendingData(modelName, changedData, urlObj,type,customData);
+			return this.handleRequest(urlObj, modelName, data, type);
+		},
+		sendingData:function(modelName,data,urlObj,type,customData){
 			var scope = store.serializer.$.getCallBackScope(modelName, "serializeKey");
 			var serializeKey = modelName;
 			var payload = {};
@@ -4051,7 +3368,7 @@ store.adapter = {
 			}
 			var scope = store.serializer.$.getCallBackScope(modelName, "serialize");
 			if(scope){
-				var args = this.constructArgs(type,payload,snapshot,customData,modelName);
+				var args = this.constructArgs(type,payload,data,customData);
 				payload = this.callBack(scope, args);
 			}
             if(type !== "deleteRecord" && type !== "destroyRecord" ){
@@ -4063,39 +3380,34 @@ store.adapter = {
 				}
 			}
 		},
-		handleAction:function(actionName,model,record,customData,qP){
+		handleAction:function(actionName,model,record,customData){
 			var pkVal;
 			if(record && Lyte.isRecord(record)){
 				pkVal = record.$.get(model._primaryKey);				
 			}
-			var modelName = model._name;
 			var method = "action";
-			var urlObj = this.buildURL(method, "POST", model._name, pkVal, record, qP, actionName,customData);
+			var urlObj = this.buildURL(method, "POST", model._name, pkVal, record, undefined, actionName,customData);
 			var scope = store.serializer.$.getCallBackScope(model._name, "serialize");
 			if(scope){
-				var args = this.constructArgs(actionName,undefined,record,customData,modelName);
+				var args = this.constructArgs(actionName,undefined,record,customData);
 				urlObj.data = this.callBack(scope, args);
 			}
-			return this.handleRequest(urlObj, model._name, undefined, method,undefined,customData);
+			return this.handleRequest(urlObj, model._name, undefined, method);
 		},
-		handleRequest:function(urlObj,modelName,data,type,changedData,customData){
+		handleRequest:function(urlObj,modelName,data,type){
 			if(urlObj.data && (typeof urlObj.data == "object" || Lyte.isRecord(urlObj.data) || Array.isArray(urlObj.data)) && !(urlObj.data instanceof FormData)){
 				urlObj.data = JSON.stringify(urlObj.data);
 			}
-			var self = this, xhr;
+			var self = this;
 			return new Promise(function(resolve, reject){
 				var processRequest = self.getFromAdapter(store.adapter[modelName],"processRequest"),sendXHR = true;
-				var makeBatch = store.$.makeBatch;
 				if(processRequest){
 					sendXHR = false;
-					var returnPromise = self.callGeneric(type,modelName,urlObj.data,data,customData),response;
+					var returnPromise = self.callGeneric(type,modelName,urlObj.data,data),response;
 					if(returnPromise instanceof Promise){						
 						returnPromise.then(function(resp){
                             resp = (resp == "" ? JSON.parse("{}") : JSON.parse(resp));
 							response = self.genericResponse(resp,modelName,type,data,urlObj);
-							if(response == false){
-								reject("Data is not in the format as store expects in "+modelName+" for type- "+type);								
-							}
 							resolve(response);
 						},function(message){
 							reject(message);
@@ -4105,163 +3417,42 @@ store.adapter = {
 						sendXHR = true;
 					}
 				}
-				if(makeBatch){
-					store.adapter.$.constructBatch(modelName,type,key,urlObj).then(function(respObj){
-						var resp = respObj.content; 
-						store.adapter.$.handleSuccess(modelName, type, xhr, data, urlObj, resolve, resp, respObj);
-						resolve(resp);
-					},function(){
-						store.adapter.$.handleFailure(modelName, type, xhr, reject);
-					});
-				}
-				else if(sendXHR){
-					var argsXHR = [modelName,type,key,urlObj,resolve,reject,"other",data];
-					store.adapter.$.sendXHR.apply(store.adapter.$, argsXHR).then(function(xhrReq){
-						store.adapter.$.handleSuccess(modelName, type, xhrReq, data, urlObj, resolve);					
-					},function(xhrReq){
-						store.adapter.$.handleFailure(modelName, type, xhrReq, reject);
-					});
+				if(sendXHR){
+					var xhr = new XMLHttpRequest();
+					xhr.open(urlObj.method, urlObj.url, true);
+					for(var key in urlObj.headers){
+						xhr.setRequestHeader(key, urlObj.headers[key]);
+					}
+                    xhr.withCredentials = (urlObj.withCredentials)?true:false;
+					xhr.send(urlObj.data);
+					xhr.onreadystatechange = function(){
+						if(xhr.readyState == 4){
+							if(xhr.status.toString()[0] == "2" || xhr.status.toString()[0] == "3"){
+								var resp = xhr.responseText,response;
+                                resp = (resp == "" ? JSON.parse("{}") : JSON.parse(resp));
+                                if(store.adapter && store.adapter[modelName]){
+                                    var scope =  self.getCallBackScope(modelName, "parseResponse"), args;
+                                    if(scope){
+                                        args = self.constructArgs(type, modelName, xhr, resp);
+                                        resp = self.callBack(scope, args);
+                                    }
+
+                                }
+								response = self.genericResponse(resp,modelName,type,data,urlObj,xhr)
+								resolve(response);
+							}
+							else{
+                                var scope =  self.getCallBackScope(modelName, "parseResponse"), args;
+                                if(scope){
+                                    args = self.constructArgs(type, modelName, xhr);
+                                    resp = self.callBack(scope, args);
+                                }
+								reject(xhr);
+							}
+						}
+					}
 				}
 			});
-			
-		},
-		handleSuccess:function(modelName, type, xhr, data, urlObj, resolve, resp, respObj){
-			var resp = resp ? resp : xhr.responseText, response, req, batchIndex, batch;
-			resp = (resp == "" ? JSON.parse("{}") : typeof resp == "string" ? JSON.parse(resp) : resp);
-			if(xhr){
-				req = xhr;
-			}
-			if(respObj){
-				batchIndex = respObj.index;
-				batch = respObj.batch;
-				req = respObj.resp;
-			}
-			if(req){
-				if(store.adapter && store.adapter[modelName]){
-					var scope =  this.getCallBackScope(modelName, "parseResponse"), args;
-					if(scope){
-						args = this.constructArgs(type, modelName, req, resp);
-						resp = this.callBack(scope, args);
-					}
-				}	
-			}
-
-			response = this.genericResponse(resp,modelName,type,data,urlObj,xhr);
-			if(response == false){
-				reject("Response is not in the format as store expects in model, "+modelName+" for type "+type);
-			}
-			else{
-				if(batchIndex != undefined){
-					store.$.batchResponse[batch][batchIndex] = response;
-				}
-				if(type != "action"){
-					this.updateIDB(modelName,type,data);
-				}
-				resolve(response);
-			}
-		},
-		handleFailure:function(modelName, type, xhr, reject){
-			if(xhr){
-				var scope =  this.getCallBackScope(modelName, "parseResponse"), args;
-				if(scope){
-					args = this.constructArgs(type, modelName, xhr);
-					resp = this.callBack(scope, args);
-				}	
-			}
-			reject(xhr);
-		},
-		updateIDB:function(modelName,type, data){
-			if(data && !Array.isArray(data)){
-				data = [data];
-			}
-			var q =	store.$.idbQ2[modelName] = store.$.idbQ2[modelName] || [];
-			if(data){
-				switch(type){
-					case "update":
-					case "updateRecord":
-					{
-						data.forEach(function(item, index){
-							if(item && Lyte.isRecord(item)){
-								var model = store.model[modelName];
-								var relations = model.relations;
-								var parent = item.$.parent;
-								if(parent){
-									var pModel = parent.$.model._name;
-									var parentQ = store.$.idbQ2[pModel] = store.$.idbQ2[pModel] || [];
-									parentQ.push({type:"updateRecord",model:pModel,data:parent.$.toJSON(true)});
-								}
-								else{
-									q.push({type:"updateRecord",model:modelName,data:item.$.toJSON(true)});
-								}
-								store.adapter.$.updateRelationsIDB(item, relations);
-								store.$.addToIDBonSave(modelName,item);
-							}
-						});
-						break;
-					}
-					case "delete":
-					case "deleteRecord":
-					case "destroyRecord":
-					{
-						var parent, pModel, parentQ;
-						var pK = store.modelFor(modelName)._primaryKey;
-						data.forEach(function(item, index){
-							if(item && Lyte.isRecord(item)){
-								var model = store.model[modelName];
-								var relations = model.relations;
-								parent = item.$.parent;
-								if(parent){
-									pModel = parent.$.model._name;
-									parentQ = store.$.idbQ2[pModel] = store.$.idbQ2[pModel] || [];
-									parentQ.push({type:"updateRecord",model:parent.$.model._name,data:parent.$.toJSON(true)});
-								}
-								else{
-									q.push({type:"deleteRecord",model:modelName,key:item[pK]});
-								}
-								store.adapter.$.updateRelationsIDB(item, relations);
-								store.$.removeOnSave(modelName,item[pK]);
-							}
-						});
-						break;
-					}
-					case "create":
-					case "createRecord":{
-						data.forEach(function(item, index){
-							if(item && Lyte.isRecord(item)){
-								var model = store.model[modelName];
-								var relations = model.relations;
-								q.push({type:"createRecord",model:modelName,data:item.$.toJSON(true)});
-								store.adapter.$.updateRelationsIDB(item, relations);
-								store.$.addToIDBonSave(modelName,item);
-							}
-						});
-						break;
-					}
-				}
-			}
-		},	
-		updateRelationsIDB : function(item, relations){
-			for(var key in relations){
-				var rel = relations[key];
-				rel.forEach(function(obj){
-					var relKey = obj.relKey;
-					var relModel = obj.relatedTo;
-					var relQ = store.$.idbQ2[relModel] = store.$.idbQ2[relModel] || [];										
-					var data = item[relKey];
-					if(data){
-						if(Array.isArray(data)){
-							data.forEach(function(rec){
-								if(Lyte.isRecord(rec) && !rec.$.parent && rec.$.inIDB){
-									relQ.push({type:"updateRecord",model:relModel,data:rec.$.toJSON(true)});
-								}
-							});
-						}
-						else if(Lyte.isRecord(data) && !data.$.parent && data.$.inIDB){
-							relQ.push({type:"updateRecord",model:relModel,data:data.$.toJSON(true)});
-						}
-					}
-				});
-			}
 		},
         callGeneric : function(type, modelName,data,record,customData){
 			var scope = this.getCallBackScope(modelName, "processRequest"),result;
@@ -4272,80 +3463,57 @@ store.adapter = {
 			return result;
 		},
 		genericResponse:function(resp,modelName,type,data,urlObj,xhr){
+//			if(resp == ""){
+//				resp = "{}";
+//			}
+//			var response = JSON.parse(resp);
             var response = resp;
             var scope,args;
 			scope = store.serializer.$.getCallBackScope(modelName, "extractMeta");
 			if(scope){
 				args = this.constructArgs(response,modelName,type);
-				var metaRes = this.callBack(scope, args);
-				if(!store.$.isEmpty(metaRes)){
-					response.meta = metaRes;
+				response.meta = this.callBack(scope, args);
+			}
+			if(response){
+				response = store.serializer.$.buildJSON(modelName, type, response, Lyte.isRecord(data) ? data[store.modelFor(modelName)._primaryKey] :undefined ,xhr ? xhr.status : xhr, urlObj.headers);
+                var scope = store.serializer.$.getCallBackScope(modelName, "deserializeKey");
+				if(scope){
+					var keys = Object.keys(response), index = 0;
+					if(keys.length == 2 && keys[0] == "meta"){
+						index = 1;
+					}
+					var args = this.constructArgs(modelName,type), deserializeKey = this.callBack(scope, args), rec = response[keys[index]];
+					delete response[keys[index]];
+					response[deserializeKey] = rec;
 				}
 			}
-			if(response && type != "action"){
-				response = store.serializer.$.buildJSON(modelName, type, response, Lyte.isRecord(data) ? data[store.modelFor(modelName)._primaryKey] :undefined ,xhr ? xhr.status : xhr, urlObj.headers);
-				scope = store.serializer.$.getCallBackScope(modelName, "payloadKey");
-				if(scope){
-					args = this.constructArgs(modelName,type);
-					var plKey = this.callBack(scope, args);
-					if(plKey && plKey != modelName){
-						var temp = response[plKey];
-						response[modelName] = temp;		
-						delete response[plKey];
-					}			
-				}					
-				var keys = Object.keys(response);
-				var len = keys.length;
-				scope = store.serializer.$.getCallBackScope(modelName, "deserializeKey");
-				if(scope){
-					Lyte.warn("LD08", "deserializeKey", "callback", "Please use payloadKey callback instead");
-					if(len > 2){
-						Lyte.error("LD09");
-					}
-						var index = 0;
-						if(keys[0] == "meta"){
-							index = 1;
-						}
-						var args = this.constructArgs(modelName,type), deserializeKey = this.callBack(scope, args), rec = response[keys[index]];
-						delete response[keys[index]];
-						response[deserializeKey] = rec;	
-				}	
+			if(type != "action"){
 				this.handleResponse(urlObj, data, response[modelName], xhr ? xhr.statusText : xhr, xhr, store.modelFor(modelName));
 			}
 			return response;
 		},
         checkResponse:function(data,model,response,pK){
-		//var rawData = Lyte.isRecord(data) ? data.$.toJSON() : undefined;
-			var dirtyId;
-			if(data.$.isNew){
+            if(data.$.isNew){
             	if(data.hasOwnProperty(pK) && response.hasOwnProperty(pK)){
-					dirtyId = data[pK];
-					if(typeof LyteComponent != "undefined"){
+            		if(typeof LyteComponent != "undefined"){
             			LyteComponent.set(data,pK,response[pK],true);
             		}
             		else{
             			data[pK] = response[pK];
             		}
             	}
-                var result = store.$.validateAndMerge(model, response);						
-				data.$.isNew = false;
-				if(result == false){
-					Lyte.error("LD01", response);
-				}
+                store.$.validateAndMerge(model, response);						
+                data.$.isNew = false;
             }
             if(data.$.isModified){
-				dirtyId = data[pK];
                 data.$.isModified = false;
-				data.$._attributes = {};
+                data.$._attributes = {};
                 if(!data.$.isDeleted && response){
-				   var result =  store.$.validateAndMerge(model, response);
-				   if(result == false){
-					  Lyte.error("LD01", response);
-				   }						
+                    store.$.validateAndMerge(model, response);						
                 }
             }
             if(model.dirty.length){
-                store.$.deleteFromArray(model.dirty, dirtyId);
+                store.$.deleteFromArray(model.dirty, data[pK]);
             }
             if(data.$.isDeleted){
                 data.$.isDeleted = false;
@@ -4364,24 +3532,24 @@ store.adapter = {
                     records.$.isModified = false;
                 }
             }
-			store.$.clearRecordError(data.$);   
+            store.$.clearRecordError(data.$);    
         },
 		handleResponse:function(urlObj,data, response,textStatus,xhr, model){
 			var pK = model._primaryKey;
 			if(Array.isArray(data)){
 				for(var i=0; i<data.length; i++){
-				  ret = this.checkResponse(data[i],model,Array.isArray(response) ? response[i] : response,pK);	
-				}
+				  this.checkResponse(data[i],model,Array.isArray(response) ? response[i] : response,pK);	
+                }
 			}
 			else{
                 this.checkResponse(data,model,response,pK);	
-			}
+            }
 		},
         /*Compares two objects
         params - obj1, obj2
         return true/false
         */
-		compareObjects : function(obj1, obj2, qP){
+		compareObjects : function(obj1, obj2){
             if(!(obj1 instanceof Object) || !(obj2 instanceof Object)){
                 return false;
             }
@@ -4390,44 +3558,30 @@ store.adapter = {
 			}
 			for(var key in obj1){
 				var val1 = obj1[key], val2 = obj2[key];
-				if(qP && Array.isArray(val1) && Array.isArray(val2)){
-					var len = val1.length;
-					for(var i=0; i<len; i++){
-						if(val1[i] != val2[i]){
-							return false;
-						}
-					}
-				}
-				else if(val2 == undefined || val1 != val2){
+				if(val2 == undefined || val1 != val2){
 					return false;
 				}
 			}
 			return true;
 		},
-		handleBatchPromise:function(obj){
-			var response = obj.response;
-			var batch = obj.batch;
-			//callback
-			scope = store.serializer.$.getCallBackScope("application", "normalizeResponse");
-			if(scope){
-				args = this.constructArgs(undefined,"batch",obj.response);
-				response = this.callBack(scope, args);
+        /*Returns the specified action namespace of a model
+        params - adapter
+        return - namespace
+        */
+		getActionNamespace : function(adapter){
+			var namespace = adapter ? adapter.actionNamespace : undefined;
+			while(namespace == undefined){
+				if(adapter && adapter.$super){
+					adapter = adapter.$super;
+					namespace = adapter ? adapter.actionNamespace : undefined;					
+				}
+				else{
+					adapter = store.adapter.application;
+					namespace = (adapter && adapter.actionNamespace) ? adapter.actionNamespace : "action";
+				}
 			}
-			var resp = response.batch_requests;
-			resp.forEach(function(item, index){
-				var pro = store.$.batchPromise[batch][index];
-				var code = item.status.toString()[0];
-				if(code == "2"){
-					pro.resolve({content:item.content,index:index,batch:batch,resp:item});
-				}
-				else if(code == "4" || code == "5"){
-					pro.reject();
-				}
-			});
-			// obj.resolve(response);
-			delete store.$.batch[batch];
-			delete store.$.batchPromise[batch];
-		}
+			return namespace;
+        }
 	}
 }
 Object.defineProperty(store.adapter,"extends",{
@@ -4443,7 +3597,6 @@ Object.defineProperty(store.adapter,"extends",{
 			return store.adapter[adapterName];
 	}
 });
-
 function Serializer(opts,parent,name){
 	for(key in opts){
 		this[key] = opts[key];
@@ -4456,27 +3609,24 @@ function Serializer(opts,parent,name){
 				self[key] = mixin[key];
 			}
 		});
-    }
-    this.__extendedBy = [];
+	}
+    
     if(store.serializer.__toAddSuper && store.serializer.__toAddSuper.hasOwnProperty(name)){
         var addSuper = store.serializer.__toAddSuper[name];
         for(var i=0; i<addSuper.length; i++){
             var child = store.serializer[addSuper[i]];
-            if(child.is == "serializer"){
+            if(child.isSerializer){
                 child.$super = this;
-                this.__extendedBy.push(addSuper[i]);
             }
         }
         delete store.serializer.__toAddSuper[name];
     }
 	Object.defineProperty(this,"extends", {
 		enumerable: false,
-		value: function value(name){
-			store.$.extendCallback.call(this,store,"serializer",name);
-		}
+		value: store.$.extendSerializer
 	});
-	Object.defineProperty(this,"is", {
-		value: "serializer",
+	Object.defineProperty(this,"isSerializer", {
+		value: true,
 		enumerable:false
 	});
     Object.defineProperty(this,"__name", {
@@ -4503,31 +3653,35 @@ store.serializer = {
                 }
             }
         },
-        buildJSON:function(modelName, type, payLoad, id, status, headers){
+        buildJSON:function(modelName,type,payLoad,id, status, headers){
             var scope = this.getCallBackScope(modelName, "normalizeResponse");
             var realData = payLoad;
             if(scope){
                 var args = store.adapter.$.constructArgs(modelName, type, realData, id, status, headers);
                 realData = store.adapter.$.callBack(scope, args);
             }
-            var changed = false, recs;
+            var changed = false;
             if(/^(findRecord|findAll)$/.test(type) || realData[modelName]){
-                recs = realData[modelName];
+                realData = realData[modelName];
                 changed = true;
-                scope = this.getCallBackScope(modelName, "normalize");
-                if(scope){
-                    if(Array.isArray(recs)){
-                        for(var i=0; i<recs.length; i++){
-                            var args = store.adapter.$.constructArgs(modelName, type, recs[i]);
-                            recs[i] = store.adapter.$.callBack(scope, args);
-                        }
-                    }					
-                    else{
-                        var args = store.adapter.$.constructArgs(modelName, type, recs);
-                        recs = store.adapter.$.callBack(scope, args);
+            }
+            scope = this.getCallBackScope(modelName, "normalize");
+            if(scope){
+                if(Array.isArray(realData)){
+                    for(var i=0; i<realData.length; i++){
+                        var args = store.adapter.$.constructArgs(modelName, type, realData[i]);
+                        realData[i] = store.adapter.$.callBack(scope, args);
                     }
+                }					
+                else{
+                    var args = store.adapter.$.constructArgs(modelName, type, realData);
+                    realData = store.adapter.$.callBack(scope, args);
                 }
-                realData[modelName] = recs;
+            }
+            if(changed){
+                payLoad = {};
+                payLoad[modelName] = realData;
+                return payLoad;
             }
             return realData;
         },
@@ -4577,113 +3731,26 @@ Object.defineProperty(store.serializer,"extends",{
 	}
 });
 Object.defineProperties(store,{
-	triggerUpdate:{
-		enumerable:false,
-		value: function value(modelName, pkVal, keys, qP, customData){
-			var obj = {};
-			var record = store.peekRecord(modelName, pkVal);
-			if(record){
-				var model = record.$.model;
-				var pK = model._primaryKey;
-				var fields = keys || Object.keys(model.fieldList);	
-				fields.forEach(function(item){
-					obj[item] = record[item];
-				});
-				obj[pK] = record[pK];
-				return store.adapter.$.put(modelName, obj, record, true, customData, qP);	
-			}
-			return Promise.reject("No such record found");
-		}
-	},
-	batch:{
-		enumerable:false,
-		value:function value(func){
-			return new Promise(function(resolve, reject){
-				store.$.makeBatch = true;
-				store.$.batch = store.$.batch || {};
-				store.$.batchPromise = store.$.batchPromise || {};
-				var bLen = (store.$.currentBatch === undefined) ? Object.keys(store.$.batch).length : (store.$.currentBatch + 1);
-				var batch = store.$.currentBatch = bLen;
-				try{
-					func();
-				}
-				catch(e){
-					store.$.makeBatch = false;
-					throw e;
-				}
-				store.$.makeBatch = false;
-				var payLoad = {batch:store.$.batch[batch]};
-				var urlObj = store.adapter.$.buildURL("batch", "POST", "application");
-				var batchPl = payLoad.batch;
-				if(store.$.isEmpty(batchPl) || batchPl == {}){
-					if(store.$.cachedBatch && store.$.cachedBatch[batch] && store.$.cachedBatch[batch].length){
-						var finalRes = store.$.handleCachedResponse(batch, []);
-						return resolve(finalRes);
-					}
-					return resolve();					
-				}
-				var scope = store.serializer.$.getCallBackScope("application", "serialize");
-				if(scope){
-					var args = store.adapter.$.constructArgs("batch",payLoad);
-					payLoad = store.adapter.$.callBack(scope, args);
-				}
-				var xhr = new XMLHttpRequest();
-				xhr.open("POST", urlObj.url, true);
-				for(var header in urlObj.headers){
-					xhr.setRequestHeader(header, urlObj.headers[header]);
-				}
-				xhr.withCredentials = (urlObj.withCredentials)?true:false;
-				xhr.send(JSON.stringify(payLoad));
-				xhr.onreadystatechange = function(){
-					if(xhr.readyState == 4){
-						if(xhr.status.toString()[0] == "2" || xhr.status.toString()[0] == "3"){
-							var resp = JSON.parse(xhr.responseText);
-							store.$.batchResponse = store.$.batchResponse || {};
-							store.$.batchResponse[batch] = [];
-							store.adapter.$.handleBatchPromise({response:resp,batch:batch,resolve:resolve});
-							setTimeout(function(){
-								var finalRes = store.$.handleCachedResponse(batch, store.$.batchResponse[batch]);
-								resolve(finalRes);
-								store.$.batchResponse[batch] = [];
-							},0);
-						}
-						else{
-							setTimeout(function(){
-								reject();
-							},0);
-						}
-					}
-				}					
-			});
-		}
-	},
 	pushPayload:{
 		enumerable:false,
 		value:function value(modelName,data,deserialize){
 			var model = store.modelFor(modelName);
-	    	var result = data, len;
+            var result = data;
 			if(deserialize){
                 data = store.serializer.$.buildJSON(modelName,"pushPayload",data);
                 var scope = store.serializer.$.getCallBackScope(modelName, "deserializeKey");
-		len = data ? Object.keys(data).length : undefined;
                 if(scope){
-					Lyte.warn("LD08", "deserializeKey", "callback", "Please use payloadKey callback instead");
-					if(len > 2){
-						Lyte.error("LD09");
-					}
-					var keys = Object.keys(data), index = 0;
-					if(keys.length == 2 && keys[0] == "meta"){
-						index = 1;
-					}
-					var args = store.adapter.$.constructArgs(modelName,"pushPayload"), deserializeKey = store.adapter.$.callBack(scope, args), rec = data[keys[index]];
-					delete data[keys[index]];
-					data[deserializeKey] = rec;
-					
+                    var keys = Object.keys(data), index = 0;
+                    if(keys.length == 2 && keys[0] == "meta"){
+                        index = 1;
+                    }
+                    var args = store.adapter.$.constructArgs(modelName,"pushPayload"), deserializeKey = store.adapter.$.callBack(scope, args), rec = data[keys[index]];
+                    delete data[keys[index]];
+                    data[deserializeKey] = rec;
                 }
                 result = data[modelName];
 			}
-			store.$.idbQ2Push(modelName,data,undefined,"pushPayload");
-  			data = store.$.insertIntoStore(model, result, true);
+  			data = store.$.insertIntoStore(model, result);
 			delete model.rel;
 			return data;
 		}
@@ -4694,11 +3761,10 @@ Object.defineProperties(store,{
 			if(store.model.hasOwnProperty(name)){
 				throw new Error("Model with name - "+name+" - already exists");
 			}
-			var extend,actions,idb;
+			var extend,actions;
 			if(options && typeof options == "object"){
-				extend = options.extends || undefined;
-				actions = options.actions || undefined;
-				idb = options.idb || undefined;
+				extend = (options.extends) ? options.extends : undefined;
+				actions = (options.actions) ? options.actions : undefined;
 			}
 			if(extend){
 				var parentFields = Object.assign({},store.model[extend].fieldList);
@@ -4736,58 +3802,19 @@ Object.defineProperties(store,{
 			if(actions){
 				store.model[name].actions = actions;
 			}
-			if(idb){
-				store.model[name].idb = idb;
-			}
 			return store.model[name];
 		}
 	},
-    unregisterModel:{
-      enumerable:false,
-      value:function(name){
-		var model = store.modelFor(name);
-		if(!model){
-			Lyte.error("LD02","Model ",name);
-			return;
-		}
-		if(model.data.length){
-			store.unloadAll(name);
-		}
-		var extendedBy = model.extendedBy;
-		if(extendedBy && Object.keys(extendedBy).length){
-			for(var ext in extendedBy){
-				store.unregisterModel(ext);
-			}
-		}
-		var extend = model.extend;
-		if(extend){
-			var ext = store.modelFor(extend);
-			delete ext.extendedBy[name];
-		}
-		delete store.model[name];  
-      }
-	},
-	unregisterAdapter:{
-		enumerable:false,
-		value:function value(name){
-			store.$.unregisterCallback("adapter",name);
-		}
-	},
-	unregisterSerializer:{
-		enumerable:false,
-		value:function value(name){
-			store.$.unregisterCallback("serializer",name);
-		}
-	},
-	addField:{
-		enumerable:false,
-		value:function value(modelName,key,type,options){
-			var model = store.modelFor(modelName);
-			var field = Lyte.attr(type,options);
-			var obs = [];
-			store.$.registerField(model,key,field,obs);
-		}
-	},
+    // unregisterModel:{
+    //   enumerable:false,
+    //   value:function(name){
+    //      var model = store.modelFor(name);
+    //      if(model.data.length){
+    //          store.unloadAll(name);
+    //      }
+    //      delete store.model[name];  
+    //   }
+    // },
 	modelFor:{
 		enumerable:false,		
 		value:function value(name){
@@ -4817,9 +3844,7 @@ Object.defineProperties(store,{
 		value : function value(modelName, queryParams, cacheQuery,cacheData,customData){
 			return store.adapter.$.get("findAll", modelName, undefined, queryParams, cacheQuery,customData).then(function(){
 				var data = arguments[0][0];
-				var fromCache = arguments[0][1] == "cache" ? true : false; 
-				var batchObj = arguments[0][1] == "batch" ? arguments[0][2] : undefined; 
-				var fromIDB = arguments[0][1] == "idb" ? true : false;
+                var fromCache = arguments[0][1] == "cache" ? true : false;
 				if(cacheData === false){
                     if(cacheQuery && Object.keys(queryParams).length > 0){
 						store.$.cacheQuery(modelName, queryParams, data);
@@ -4828,31 +3853,20 @@ Object.defineProperties(store,{
 				}
 				if(data && !data.save){
 					if(!fromCache){
-//						var rawData = Lyte.deepCopyObject(data);
-						if(!fromIDB){
-							store.$.idbQ2Push(modelName,data,queryParams,"findAll");
-						}
-						var records = store.$.toInsertData(modelName, data,true);
-						data[modelName] = records;
+						var rawData = Object.assign({}, data);
+						var records = store.$.toInsertData(modelName, data);
+                        data[modelName] = records;
 						if(data.meta && records){
-							if(!data[modelName].$){
-								Object.defineProperty(data[modelName], "$", {
-									enumerable : false,
-									value : {meta : data.meta}
-								});	
-							}
-							else{
-								data[modelName].meta = data.meta;
-							}
+							Object.defineProperty(data[modelName], "$", {
+								enumerable : false,
+								value : {meta : data.meta}
+							});
 						}
 						if(cacheQuery && Object.keys(queryParams).length > 0){
-							store.$.cacheQuery(modelName, queryParams, data);								
+                            store.$.cacheQuery(modelName, queryParams, data);								
 						}						
 					}
-					if(batchObj != undefined){
-						store.$.batchResponse[batchObj.batch][batchObj.index] = data[modelName];
-					}
-					return data[modelName];	
+					return data[modelName];
 				}
 				return arguments;
 			}, function(e){
@@ -4874,8 +3888,6 @@ Object.defineProperties(store,{
 			}
 			return store.adapter.$.get("findRecord", modelName, key, queryParams, cacheQuery,customData).then(function(){
 				var data = arguments[0][0], fromCache = arguments[0][1] == "cache" ? true : false;
-				var batchObj = arguments[0][1] == "batch" ? arguments[0][2] : undefined; 
-				var fromIDB = arguments[0][1] == "idb" ? true : false;
 				if(cacheData === false){
                     if(arguments[0][1] != "cache" && cacheQuery && Object.keys(queryParams).length > 0){
 						store.$.cacheRecordQuery(modelName, key, queryParams, data);
@@ -4884,25 +3896,19 @@ Object.defineProperties(store,{
 				}
 				if(data){
 					if(!fromCache){
-						//var rawData = Lyte.deepCopyObject(data);
-						if(!fromIDB){
-							store.$.idbQ2Push(modelName,data,queryParams,"findRecord",key);
-						}
+						var rawData = Object.assign({}, data);
 						if(!Lyte.isRecord(data)){
-							var record = store.$.toInsertData(modelName, data, true);
+							var record = store.$.toInsertData(modelName, data);
 							data[modelName] = record;
 							if(data.meta){
 								record.$.meta = data.meta;
 							}
 						}
 						if(arguments[0][1] != "cache" && cacheQuery && Object.keys(queryParams).length > 0){
-							store.$.cacheRecordQuery(modelName, key, queryParams, data);
-						}						
+                            store.$.cacheRecordQuery(modelName, key, queryParams, data);
+                        }						
 					}
-					if(batchObj != undefined){
-						store.$.batchResponse[batchObj.batch][batchObj.index] = data[modelName];
-					}
-					return data[modelName];	
+					return data[modelName];
 				}
 				return arguments;
 			}, function(e){
@@ -4915,7 +3921,7 @@ Object.defineProperties(store,{
 		value : function value(modelName, pKey){
 			var model = this.modelFor(modelName);
 			if( !model ){
-				Lyte.error("LD02","Model ",modelName);
+				console.error("No model found for ",modelName);
 				return;
 			}
 			var data = model.data, primaryKey = this.model[modelName]._primaryKey;
@@ -4927,6 +3933,7 @@ Object.defineProperties(store,{
 			if(record[0]){
 				return record[0];
 			}
+			
 			return undefined;
 		}
 	},
@@ -4935,7 +3942,7 @@ Object.defineProperties(store,{
 		value : function value(modelName){
 			var model = this.modelFor(modelName), arr;
 			if( !model ){
-				Lyte.error("LD02","Model ",modelName);
+				console.error("No model found for ",modelName);
 				return;
 			}
 			arr= model.data;
@@ -4956,19 +3963,17 @@ Object.defineProperties(store,{
 		value : function value(modelName, key){
 			var data = store.peekRecord(modelName, key);
 			var model = store.modelFor(modelName);
-			var pkVal;
 			if(data){
-				pkVal = data[model._primaryKey];
-				this.$.removeFromStore(model, pkVal, true);
-				for(var i=0; i<model._deleted.length; i++){
-					if(model._deleted[i].$.get(model._primaryKey) == key){
-						model._deleted.splice(i, 1);
-						break;
-					}
+				this.$.removeFromStore(model, data[model._primaryKey], true);
+			}
+			for(var i=0; i<model._deleted.length; i++){
+				if(model._deleted[i].$.get(model._primaryKey) == key){
+					model._deleted.splice(i, 1);
+					break;
 				}
-				if(this.model.cachedRecordQueries && this.model.cachedRecordQueries[modelName] && this.model.cachedRecordQueries[modelName][key]){
-					this.model.cachedRecordQueries[modelName][key] = [];
-				}
+			}
+			if(this.model.cachedRecordQueries && this.model.cachedRecordQueries[modelName] && this.model.cachedRecordQueries[modelName][key]){
+				this.model.cachedRecordQueries[modelName][key] = [];
 			}
 		}
 	},
@@ -4993,11 +3998,11 @@ Object.defineProperties(store,{
 	},
 	triggerAction:{
 		enumerable:false,
-		value:function value(modelName,actionName,customData,qP){
+		value:function value(modelName,actionName,customData){
 			var model = store.modelFor(modelName);
 			var actions = model.actions, action = (actions)?model.actions[actionName]:undefined;
 			if(action){
-				return store.adapter.$.handleAction(actionName,model,store.peekAll(modelName),customData,qP).then(function(data){
+				return store.adapter.$.handleAction(actionName,model,store.peekAll(modelName),customData).then(function(data){
 					return data;
 				},function(err){
 					return Promise.reject(err);
@@ -5042,7 +4047,7 @@ Object.defineProperties(store,{
 	},
 	create : {
 		enumerable : false,
-		value : function value(modelName, recordObject, customData, qP){
+		value : function value(modelName, recordObject, customData){
 			var model = store.modelFor(modelName);
 			if(model == undefined){
 				return Promise.reject({code : "ERR19", message : Lyte.errorCodes.ERR19, data:modelName});
@@ -5061,36 +4066,31 @@ Object.defineProperties(store,{
 				}
 			}
 			if(created.length){
-				return store.adapter.$.create(modelName, created, false, customData, qP);
+				return store.adapter.$.create(modelName, created, false, customData);
 			}
 			return Promise.resolve();
 		}
 	},
 	update : {
 		enumerable : false,
-		value : function value(modelName, customData, qP){
+		value : function value(modelName,customData){
 			var model = this.modelFor(modelName);
 			if(model == undefined){
 				return Promise.reject({code : "ERR19", message : Lyte.errorCodes.ERR19, data : modelName});
 			}
 			var changed = [], recordsChanged = [], pK = model._primaryKey;
-			var records = store.peekAll(modelName);
-			records.forEach(function(item, index){
-				var rec = item;
-				var dirty = rec.$.isDirty();
-				if((rec && rec.$.isModified && !rec.$.isNew) || (dirty && dirty.length)){
+			for(var i=0; i<model.dirty.length; i++){
+				var rec = store.peekRecord(modelName, model.dirty[i]);
+				if(rec && rec.$.isModified && !rec.$.isNew){
 					var attr = rec.$._attributes, obj = {};
 					for(var key in attr){
 						obj[key] = rec.$.get(key);
-					}
-					for(var j=0;j<dirty.length;j++){
-						obj[dirty[j]] = rec[dirty[j]];
 					}
 					obj[pK] = rec.$.get(pK);
 					changed.push(obj);
 					recordsChanged.push(rec);
 				}
-			});
+			}
 			if(changed.length){
 				return store.adapter.$.put(modelName, changed, recordsChanged,false, customData);
 			}
@@ -5099,7 +4099,7 @@ Object.defineProperties(store,{
 	},
 	delete : {
 		enumerable : false,
-		value : function value(modelName, key, customData, qP){
+		value : function value(modelName, key, customData){
 			var model = store.modelFor(modelName);
 			if(model == undefined){
 				return Promise.reject({code : "ERR19", message : Lyte.errorCodes.ERR19,data:modelName});
@@ -5118,13 +4118,11 @@ Object.defineProperties(store,{
 			}
 			if(deleted.length){
 				var pK = model._primaryKey;
-				var prm = store.adapter.$.del(modelName, deleted,undefined,"delete",customData);
-				prm.then(function(resp){
+				return store.adapter.$.del(modelName, deleted,undefined,"delete",customData).then(function(resp){
 					return resp;
 				}, function(e){
 					return Promise.reject(e);
 				});
-				return prm;
 			}
 			return Promise.resolve();
 		}
@@ -5153,7 +4151,7 @@ Object.defineProperties(store,{
 				}
 			}
 			for(var i=0; i<cachedQueries.length; i++){
-				if(this.adapter.$.compareObjects(cachedQueries[i].queryParams, queryParams, true)){
+				if(this.adapter.$.compareObjects(cachedQueries[i].queryParams, queryParams)){
 					cachedQueries.splice(i, 1);
 					break;
 				}

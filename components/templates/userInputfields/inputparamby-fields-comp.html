@@ -6,7 +6,7 @@
                 <img src="components/images/img/logo-man.svg" style="width: 40px;"><br> <label >Creative Crops's</label>
             </div>
             <div class="col s12">
-                <h5 class="left-align">Input Parameter</h5>
+                <h5 class="left-align">Input Parameter </h5>
             </div>
 
             <!--
@@ -14,96 +14,20 @@
                 'Sulphur (S)'
                 'Maganese (M)'       'Calcium (Ca)'       'Boron (B)'       'Magnesium (Mg)'       'Chlorine (Cl)'       'Molybdenum (Mo)'       'Cobalt (Co)-->
 
-
+            <%paran.details.forEach(function(item,inx){%>
             <div class="col s12">
                 <div class="col s12 input-field">
                     <div class="progress">
-                        <div class="determinate" style="width: 30%"></div>
+                        <div class="determinate" style="width: {{item.per}}%"></div>
+                        <div class="determinate" style="width: {{item.per}}%"></div>
                     </div>
-                    <label >Copper (Cu)</label>
-                </div>
-
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 50%"></div>
-                    </div>
-                    <label >Oxygen (O)</label>
-                </div>
-            </div>
-
-            <div class="col s12">
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 70%"></div>
-                    </div>
-                    <label >Iron (Fe)</label>
-                </div>
-
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 45%"></div>
-                    </div>
-                    <label >Potassium (K)</label>
-                </div>
-            </div>
-
-
-            <div class="col s12">
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 60%"></div>
-                    </div>
-                    <label >Maganese (M)</label>
-                </div>
-
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 30%"></div>
-                    </div>
-                    <label>Calcium (Ca)</label>
-                </div>
-            </div>
-
-            <div class="col s12">
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 80%"></div>
-                    </div>
-                    <label >Boron (B)</label>
-                </div>
-
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 60%"></div>
-                    </div>
-                    <label >Magnesium (Mg)</label>
-                </div>
-            </div>
-            <div class="col s12">
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 74%"></div>
-                    </div>
-                    <label >Chlorine (Cl)</label>
-                </div>
-
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 40%"></div>
-                    </div>
-                    <label >Molybdenum (Mo)</label>
-                </div>
-            </div>
-            <div class="col s12">
-                <div class="col s12 input-field">
-                    <div class="progress">
-                        <div class="determinate" style="width: 70%"></div>
-                    </div>
-                    <label >Cobalt (Co)</label>
+                    <label >{{item.name}}</label>
                 </div>
 
 
             </div>
+            <%})%>
+
 
 
 
@@ -122,6 +46,18 @@
 
         </div>
         <div class="col l6 m6 hide-on-small-only center">
+            <ul class="collection with-header left-align">
+
+                    <li class="collection-header"><h4>traditional</h4></li>
+                    <%data.traditional.forEach(function(item,inx){%>
+                    <li class="collection-item" onclick="{{action('traditional',inx)}}"><div>{{item.name}}</div></li>
+                    <%})%>
+                    <li class="collection-header"><h4>advanced</h4></li>
+                    <%data.advanced.forEach(function(item,inx){%>
+                    <li class="collection-item" onclick="{{action('advanced',inx)}}"><div>{{item.name}}</div></li>
+                    <%})%>
+
+            </ul>
             <div style="width: 100%;height: 100px;"></div>
             <img src="components/images/img/logo/biker.svg" class="responsive-img"/>
             <p>
